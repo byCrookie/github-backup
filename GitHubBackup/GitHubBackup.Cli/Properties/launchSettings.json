@@ -12,6 +12,12 @@
       "commandLineArgs": "--destination C:\\Home\\Temp --verbosity Information --quiet false",
       "environmentVariables": {
       }
+    },
+    "GitHubBackup.Cli Help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help",
+      "environmentVariables": {
+      }
     }
   }
 }
