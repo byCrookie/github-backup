@@ -4,7 +4,7 @@ using Polly;
 using Polly.Extensions.Http;
 using Polly.Timeout;
 
-namespace GitHubBackup.Cli.Github.Http;
+namespace GitHubBackup.Core.Github.Http;
 
 internal static class GithubHttpModule
 {

@@ -9,7 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{B58CB078-54A4-40
 		..\.gitignore = ..\.gitignore
 		..\LICENSE = ..\LICENSE
 		..\README.md = ..\README.md
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubBackup.Core", "GitHubBackup.Core\GitHubBackup.Core.csproj", "{94CE06B8-7742-4A37-93CD-662FF98D6DD1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,5 +25,9 @@ Global
 		{0D7535C6-E82C-4014-A684-0FAD400DA383}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D7535C6-E82C-4014-A684-0FAD400DA383}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D7535C6-E82C-4014-A684-0FAD400DA383}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94CE06B8-7742-4A37-93CD-662FF98D6DD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94CE06B8-7742-4A37-93CD-662FF98D6DD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94CE06B8-7742-4A37-93CD-662FF98D6DD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94CE06B8-7742-4A37-93CD-662FF98D6DD1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

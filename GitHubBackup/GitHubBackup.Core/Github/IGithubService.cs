@@ -1,6 +1,6 @@
-using GitHubBackup.Cli.Github.Http;
+using GitHubBackup.Core.Github.Http;
 
-namespace GitHubBackup.Cli.Github;
+namespace GitHubBackup.Core.Github;
 
 internal interface IGithubService
 {

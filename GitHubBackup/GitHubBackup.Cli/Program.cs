@@ -1,7 +1,6 @@
 ﻿using System.CommandLine;
 using GitHubBackup.Cli;
 using GitHubBackup.Cli.Utils;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
