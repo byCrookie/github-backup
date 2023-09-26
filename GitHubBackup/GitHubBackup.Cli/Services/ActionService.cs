@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Hosting;
 
-namespace GitHubBackup.Cli;
+namespace GitHubBackup.Cli.Services;
 
 internal class ActionService : IHostedService
 {

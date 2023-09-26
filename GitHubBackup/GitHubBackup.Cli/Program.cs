@@ -59,8 +59,7 @@ async Task Run(LogLevel verbosity, bool quiet, FileSystemInfo? logFile, Func<Tas
 {
     Log.Logger = CreateLoggerConfiguration(verbosity, logFile, quiet).CreateLogger();
     var builder = Host.CreateApplicationBuilder(args);
-    builder.Services.AddHostedService(sp =>
-        new ActionService(sp.GetRequiredService<IHostApplicationLifetime>(), async () => await action()));
+    builder.Services.AddCli(action);
     builder.Services.AddSerilog();
     var host = builder.Build();
     await host.RunAsync();
