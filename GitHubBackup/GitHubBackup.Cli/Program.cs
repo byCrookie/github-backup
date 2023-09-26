@@ -14,7 +14,6 @@ var quietOption = new Option<bool>(
 
 var logFileOption = new Option<FileInfo?>(
     aliases: new[] { "-l", "--log-file" },
-    getDefaultValue: () => null,
     description: "The path to the log file"
 );
 
