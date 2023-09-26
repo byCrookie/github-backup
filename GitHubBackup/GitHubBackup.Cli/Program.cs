@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using GitHubBackup.Cli;
+using GitHubBackup.Cli.Logging;
 using GitHubBackup.Cli.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -56,7 +57,7 @@ return await rootCommand.InvokeAsync(args);
 
 async Task Run(LogLevel verbosity, bool quiet, FileSystemInfo? logFile, Func<Task> action)
 {
-    Log.Logger = CreateLoggerConfiguration(verbosity, logFile, quiet).CreateLogger();
+    Log.Logger = CliLoggerConfiguration.Create(verbosity, logFile, quiet).CreateLogger();
     var builder = Host.CreateApplicationBuilder(args);
     builder.Services.AddCli(action);
     builder.Services.AddSerilog();
@@ -78,26 +79,3 @@ Task Backup(DirectoryInfo destination, bool interactive)
     return Task.CompletedTask;
 }
 
-LoggerConfiguration CreateLoggerConfiguration(LogLevel logLevel, FileSystemInfo? fileSystemInfo, bool quiet)
-{
-    var configuration = new LoggerConfiguration()
-        .MinimumLevel.Is(logLevel.MicrosoftToSerilogLevel());
-
-    if (fileSystemInfo is not null)
-    {
-        configuration.WriteTo.File(
-            fileSystemInfo.FullName,
-            rollOnFileSizeLimit: true,
-            fileSizeLimitBytes: 100_000_000,
-            retainedFileCountLimit: 10,
-            rollingInterval: RollingInterval.Infinite
-        );
-    }
-
-    if (!quiet)
-    {
-        configuration.WriteTo.Console();
-    }
-
-    return configuration;
-}
