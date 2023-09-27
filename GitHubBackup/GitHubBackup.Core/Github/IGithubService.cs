@@ -1,6 +1,7 @@
 namespace GitHubBackup.Core.Github;
 
-internal interface IGithubService
+public interface IGithubService
 {
-    
+    Task<DeviceAndUserCodesResponse> RequestDeviceAndUserCodesAsync(CancellationToken ct);
+    Task<AccessTokenResponse> PollForAccessTokenAsync(string deviceCode, int interval, CancellationToken ct);
 }

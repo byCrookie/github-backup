@@ -5,10 +5,9 @@ namespace GitHubBackup.Core.Github;
 
 internal static class GithubModule
 {
-   public static IServiceCollection AddGithub(this IServiceCollection services)
+   public static void AddGithub(this IServiceCollection services)
    {
       services.AddGithubHttp();
       services.AddTransient<IGithubService, GithubService>();
-      return services;
    }
 }

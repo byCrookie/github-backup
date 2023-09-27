@@ -16,7 +16,7 @@ internal class CliCommandService : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        await _cliCommand.RunAsync();
+        await _cliCommand.RunAsync(cancellationToken);
         _hostApplicationLifetime.StopApplication();
     }
 

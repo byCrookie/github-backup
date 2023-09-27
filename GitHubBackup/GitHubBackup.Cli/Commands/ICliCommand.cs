@@ -2,5 +2,5 @@
 
 public interface ICliCommand
 {
-    Task RunAsync();
+    Task RunAsync(CancellationToken ct);
 }
