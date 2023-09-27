@@ -1,6 +1,7 @@
+using GitHubBackup.Cli.Commands;
+
 namespace GitHubBackup.Cli.Github;
 
-internal interface IGithubBackup
+internal interface IGithubBackup : ICliCommand
 {
-    public Task BackupAsync();
 }

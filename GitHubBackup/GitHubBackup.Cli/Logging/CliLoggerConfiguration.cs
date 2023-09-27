@@ -1,20 +1,20 @@
+using GitHubBackup.Cli.Options;
 using GitHubBackup.Cli.Utils;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace GitHubBackup.Cli.Logging;
 
 internal static class CliLoggerConfiguration
 {
-    public static LoggerConfiguration Create(LogLevel logLevel, FileSystemInfo? fileSystemInfo, bool quiet)
+    public static LoggerConfiguration Create(GlobalArgs globalArgs)
     {
         var configuration = new LoggerConfiguration()
-            .MinimumLevel.Is(logLevel.MicrosoftToSerilogLevel());
+            .MinimumLevel.Is(globalArgs.Verbosity.MicrosoftToSerilogLevel());
 
-        if (fileSystemInfo is not null)
+        if (globalArgs.LogFile is not null)
         {
             configuration.WriteTo.File(
-                fileSystemInfo.FullName,
+                globalArgs.LogFile.FullName,
                 rollOnFileSizeLimit: true,
                 fileSizeLimitBytes: 100_000_000,
                 retainedFileCountLimit: 10,
@@ -22,7 +22,7 @@ internal static class CliLoggerConfiguration
             );
         }
 
-        if (!quiet)
+        if (!globalArgs.Quiet)
         {
             configuration.WriteTo.Console();
         }

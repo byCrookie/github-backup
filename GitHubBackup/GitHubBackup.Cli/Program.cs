@@ -1,81 +1,36 @@
 ﻿using System.CommandLine;
 using GitHubBackup.Cli;
+using GitHubBackup.Cli.Commands;
+using GitHubBackup.Cli.Github;
 using GitHubBackup.Cli.Logging;
-using GitHubBackup.Cli.Utils;
+using GitHubBackup.Cli.Options;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
-var quietOption = new Option<bool>(
-    aliases: new[] { "-q", "--quiet" },
-    getDefaultValue: () => false,
-    description: "Do not print logs to console"
-);
-
-var logFileOption = new Option<FileInfo?>(
-    aliases: new[] { "-l", "--log-file" },
-    description: "The path to the log file"
-);
-
-var verbosityOption = new Option<LogLevel>(
-    aliases: new[] { "-v", "--verbosity" },
-    getDefaultValue: () => LogLevel.Warning,
-    description: "The verbosity of the logs"
-);
-
-var interactiveOption = new Option<bool>(
-    aliases: new[] { "-i", "--interactive" },
-    getDefaultValue: () => false,
-    description: "Select backup customizations interactively"
-);
-
-var destinationOption = new Option<DirectoryInfo>(
-    aliases: new[] { "-d", "--destination" },
-    getDefaultValue: () => new DirectoryInfo(Directory.GetCurrentDirectory()),
-    description: "The path to put the backup in"
-) { IsRequired = true };
-
 var rootCommand = new RootCommand("Github Backup");
-rootCommand.AddGlobalOption(verbosityOption);
-rootCommand.AddGlobalOption(quietOption);
-rootCommand.AddGlobalOption(logFileOption);
-rootCommand.AddGlobalOption(interactiveOption);
+rootCommand.AddGlobalOption(GlobalArgs.VerbosityOption);
+rootCommand.AddGlobalOption(GlobalArgs.QuietOption);
+rootCommand.AddGlobalOption(GlobalArgs.LogFileOption);
+rootCommand.AddGlobalOption(GlobalArgs.InteractiveOption);
 
-rootCommand.AddOption(destinationOption);
+rootCommand.AddOption(GithubBackupArgs.DestinationOption);
 
 rootCommand.SetHandler(
-    (verbosity, quiet, logFile, interactive, dest) =>
-        Run(verbosity, quiet, logFile, () => Backup(dest, interactive)),
-    verbosityOption,
-    quietOption,
-    logFileOption,
-    interactiveOption,
-    destinationOption
+    (globalArgs, backupArgs) => RunAsync<IGithubBackup>(globalArgs, _ => new GithubBackup(globalArgs, backupArgs)),
+    new GlobalArgsBinder(),
+    new GithubBackupArgsBinder()
 );
 
 return await rootCommand.InvokeAsync(args);
 
-async Task Run(LogLevel verbosity, bool quiet, FileSystemInfo? logFile, Func<Task> action)
+Task RunAsync<TCliCommand>(GlobalArgs globalArgs, Func<IServiceProvider, TCliCommand> factory)
+    where TCliCommand : class, ICliCommand
 {
-    Log.Logger = CliLoggerConfiguration.Create(verbosity, logFile, quiet).CreateLogger();
+    Log.Logger = CliLoggerConfiguration.Create(globalArgs).CreateLogger();
     var builder = Host.CreateApplicationBuilder(args);
-    builder.Services.AddCli(action);
-    builder.Services.AddSerilog();
+    builder.Services.AddTransient(factory);
+    builder.Services.AddCli<TCliCommand>();
     var host = builder.Build();
-    await host.RunAsync();
+    return host.RunAsync();
 }
-
-Task Backup(DirectoryInfo destination, bool interactive)
-{
-    if (interactive)
-    {
-        Console.WriteLine("Do you want to backup? (y/n)");
-        if (!new List<ConsoleKey> { ConsoleKey.Y }.Contains(Console.ReadKey().Key))
-        {
-            return Task.CompletedTask;
-        }
-    }
-
-    return Task.CompletedTask;
-}
-

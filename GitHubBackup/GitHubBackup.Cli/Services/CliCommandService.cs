@@ -1,21 +1,22 @@
+using GitHubBackup.Cli.Commands;
 using Microsoft.Extensions.Hosting;
 
 namespace GitHubBackup.Cli.Services;
 
-internal class ActionService : IHostedService
+internal class CliCommandService : IHostedService
 {
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
-    private readonly Func<Task> _action;
+    private readonly ICliCommand _cliCommand;
 
-    public ActionService(IHostApplicationLifetime hostApplicationLifetime, Func<Task> action)
+    public CliCommandService(IHostApplicationLifetime hostApplicationLifetime, ICliCommand cliCommand)
     {
         _hostApplicationLifetime = hostApplicationLifetime;
-        _action = action;
+        _cliCommand = cliCommand;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        await _action();
+        await _cliCommand.RunAsync();
         _hostApplicationLifetime.StopApplication();
     }
 

@@ -3,7 +3,7 @@
   "profiles": {
     "GitHubBackup.Cli Destination": {
       "commandName": "Project",
-      "commandLineArgs": "--destination C:\\Home\\Temp",
+      "commandLineArgs": "--destination C:\\Home\\Temp -i",
       "environmentVariables": {
       }
     },

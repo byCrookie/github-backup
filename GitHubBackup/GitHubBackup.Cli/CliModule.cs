@@ -1,17 +1,17 @@
-using GitHubBackup.Cli.Github;
+using GitHubBackup.Cli.Commands;
 using GitHubBackup.Cli.Services;
 using GitHubBackup.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace GitHubBackup.Cli;
 
 internal static class CliModule
 {
-    public static IServiceCollection AddCli(this IServiceCollection services, Func<Task> action)
+    public static void AddCli<TCliCommand>(this IServiceCollection services) where TCliCommand : class, ICliCommand
     {
-        services.AddGithub();
         services.AddCore();
-        services.AddServices(action);
-        return services;
+        services.AddServices<TCliCommand>();
+        services.AddSerilog();
     }
 }
