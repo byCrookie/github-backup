@@ -1,8 +1,0 @@
-namespace GithubBackup.Core.Github;
-
-public interface IGithubService
-{
-    Task<User> WhoAmIAsync(string accessToken, CancellationToken ct);
-    Task<DeviceAndUserCodes> RequestDeviceAndUserCodesAsync(CancellationToken ct);
-    Task<AccessToken> PollForAccessTokenAsync(string deviceCode, int interval, CancellationToken ct);
-}

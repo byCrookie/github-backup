@@ -1,4 +1,5 @@
 using GithubBackup.Cli.Commands;
+using GithubBackup.Cli.Github;
 using GithubBackup.Cli.Services;
 using GithubBackup.Core;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,5 +14,6 @@ internal static class CliModule
         services.AddCore();
         services.AddServices<TCliCommand>();
         services.AddSerilog();
+        services.AddGithub();
     }
 }

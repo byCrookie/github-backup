@@ -1,6 +1,6 @@
+using GithubBackup.Cli.Github.GithubCredentials;
 using GithubBackup.Cli.Options;
-using GithubBackup.Core.Github;
-using GithubBackup.Core.TokenStorage;
+using Octokit;
 
 namespace GithubBackup.Cli.Github;
 
@@ -8,45 +8,69 @@ internal class Backup : IBackup
 {
     private readonly GlobalArgs _globalArgs;
     private readonly GithubBackupArgs _backupArgs;
-    private readonly IGithubService _githubService;
-    private readonly ITokenStorageService _tokenStorageService;
+    private readonly IAppSettingsCredentialsStore _appSettingsCredentialsStore;
 
-    public Backup(
-        GlobalArgs globalArgs,
-        GithubBackupArgs backupArgs,
-        IGithubService githubService,
-        ITokenStorageService tokenStorageService)
+    private const string ClientId = "e197b2a7e36e8a0d5ea9";
+
+    public Backup(GlobalArgs globalArgs, GithubBackupArgs backupArgs, IAppSettingsCredentialsStore appSettingsCredentialsStore)
     {
         _globalArgs = globalArgs;
         _backupArgs = backupArgs;
-        _githubService = githubService;
-        _tokenStorageService = tokenStorageService;
+        _appSettingsCredentialsStore = appSettingsCredentialsStore;
     }
 
     public async Task RunAsync(CancellationToken ct)
     {
-        var accessToken = await LoginAsync(ct);
-        Console.WriteLine($"Access token: {accessToken}");
-        var user = await _githubService.WhoAmIAsync(accessToken, ct);
+        var user = await LoginAsync(ct);
         Console.WriteLine($"Hello, {user.Name}!");
+        var githubClient = GetGitHubClient();
+        var repositories = await githubClient.Repository.GetAllForCurrent();
+        foreach (var repository in repositories)
+        {
+            Console.WriteLine($"Backing up {repository.FullName}");
+        }
     }
 
-    private async Task<string> LoginAsync(CancellationToken ct)
+    private static GitHubClient GetGitHubClient()
     {
-        var storedToken = await _tokenStorageService.LoadTokenAsync(ct);
-        
-        if (storedToken is not null)
+        return new GitHubClient(new ProductHeaderValue("github-backup"), new AppSettingsCredentialsesStore());
+    }
+
+    private async Task<User> LoginAsync(CancellationToken ct)
+    {
+        var githubClient = GetGitHubClient();
+
+        try
         {
-            return storedToken;
+            return await githubClient.User.Get(await _appSettingsCredentialsStore.LoadUsernameAsync(ct));
         }
-        
-        var deviceAndUserCodes = await _githubService.RequestDeviceAndUserCodesAsync(ct);
-        Console.WriteLine($"Go to {deviceAndUserCodes.VerificationUri} and enter {deviceAndUserCodes.UserCode} to authenticate.");
-        Console.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
-        var accessToken = await _githubService.PollForAccessTokenAsync(deviceAndUserCodes.DeviceCode, deviceAndUserCodes.Interval, ct);
-        Console.WriteLine($"Access token: {accessToken.Token}");
-        await _tokenStorageService.StoreTokenAsync(accessToken.Token, ct);
-        Console.WriteLine("Access token stored.");
-        return accessToken.Token;
+        catch (Exception)
+        {
+            await LoginAndStoreAsync(ct);
+            return await githubClient.User.Get(await _appSettingsCredentialsStore.LoadUsernameAsync(ct));
+        }
+    }
+
+    private async Task LoginAndStoreAsync(CancellationToken ct)
+    {
+        var user = GetUser();
+        var token = await GetOAuthTokenAsync();
+        await _appSettingsCredentialsStore.StoreUsernameAsync(user, ct);
+        await _appSettingsCredentialsStore.StoreTokenAsync(token.AccessToken, ct);
+    }
+
+    private static string GetUser()
+    {
+        Console.WriteLine("Enter your GitHub username:");
+        var username = Console.ReadLine();
+        return !string.IsNullOrWhiteSpace(username) ? username : throw new Exception("Username cannot be empty");
+    }
+
+    private static async Task<OauthToken> GetOAuthTokenAsync()
+    {
+        var githubClient = new GitHubClient(new ProductHeaderValue("github-backup"));
+        var deviceFlow = await githubClient.Oauth.InitiateDeviceFlow(new OauthDeviceFlowRequest(ClientId));
+        Console.WriteLine($"Visit {deviceFlow.VerificationUri}{Environment.NewLine}and enter {deviceFlow.UserCode}");
+        return await githubClient.Oauth.CreateAccessTokenForDeviceFlow(ClientId, deviceFlow);
     }
 }
