@@ -1,8 +1,8 @@
-using GitHubBackup.Core.Flurl;
-using GitHubBackup.Core.Github;
+using GithubBackup.Core.Flurl;
+using GithubBackup.Core.Github;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GitHubBackup.Core;
+namespace GithubBackup.Core;
 
 public static class CoreModule
 {

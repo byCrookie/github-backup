@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
 
-namespace GitHubBackup.Cli.Utils;
+namespace GithubBackup.Cli.Utils;
 
 internal static class LogLevelExtensions
 {

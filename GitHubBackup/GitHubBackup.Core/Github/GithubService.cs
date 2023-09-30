@@ -2,7 +2,7 @@ using Flurl.Http;
 using Microsoft.Net.Http.Headers;
 using Polly;
 
-namespace GitHubBackup.Core.Github;
+namespace GithubBackup.Core.Github;
 
 internal class GithubService : IGithubService
 {

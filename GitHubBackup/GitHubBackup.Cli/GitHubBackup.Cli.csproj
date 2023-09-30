@@ -30,6 +30,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GitHubBackup.Core\GitHubBackup.Core.csproj" />
+      <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj" />
     </ItemGroup>
 </Project>

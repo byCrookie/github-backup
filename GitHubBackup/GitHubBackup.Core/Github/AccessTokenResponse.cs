@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace GitHubBackup.Core.Github;
+namespace GithubBackup.Core.Github;
 
 public class AccessTokenResponse
 {

@@ -1,8 +1,8 @@
-using GitHubBackup.Cli.Commands;
+using GithubBackup.Cli.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace GitHubBackup.Cli.Services;
+namespace GithubBackup.Cli.Services;
 
 internal static class ServicesModule
 {

@@ -1,7 +1,7 @@
-using GitHubBackup.Core.Github.Http;
+using GithubBackup.Core.Github.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GitHubBackup.Core.Github;
+namespace GithubBackup.Core.Github;
 
 internal static class GithubModule
 {

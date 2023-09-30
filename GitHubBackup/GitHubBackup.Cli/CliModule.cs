@@ -1,10 +1,10 @@
-using GitHubBackup.Cli.Commands;
-using GitHubBackup.Cli.Services;
-using GitHubBackup.Core;
+using GithubBackup.Cli.Commands;
+using GithubBackup.Cli.Services;
+using GithubBackup.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace GitHubBackup.Cli;
+namespace GithubBackup.Cli;
 
 internal static class CliModule
 {

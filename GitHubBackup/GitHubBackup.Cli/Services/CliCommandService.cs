@@ -1,7 +1,7 @@
-using GitHubBackup.Cli.Commands;
+using GithubBackup.Cli.Commands;
 using Microsoft.Extensions.Hosting;
 
-namespace GitHubBackup.Cli.Services;
+namespace GithubBackup.Cli.Services;
 
 internal class CliCommandService : IHostedService
 {

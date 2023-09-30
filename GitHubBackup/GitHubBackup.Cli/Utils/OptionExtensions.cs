@@ -1,7 +1,7 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Parsing;
 
-namespace GitHubBackup.Cli.Utils;
+namespace GithubBackup.Cli.Utils;
 
 public static class OptionExtensions
 {

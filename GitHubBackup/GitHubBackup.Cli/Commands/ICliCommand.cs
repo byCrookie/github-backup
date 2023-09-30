@@ -1,4 +1,4 @@
-﻿namespace GitHubBackup.Cli.Commands;
+﻿namespace GithubBackup.Cli.Commands;
 
 public interface ICliCommand
 {

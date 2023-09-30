@@ -1,10 +1,10 @@
 ﻿using System.CommandLine;
-using GitHubBackup.Cli;
-using GitHubBackup.Cli.Commands;
-using GitHubBackup.Cli.Github;
-using GitHubBackup.Cli.Logging;
-using GitHubBackup.Cli.Options;
-using GitHubBackup.Core.Github;
+using GithubBackup.Cli;
+using GithubBackup.Cli.Commands;
+using GithubBackup.Cli.Github;
+using GithubBackup.Cli.Logging;
+using GithubBackup.Cli.Options;
+using GithubBackup.Core.Github;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -18,9 +18,9 @@ rootCommand.AddGlobalOption(GlobalArgs.InteractiveOption);
 rootCommand.AddOption(GithubBackupArgs.DestinationOption);
 
 rootCommand.SetHandler(
-    (globalArgs, backupArgs) => RunAsync<IGithubBackup>(
+    (globalArgs, backupArgs) => RunAsync<IBackup>(
         globalArgs,
-        s => new GithubBackup(globalArgs, backupArgs, s.GetRequiredService<IGithubService>())
+        s => new Backup(globalArgs, backupArgs, s.GetRequiredService<IGithubService>())
     ),
     new GlobalArgsBinder(),
     new GithubBackupArgsBinder()

@@ -1,7 +1,7 @@
 ﻿using System.CommandLine;
 using Microsoft.Extensions.Logging;
 
-namespace GitHubBackup.Cli.Options;
+namespace GithubBackup.Cli.Options;
 
 public class GlobalArgs
 {

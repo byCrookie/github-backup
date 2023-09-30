@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using Flurl.Http.Configuration;
 
-namespace GitHubBackup.Core.Flurl;
+namespace GithubBackup.Core.Flurl;
 
 public class TextJsonSerializer : ISerializer
 {

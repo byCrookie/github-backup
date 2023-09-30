@@ -1,7 +1,7 @@
 ﻿using Flurl.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GitHubBackup.Core.Flurl;
+namespace GithubBackup.Core.Flurl;
 
 internal static class FlurlModule
 {

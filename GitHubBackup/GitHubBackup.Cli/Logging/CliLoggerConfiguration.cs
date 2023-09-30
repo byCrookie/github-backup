@@ -1,8 +1,8 @@
-using GitHubBackup.Cli.Options;
-using GitHubBackup.Cli.Utils;
+using GithubBackup.Cli.Options;
+using GithubBackup.Cli.Utils;
 using Serilog;
 
-namespace GitHubBackup.Cli.Logging;
+namespace GithubBackup.Cli.Logging;
 
 internal static class CliLoggerConfiguration
 {

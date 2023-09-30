@@ -1,4 +1,4 @@
-namespace GitHubBackup.Core.Github.Http;
+namespace GithubBackup.Core.Github.Http;
 
 internal static class GithubHttpClient
 {

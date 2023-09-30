@@ -1,4 +1,4 @@
-namespace GitHubBackup.Core.Github;
+namespace GithubBackup.Core.Github;
 
 public interface IGithubService
 {

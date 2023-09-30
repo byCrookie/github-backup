@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubBackup.Cli", "GitHubBackup.Cli\GitHubBackup.Cli.csproj", "{0D7535C6-E82C-4014-A684-0FAD400DA383}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubBackup.Cli", "GithubBackup.Cli\GithubBackup.Cli.csproj", "{0D7535C6-E82C-4014-A684-0FAD400DA383}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{B58CB078-54A4-4083-B6DA-B2D1C6E8CE68}"
 	ProjectSection(SolutionItems) = preProject
@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{B58CB078-54A4-40
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitHubBackup.Core", "GitHubBackup.Core\GitHubBackup.Core.csproj", "{94CE06B8-7742-4A37-93CD-662FF98D6DD1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubBackup.Core", "GithubBackup.Core\GithubBackup.Core.csproj", "{94CE06B8-7742-4A37-93CD-662FF98D6DD1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

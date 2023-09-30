@@ -1,6 +1,6 @@
 ﻿using Flurl;
 
-namespace GitHubBackup.Core.Utils;
+namespace GithubBackup.Core.Utils;
 
 public static class QueryParamCollectionExtensions
 {
