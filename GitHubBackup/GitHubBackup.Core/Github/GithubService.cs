@@ -8,17 +8,35 @@ internal class GithubService : IGithubService
 {
     private const string ClientId = "e197b2a7e36e8a0d5ea9";
 
-    public Task<DeviceAndUserCodesResponse> RequestDeviceAndUserCodesAsync(CancellationToken ct)
+    public async Task<User> WhoAmIAsync(string accessToken, CancellationToken ct)
     {
-        const string scope = "repo,read:user,read:org";
+        var response = await "https://api.github.com/user"
+            .WithHeader(HeaderNames.Accept, "application/vnd.github.v3+json")
+            .WithOAuthBearerToken(accessToken)
+            .GetJsonAsync<UserResponse>(ct);
 
-        return "https://github.com/login/device/code"
+        return new User(response.Login, response.Name, response.Email);
+    }
+
+    public async Task<DeviceAndUserCodes> RequestDeviceAndUserCodesAsync(CancellationToken ct)
+    {
+        const string scope = "";
+
+        var response = await "https://github.com/login/device/code"
             .WithHeader(HeaderNames.Accept, "application/json")
             .PostJsonAsync(new { client_id = ClientId, scope }, ct)
             .ReceiveJson<DeviceAndUserCodesResponse>();
+
+        return new DeviceAndUserCodes(
+            response.DeviceCode,
+            response.UserCode,
+            response.VerificationUri,
+            response.ExpiresIn,
+            response.Interval
+        );
     }
 
-    public Task<AccessTokenResponse> PollForAccessTokenAsync(string deviceCode, int interval, CancellationToken ct)
+    public async Task<AccessToken> PollForAccessTokenAsync(string deviceCode, int interval, CancellationToken ct)
     {
         const string grantType = "urn:ietf:params:oauth:grant-type:device_code";
 
@@ -28,10 +46,12 @@ internal class GithubService : IGithubService
             .HandleResult<AccessTokenResponse>(response => !string.IsNullOrWhiteSpace(response.Error))
             .RetryForeverAsync(response => OnRetryAsync(response.Result, currentInterval, ct));
 
-        return policy.ExecuteAsync(() => "https://github.com/login/oauth/access_token"
+        var accessTokenResponse = await policy.ExecuteAsync(() => "https://github.com/login/oauth/access_token"
             .WithHeader(HeaderNames.Accept, "application/json")
             .PostJsonAsync(new { client_id = ClientId, device_code = deviceCode, grant_type = grantType }, ct)
             .ReceiveJson<AccessTokenResponse>());
+
+        return new AccessToken(accessTokenResponse.AccessToken!, accessTokenResponse.TokenType!, accessTokenResponse.Scope!);
     }
 
     private static async Task OnRetryAsync(AccessTokenResponse response, IntervalWrapper intervalWrapper, CancellationToken ct)

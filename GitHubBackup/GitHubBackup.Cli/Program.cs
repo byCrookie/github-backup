@@ -5,6 +5,7 @@ using GithubBackup.Cli.Github;
 using GithubBackup.Cli.Logging;
 using GithubBackup.Cli.Options;
 using GithubBackup.Core.Github;
+using GithubBackup.Core.TokenStorage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -20,7 +21,11 @@ rootCommand.AddOption(GithubBackupArgs.DestinationOption);
 rootCommand.SetHandler(
     (globalArgs, backupArgs) => RunAsync<IBackup>(
         globalArgs,
-        s => new Backup(globalArgs, backupArgs, s.GetRequiredService<IGithubService>())
+        s => new Backup(
+            globalArgs,
+            backupArgs,
+            s.GetRequiredService<IGithubService>(),
+            s.GetRequiredService<ITokenStorageService>())
     ),
     new GlobalArgsBinder(),
     new GithubBackupArgsBinder()
