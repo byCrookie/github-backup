@@ -1,6 +1,9 @@
 ﻿using Flurl.Http;
-using GithubBackup.Core.Flurl;
-using Microsoft.Net.Http.Headers;
+using GithubBackup.Core.Github.Authentication;
+using GithubBackup.Core.Github.Flurl;
+using GithubBackup.Core.Github.Migrations;
+using GithubBackup.Core.Github.Repositories;
+using GithubBackup.Core.Github.Users;
 using Polly;
 
 namespace GithubBackup.Core.Github;
@@ -8,35 +11,23 @@ namespace GithubBackup.Core.Github;
 internal class GithubService : IGithubService
 {
     private const string ClientId = "e197b2a7e36e8a0d5ea9";
-    private const string AcceptGithubV3Json = "application/vnd.github.v3+json";
-    private const string AcceptGithubJson = "application/vnd.github+json";
-    private const string AcceptJson = "application/json";
-    private const string BaseUrl = "https://github.com";
-    private const string ApiBaseUrl = "https://api.github.com";
-    private const string UserAgent = "github-backup";
-
-    public async Task<Migration> StartMigrationAsync(string accessToken, IReadOnlyCollection<string> repositories, CancellationToken ct)
+    
+    public async Task<Migration> StartMigrationAsync(StartMigrationOptions options, CancellationToken ct)
     {
-        var request = new MigrationRequest(repositories);
+        var request = new MigrationRequest(options.Repositories);
         
-        var response = await $"{ApiBaseUrl}/user/migrations"
-            .WithHeader(HeaderNames.UserAgent, UserAgent)
-            .WithHeader(HeaderNames.Accept, AcceptGithubJson)
-            .WithOAuthBearerToken(accessToken)
-            .PostJsonAsync(request, ct);
+        var response = await "/user/migrations"
+            .PostJsonGithubApiAsync(request, ct)
+            .ReceiveJson<MigrationReponse>();
 
-        var parsed = await response.GetJsonAsync<MigrationReponse>();
-
-        return new Migration(parsed.Id);
+        return new Migration(response.Id);
     }
 
-    public async Task<User> WhoAmIAsync(string accessToken, CancellationToken ct)
+    public async Task<User> WhoAmIAsync(CancellationToken ct)
     {
-        var response = await $"{ApiBaseUrl}/user"
-            .WithHeader(HeaderNames.UserAgent, UserAgent)
-            .WithHeader(HeaderNames.Accept, AcceptGithubJson)
-            .WithOAuthBearerToken(accessToken)
-            .GetJsonAsync<UserResponse>(ct);
+        var response = await "/user"
+            .GetGithubApiAsync(ct)
+            .ReceiveJson<UserResponse>();
 
         return new User(response.Login, response.Name);
     }
@@ -45,10 +36,8 @@ internal class GithubService : IGithubService
     {
         const string scope = "repo user user:email read:user";
 
-        var response = await $"{BaseUrl}/login/device/code"
-            .WithHeader(HeaderNames.UserAgent, UserAgent)
-            .WithHeader(HeaderNames.Accept, AcceptJson)
-            .PostJsonAsync(new { client_id = ClientId, scope }, ct)
+        var response = await "/login/device/code"
+            .PostJsonGithubWebAsync(new { client_id = ClientId, scope }, ct)
             .ReceiveJson<DeviceAndUserCodesResponse>();
 
         return new DeviceAndUserCodes(
@@ -70,22 +59,17 @@ internal class GithubService : IGithubService
             .HandleResult<AccessTokenResponse>(response => !string.IsNullOrWhiteSpace(response.Error))
             .RetryForeverAsync(response => OnRetryAsync(response.Result, currentInterval, ct));
 
-        var response = await policy.ExecuteAsync(() => $"{BaseUrl}/login/oauth/access_token"
-            .WithHeader(HeaderNames.UserAgent, UserAgent)
-            .WithHeader(HeaderNames.Accept, AcceptJson)
-            .PostJsonAsync(new { client_id = ClientId, device_code = deviceCode, grant_type = grantType }, ct)
+        var response = await policy.ExecuteAsync(() => "/login/oauth/access_token"
+            .PostJsonGithubWebAsync(new { client_id = ClientId, device_code = deviceCode, grant_type = grantType }, ct)
             .ReceiveJson<AccessTokenResponse>());
 
         return new AccessToken(response.AccessToken!, response.TokenType!, response.Scope!);
     }
 
-    public async Task<IReadOnlyCollection<Repository>> GetRepositoriesAsync(string accessToken, CancellationToken ct)
+    public async Task<IReadOnlyCollection<Repository>> GetRepositoriesAsync(CancellationToken ct)
     {
-        var response = await $"{ApiBaseUrl}/user/repos"
-            .WithHeader(HeaderNames.UserAgent, UserAgent)
-            .WithHeader(HeaderNames.Accept, AcceptGithubV3Json)
-            .WithOAuthBearerToken(accessToken)
-            .GetGithubPagedJsonAsync<List<RepositoryResponse>, RepositoryResponse>(100, r => r, ct);
+        var response = await "/user/repos"
+            .GetJsonGithubApiPagedAsync<List<RepositoryResponse>, RepositoryResponse>(100, r => r, ct);
 
         return new List<Repository>(response.Select(r => new Repository(r.FullName)));
     }

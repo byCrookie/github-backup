@@ -1,3 +1,3 @@
-﻿namespace GithubBackup.Core.Github;
+﻿namespace GithubBackup.Core.Github.Users;
 
 public record User(string Login, string Name);

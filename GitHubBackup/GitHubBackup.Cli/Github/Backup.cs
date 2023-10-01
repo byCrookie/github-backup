@@ -1,6 +1,8 @@
 using GithubBackup.Cli.Github.Credentials;
 using GithubBackup.Cli.Options;
 using GithubBackup.Core.Github;
+using GithubBackup.Core.Github.Migrations;
+using GithubBackup.Core.Github.Users;
 
 namespace GithubBackup.Cli.Github;
 
@@ -28,14 +30,7 @@ internal class Backup : IBackup
         var user = await LoginAsync(ct);
         Console.WriteLine($"Logged in as {user.Name}");
         
-        var token = await _credentialStore.LoadTokenAsync(ct);
-
-        if (string.IsNullOrWhiteSpace(token))
-        {
-            throw new InvalidOperationException("No token found.");
-        }
-        
-        var repositories = await _githubService.GetRepositoriesAsync(token, ct);
+        var repositories = await _githubService.GetRepositoriesAsync(ct);
 
         if (!repositories.Any())
         {
@@ -54,29 +49,26 @@ internal class Backup : IBackup
             return;
         }
 
-        await _githubService.StartMigrationAsync(token, repositories.Select(r => r.FullName).ToList(), ct);
+        await _githubService.StartMigrationAsync(new StartMigrationOptions(repositories.Select(r => r.FullName).ToList()), ct);
     }
     
     private async Task<User> LoginAsync(CancellationToken ct)
     {
         try
         {
-            var loadedToken = await _credentialStore.LoadTokenAsync(ct);
+            var token = await _credentialStore.LoadTokenAsync(ct);
 
-            if (string.IsNullOrWhiteSpace(loadedToken))
+            if (string.IsNullOrWhiteSpace(token))
             {
                 await LoginAndStoreAsync(ct);
-                var newToken = await _credentialStore.LoadTokenAsync(ct);
-                return await _githubService.WhoAmIAsync(newToken!, ct);
             }
             
-            return await _githubService.WhoAmIAsync(loadedToken, ct);
+            return await _githubService.WhoAmIAsync(ct);
         }
         catch (Exception)
         {
             await LoginAndStoreAsync(ct);
-            var newToken = await _credentialStore.LoadTokenAsync(ct);
-            return await _githubService.WhoAmIAsync(newToken!, ct);
+            return await _githubService.WhoAmIAsync(ct);
         }
     }
 

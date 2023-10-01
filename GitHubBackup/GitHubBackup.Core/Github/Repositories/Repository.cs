@@ -1,13 +1,13 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace GithubBackup.Core.Github;
+namespace GithubBackup.Core.Github.Repositories;
 
-internal class RepositoryResponse
+public class Repository
 {
     [JsonPropertyName("full_name")]
     public string FullName { get; }
     
-    public RepositoryResponse(string fullName)
+    public Repository(string fullName)
     {
         FullName = fullName;
     }

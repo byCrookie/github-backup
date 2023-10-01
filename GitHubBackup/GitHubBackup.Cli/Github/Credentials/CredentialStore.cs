@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using GithubBackup.Core.Github.Credentials;
 
 namespace GithubBackup.Cli.Github.Credentials;
 
@@ -10,6 +11,7 @@ public class CredentialStore : ICredentialStore
 
     public Task StoreTokenAsync(string accessToken, CancellationToken ct)
     {
+        GithubTokenStore.Set(accessToken);
         var path = GetPath();
         Directory.CreateDirectory(path);
         var encryptedToken = EncryptString(accessToken, Key, Salt);
@@ -24,9 +26,12 @@ public class CredentialStore : ICredentialStore
         if (File.Exists(filePath))
         {
             var encryptedToken = await File.ReadAllTextAsync(filePath, ct);
-            return DecryptString(encryptedToken, Key, Salt);
+            var decryptedToken = DecryptString(encryptedToken, Key, Salt);
+            GithubTokenStore.Set(decryptedToken);
+            return decryptedToken;
         }
 
+        GithubTokenStore.Set(null);
         return null;
     }
 

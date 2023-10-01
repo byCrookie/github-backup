@@ -21,6 +21,7 @@
         <PackageReference Include="Serilog.Sinks.File" />
         <PackageReference Include="System.CommandLine" />
         <PackageReference Include="System.CommandLine.Hosting" />
+        <PackageReference Include="System.Threading.RateLimiting" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,4 @@
-﻿namespace GithubBackup.Core.Github;
+﻿namespace GithubBackup.Core.Github.Authentication;
 
 public class IntervalWrapper
 {
