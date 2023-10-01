@@ -28,7 +28,8 @@ rootCommand.SetHandler(
     new GithubBackupArgsBinder()
 );
 
-return await rootCommand.InvokeAsync(args);
+await rootCommand.InvokeAsync(args);
+return Environment.ExitCode;
 
 Task RunAsync<TCliCommand>(GlobalArgs globalArgs, Func<IServiceProvider, TCliCommand> factory)
     where TCliCommand : class, ICliCommand

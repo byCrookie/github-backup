@@ -1,3 +1,4 @@
+using Flurl.Http;
 using GithubBackup.Cli.Commands;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,9 +27,18 @@ internal class CliCommandService : IHostedService
         {
             await _cliCommand.RunAsync(cancellationToken);
         }
+        catch (FlurlHttpException e)
+        {
+            var error = await e.GetResponseStringAsync();
+            _logger.LogCritical(e, "Unhandled exception (Command: {Type}):{NewLine}{Message}",
+                _cliCommand.GetType().Name, Environment.NewLine, error);
+            Environment.ExitCode = 1;
+        }
         catch (Exception e)
         {
-            _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}", _cliCommand.GetType().Name, e.Message);
+            _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}",
+                _cliCommand.GetType().Name, e.Message);
+            Environment.ExitCode = 1;
         }
 
         _hostApplicationLifetime.StopApplication();
