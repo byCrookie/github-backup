@@ -43,7 +43,7 @@ internal class Backup : IBackup
             return;
         }
         
-        Console.WriteLine("Found the following repositories:");
+        Console.WriteLine($"Found {repositories.Count} repositories:");
         foreach (var repository in repositories)
         {
             Console.WriteLine($"- {repository.FullName}");
@@ -53,6 +53,8 @@ internal class Backup : IBackup
         {
             return;
         }
+
+        await _githubService.StartMigrationAsync(token, repositories.Select(r => r.FullName).ToList(), ct);
     }
     
     private async Task<User> LoginAsync(CancellationToken ct)

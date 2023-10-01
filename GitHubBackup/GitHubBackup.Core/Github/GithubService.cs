@@ -1,4 +1,5 @@
 ﻿using Flurl.Http;
+using GithubBackup.Core.Flurl;
 using Microsoft.Net.Http.Headers;
 using Polly;
 
@@ -13,6 +14,21 @@ internal class GithubService : IGithubService
     private const string BaseUrl = "https://github.com";
     private const string ApiBaseUrl = "https://api.github.com";
     private const string UserAgent = "github-backup";
+
+    public async Task<Migration> StartMigrationAsync(string accessToken, IReadOnlyCollection<string> repositories, CancellationToken ct)
+    {
+        var request = new MigrationRequest(repositories);
+        
+        var response = await $"{ApiBaseUrl}/user/migrations"
+            .WithHeader(HeaderNames.UserAgent, UserAgent)
+            .WithHeader(HeaderNames.Accept, AcceptGithubJson)
+            .WithOAuthBearerToken(accessToken)
+            .PostJsonAsync(request, ct);
+
+        var parsed = await response.GetJsonAsync<MigrationReponse>();
+
+        return new Migration(parsed.Id);
+    }
 
     public async Task<User> WhoAmIAsync(string accessToken, CancellationToken ct)
     {
@@ -69,7 +85,7 @@ internal class GithubService : IGithubService
             .WithHeader(HeaderNames.UserAgent, UserAgent)
             .WithHeader(HeaderNames.Accept, AcceptGithubV3Json)
             .WithOAuthBearerToken(accessToken)
-            .GetJsonAsync<List<RepositoryResponse>>(ct);
+            .GetGithubPagedJsonAsync<List<RepositoryResponse>, RepositoryResponse>(100, r => r, ct);
 
         return new List<Repository>(response.Select(r => new Repository(r.FullName)));
     }
