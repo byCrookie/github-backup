@@ -29,7 +29,32 @@ internal class GithubService : IGithubService
             .PostJsonGithubApiAsync(request, ct)
             .ReceiveJson<MigrationReponse>();
 
-        return new Migration(response.Id);
+        return new Migration(response.Id, response.Repositories.Select(r => new Repository(r.FullName)).ToList(), response.State, response.Url);
+    }
+    
+    public async Task<List<Migration>> GetMigrationsAsync(CancellationToken ct)
+    {
+        var response = await "/user/migrations"
+            .GetGithubApiAsync(ct)
+            .ReceiveJson<List<MigrationReponse>>();
+
+        return response.Select(m => new Migration(m.Id, m.Repositories.Select(r => new Repository(r.FullName)).ToList(), m.State, m.Url)).ToList();
+    }
+    
+    public async Task<Migration> GetMigrationAsync(long id, CancellationToken ct)
+    {
+        var response = await $"/user/migrations/{id}"
+            .GetGithubApiAsync(ct)
+            .ReceiveJson<MigrationReponse>();
+
+        return new Migration(response.Id, response.Repositories.Select(r => new Repository(r.FullName)).ToList(), response.State, response.Url);
+    }
+
+    public Task<string> DownloadMigrationAsync(long id, DirectoryInfo destination, CancellationToken ct)
+    {
+        var fileName = $"{DateTime.Now:yyyyMMddHHmmss}_migration_{id}.tar.gz";
+        return $"/user/migrations/{id}/archive"
+            .DownloadFileGithubApiAsync(destination.FullName, fileName);
     }
 
     public async Task<User> WhoAmIAsync(CancellationToken ct)

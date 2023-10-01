@@ -46,6 +46,19 @@ public static class GithubFlurlExtensions
             );
     }
     
+    public static Task<string> DownloadFileGithubApiAsync(
+        this string urlSegments,
+        string localFolderPath,
+        string? localFileName = null,
+        int bufferSize = 4096,
+        CancellationToken? ct = null)
+    {
+        return ApiClient
+            .Request(urlSegments)
+            .WithOAuthBearerToken(GithubTokenStore.Get())
+            .DownloadFileAsync(localFolderPath, localFileName, bufferSize, ct ?? CancellationToken.None);
+    }
+    
     public static Task<IFlurlResponse> GetGithubApiAsync(
         this string urlSegments,
         CancellationToken? ct = null,

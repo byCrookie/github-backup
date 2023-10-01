@@ -29,27 +29,53 @@ internal class Backup : IBackup
     {
         var user = await LoginAsync(ct);
         Console.WriteLine($"Logged in as {user.Name}");
-        
-        var repositories = await _githubService.GetRepositoriesAsync(ct);
 
-        if (!repositories.Any())
+        if (ContinuePrompt(_globalArgs, "Do you want to start a migration?"))
         {
-            Console.WriteLine("No repositories found.");
+            var repositories = await _githubService.GetRepositoriesAsync(ct);
+
+            if (!repositories.Any())
+            {
+                Console.WriteLine("No repositories found.");
+                return;
+            }
+        
+            Console.WriteLine($"Found {repositories.Count} repositories:");
+            foreach (var repository in repositories)
+            {
+                Console.WriteLine($"- {repository.FullName}");
+            }
+
+            if (!ContinuePrompt(_globalArgs, "Do you want to backup these repositories?"))
+            {
+                return;
+            }
+
+            await _githubService.StartMigrationAsync(new StartMigrationOptions(repositories.Select(r => r.FullName).ToList()), ct);
+        }
+        
+        var migrations = await _githubService.GetMigrationsAsync(ct);
+        
+        if (!migrations.Any())
+        {
+            Console.WriteLine("No migrations found.");
             return;
         }
         
-        Console.WriteLine($"Found {repositories.Count} repositories:");
-        foreach (var repository in repositories)
+        Console.WriteLine($"Found {migrations.Count} migrations:");
+        foreach (var migration in migrations)
         {
-            Console.WriteLine($"- {repository.FullName}");
+            var status = await _githubService.GetMigrationAsync(migration.Id, ct);
+            Console.WriteLine($"- {status.Id} ({status.State})");
+            
+            if (status.State == "exported" && !ContinuePrompt(_globalArgs, "Do you want to download this migration?"))
+            {
+                continue;
+            }
+            
+            var file =await _githubService.DownloadMigrationAsync(status.Id, _backupArgs.Destination, ct);
+            Console.WriteLine($"Downloaded {file}");
         }
-
-        if (!ContinuePrompt(_globalArgs, "Do you want to backup these repositories?"))
-        {
-            return;
-        }
-
-        await _githubService.StartMigrationAsync(new StartMigrationOptions(repositories.Select(r => r.FullName).ToList()), ct);
     }
     
     private async Task<User> LoginAsync(CancellationToken ct)
