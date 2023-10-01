@@ -1,4 +1,4 @@
-﻿using GithubBackup.Cli.Github.GithubCredentials;
+﻿using GithubBackup.Cli.Github.Credentials;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GithubBackup.Cli.Github;

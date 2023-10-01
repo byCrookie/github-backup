@@ -1,41 +1,12 @@
 ﻿using System.Security.Cryptography;
-using Octokit;
 
-namespace GithubBackup.Cli.Github.GithubCredentials;
+namespace GithubBackup.Cli.Github.Credentials;
 
-public class AppSettingsCredentialsesStore : ICredentialStore, IAppSettingsCredentialsStore
+public class CredentialStore : ICredentialStore
 {
     private const string Key = "LBaZO3iFnF";
     private const string Salt = "fqCKmp5nwk";
     private const string TokenFileName = ".token";
-    private const string UserFileName = ".user";
-        
-    public async Task<Credentials> GetCredentials()
-    {
-        var token = await LoadTokenAsync(CancellationToken.None);
-        var exception = new Exception($"Populate the credential store first using {nameof(IAppSettingsCredentialsStore)}");
-        return !string.IsNullOrWhiteSpace(token) ? new Credentials(token) : throw exception;
-    }
-
-    public Task StoreUsernameAsync(string user, CancellationToken ct)
-    {
-        var path = GetPath();
-        Directory.CreateDirectory(path);
-        return File.WriteAllTextAsync(Path.Combine(path, UserFileName), user, ct);
-    }
-
-    public async Task<string?> LoadUsernameAsync(CancellationToken ct)
-    {
-        var path = GetPath();
-        var filePath = Path.Combine(path, UserFileName);
-
-        if (File.Exists(filePath))
-        {
-            return await File.ReadAllTextAsync(filePath, ct);
-        }
-
-        return null;
-    }
 
     public Task StoreTokenAsync(string accessToken, CancellationToken ct)
     {
