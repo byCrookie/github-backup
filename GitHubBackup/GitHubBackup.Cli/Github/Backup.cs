@@ -1,5 +1,6 @@
 using GithubBackup.Cli.Github.GithubCredentials;
 using GithubBackup.Cli.Options;
+using GithubBackup.Cli.Utils;
 using Octokit;
 
 namespace GithubBackup.Cli.Github;
@@ -22,13 +23,21 @@ internal class Backup : IBackup
     public async Task RunAsync(CancellationToken ct)
     {
         var user = await LoginAsync(ct);
-        Console.WriteLine($"Hello, {user.Name}!");
+        Console.WriteLine($"Logged in as {user.Name} - {user.Login} ({user.Email})");
         var githubClient = GetGitHubClient();
         var repositories = await githubClient.Repository.GetAllForCurrent();
         foreach (var repository in repositories)
         {
             Console.WriteLine($"Backing up {repository.FullName}");
         }
+
+        if (!ContinuePrompt(_globalArgs, "Do you want to continue?"))
+        {
+            return;
+        }
+
+        var migration = await githubClient.Migration.Migrations
+            .Start(user.Name, new StartMigrationRequest(repositories.Select(r => r.FullName).ToList()));
     }
 
     private static GitHubClient GetGitHubClient()
@@ -69,8 +78,23 @@ internal class Backup : IBackup
     private static async Task<OauthToken> GetOAuthTokenAsync()
     {
         var githubClient = new GitHubClient(new ProductHeaderValue("github-backup"));
-        var deviceFlow = await githubClient.Oauth.InitiateDeviceFlow(new OauthDeviceFlowRequest(ClientId));
+        var flowRequest = new OauthDeviceFlowRequest(ClientId);
+        flowRequest.Scopes.AddAll(new[] { "repo", "user" });
+        var deviceFlow = await githubClient.Oauth.InitiateDeviceFlow(flowRequest);
         Console.WriteLine($"Visit {deviceFlow.VerificationUri}{Environment.NewLine}and enter {deviceFlow.UserCode}");
         return await githubClient.Oauth.CreateAccessTokenForDeviceFlow(ClientId, deviceFlow);
+    }
+    
+    private static bool ContinuePrompt(GlobalArgs globalArgs, string message)
+    {
+        if (globalArgs.Interactive)
+        {
+            Console.WriteLine($"{message} (y/n)");
+            var key = Console.ReadKey();
+            Console.WriteLine();
+            return key.Key == ConsoleKey.Y;
+        }
+
+        return false;
     }
 }
