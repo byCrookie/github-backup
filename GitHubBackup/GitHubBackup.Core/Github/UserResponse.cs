@@ -9,14 +9,10 @@ public class UserResponse
     
     [JsonPropertyName("name")]
     public string Name { get; set; }
-    
-    [JsonPropertyName("email")]
-    public string Email { get; set; }
 
-    public UserResponse(string login, string name, string email)
+    public UserResponse(string login, string name)
     {
         Login = login;
         Name = name;
-        Email = email;
     }
 }

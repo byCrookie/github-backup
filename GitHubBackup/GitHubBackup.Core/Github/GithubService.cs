@@ -12,15 +12,17 @@ internal class GithubService : IGithubService
     private const string AcceptJson = "application/json";
     private const string BaseUrl = "https://github.com";
     private const string ApiBaseUrl = "https://api.github.com";
+    private const string UserAgent = "github-backup";
 
     public async Task<User> WhoAmIAsync(string accessToken, CancellationToken ct)
     {
         var response = await $"{ApiBaseUrl}/user"
+            .WithHeader(HeaderNames.UserAgent, UserAgent)
             .WithHeader(HeaderNames.Accept, AcceptGithubJson)
             .WithOAuthBearerToken(accessToken)
             .GetJsonAsync<UserResponse>(ct);
 
-        return new User(response.Login, response.Name, response.Email);
+        return new User(response.Login, response.Name);
     }
 
     public async Task<DeviceAndUserCodes> RequestDeviceAndUserCodesAsync(CancellationToken ct)
@@ -28,6 +30,7 @@ internal class GithubService : IGithubService
         const string scope = "repo user user:email read:user";
 
         var response = await $"{BaseUrl}/login/device/code"
+            .WithHeader(HeaderNames.UserAgent, UserAgent)
             .WithHeader(HeaderNames.Accept, AcceptJson)
             .PostJsonAsync(new { client_id = ClientId, scope }, ct)
             .ReceiveJson<DeviceAndUserCodesResponse>();
@@ -52,6 +55,7 @@ internal class GithubService : IGithubService
             .RetryForeverAsync(response => OnRetryAsync(response.Result, currentInterval, ct));
 
         var response = await policy.ExecuteAsync(() => $"{BaseUrl}/login/oauth/access_token"
+            .WithHeader(HeaderNames.UserAgent, UserAgent)
             .WithHeader(HeaderNames.Accept, AcceptJson)
             .PostJsonAsync(new { client_id = ClientId, device_code = deviceCode, grant_type = grantType }, ct)
             .ReceiveJson<AccessTokenResponse>());
@@ -62,6 +66,7 @@ internal class GithubService : IGithubService
     public async Task<IReadOnlyCollection<Repository>> GetRepositoriesAsync(string accessToken, CancellationToken ct)
     {
         var response = await $"{ApiBaseUrl}/user/repos"
+            .WithHeader(HeaderNames.UserAgent, UserAgent)
             .WithHeader(HeaderNames.Accept, AcceptGithubV3Json)
             .WithOAuthBearerToken(accessToken)
             .GetJsonAsync<List<RepositoryResponse>>(ct);

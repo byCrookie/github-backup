@@ -26,7 +26,7 @@ internal class Backup : IBackup
     public async Task RunAsync(CancellationToken ct)
     {
         var user = await LoginAsync(ct);
-        Console.WriteLine($"Logged in as {user.Name} - {user.Login} ({user.Email})");
+        Console.WriteLine($"Logged in as {user.Name}");
         
         var token = await _credentialStore.LoadTokenAsync(ct);
 
