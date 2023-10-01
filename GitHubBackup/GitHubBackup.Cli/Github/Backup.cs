@@ -98,6 +98,6 @@ internal class Backup : IBackup
             return key.Key == ConsoleKey.Y;
         }
 
-        return false;
+        return true;
     }
 }

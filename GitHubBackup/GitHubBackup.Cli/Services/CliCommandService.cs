@@ -1,22 +1,36 @@
 using GithubBackup.Cli.Commands;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace GithubBackup.Cli.Services;
 
 internal class CliCommandService : IHostedService
 {
+    private readonly ILogger<CliCommandService> _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly ICliCommand _cliCommand;
 
-    public CliCommandService(IHostApplicationLifetime hostApplicationLifetime, ICliCommand cliCommand)
+    public CliCommandService(
+        ILogger<CliCommandService> logger,
+        IHostApplicationLifetime hostApplicationLifetime,
+        ICliCommand cliCommand)
     {
+        _logger = logger;
         _hostApplicationLifetime = hostApplicationLifetime;
         _cliCommand = cliCommand;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        await _cliCommand.RunAsync(cancellationToken);
+        try
+        {
+            await _cliCommand.RunAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}", _cliCommand.GetType().Name, e.Message);
+        }
+
         _hostApplicationLifetime.StopApplication();
     }
 
