@@ -1,4 +1,5 @@
-﻿using Flurl.Http;
+﻿using Flurl;
+using Flurl.Http;
 using Flurl.Http.Content;
 using GithubBackup.Core.Flurl;
 using GithubBackup.Core.Github.Credentials;
@@ -27,13 +28,13 @@ public static class GithubFlurlExtensions
         .WithHeader(HeaderNames.Accept, Accept);
 
     public static Task<List<TItem>> GetJsonGithubApiPagedAsync<TReponse, TItem>(
-        this string urlSegments,
+        this Url url,
         int perPage,
         Func<TReponse, List<TItem>> getItems,
         CancellationToken ct)
     {
         return ApiClient
-            .Request(urlSegments)
+            .Request(url)
             .WithOAuthBearerToken(GithubTokenStore.Get())
             .SetQueryParam("per_page", perPage)
             .GetPagedJsonAsync(

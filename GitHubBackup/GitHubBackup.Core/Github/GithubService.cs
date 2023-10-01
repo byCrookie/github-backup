@@ -1,4 +1,5 @@
-﻿using Flurl.Http;
+﻿using Flurl;
+using Flurl.Http;
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Flurl;
 using GithubBackup.Core.Github.Migrations;
@@ -77,6 +78,7 @@ internal class GithubService : IGithubService
     public async Task<IReadOnlyCollection<Repository>> GetRepositoriesAsync(CancellationToken ct)
     {
         var response = await "/user/repos"
+            .SetQueryParam("affiliation", "owner")
             .GetJsonGithubApiPagedAsync<List<RepositoryResponse>, RepositoryResponse>(100, r => r, ct);
 
         return new List<Repository>(response.Select(r => new Repository(r.FullName)));
