@@ -40,7 +40,7 @@ public static class GithubFlurlExtensions
                 getItems,
                 (_, _, items) => items.Count == perPage,
                 (rq, index) => rq.SetQueryParam("page", index + 1),
-                (rq, cancellationToken) => SendGithubAsync(rq, HttpMethod.Get, null, cancellationToken),
+                (rq, cancellationToken) => SendGithubApiAsync(rq, HttpMethod.Get, null, cancellationToken),
                 ct
             );
     }
@@ -54,7 +54,7 @@ public static class GithubFlurlExtensions
             .Request(urlSegments)
             .WithOAuthBearerToken(GithubTokenStore.Get());
 
-        return SendGithubAsync(request, HttpMethod.Get, null, ct, completionOption);
+        return SendGithubApiAsync(request, HttpMethod.Get, null, ct, completionOption);
     }
 
     public static Task<IFlurlResponse> PostJsonGithubApiAsync(
@@ -67,7 +67,8 @@ public static class GithubFlurlExtensions
             .Request(urlSegments)
             .WithOAuthBearerToken(GithubTokenStore.Get());
         
-        return PostJsonGithubAsync(request, data, ct, completionOption);
+        var content = new CapturedJsonContent(request.Settings.JsonSerializer.Serialize(data));
+        return SendGithubApiAsync(request, HttpMethod.Post, content, ct, completionOption);
     }
 
     public static Task<IFlurlResponse> PostJsonGithubWebAsync(
@@ -77,20 +78,11 @@ public static class GithubFlurlExtensions
         HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead)
     {
         var request = WebClient.Request(urlSegments);
-        return PostJsonGithubAsync(request, data, ct, completionOption);
-    }
-
-    private static Task<IFlurlResponse> PostJsonGithubAsync(
-        this IFlurlRequest request,
-        object data,
-        CancellationToken? ct = null,
-        HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead)
-    {
         var content = new CapturedJsonContent(request.Settings.JsonSerializer.Serialize(data));
-        return SendGithubAsync(request, HttpMethod.Post, content, ct, completionOption);
+        return request.SendAsync(HttpMethod.Post, content, ct ?? CancellationToken.None, completionOption);
     }
 
-    private static Task<IFlurlResponse> SendGithubAsync(
+    private static Task<IFlurlResponse> SendGithubApiAsync(
         this IFlurlRequest request,
         HttpMethod verb,
         HttpContent? content = null,

@@ -4,13 +4,21 @@ using GithubBackup.Core.Github.Flurl;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
+using Microsoft.Extensions.Logging;
 using Polly;
 
 namespace GithubBackup.Core.Github;
 
 internal class GithubService : IGithubService
 {
+    private readonly ILogger<GithubService> _logger;
+    
     private const string ClientId = "e197b2a7e36e8a0d5ea9";
+
+    public GithubService(ILogger<GithubService> logger)
+    {
+        _logger = logger;
+    }
     
     public async Task<Migration> StartMigrationAsync(StartMigrationOptions options, CancellationToken ct)
     {
@@ -74,14 +82,14 @@ internal class GithubService : IGithubService
         return new List<Repository>(response.Select(r => new Repository(r.FullName)));
     }
 
-    private static async Task OnRetryAsync(AccessTokenResponse response, IntervalWrapper intervalWrapper, CancellationToken ct)
+    private async Task OnRetryAsync(AccessTokenResponse response, IntervalWrapper intervalWrapper, CancellationToken ct)
     {
         switch (response.Error)
         {
             case "authorization_pending":
             {
                 var delay = intervalWrapper.Interval;
-                Console.WriteLine($"Authorization pending. Retrying in {delay.TotalSeconds} seconds.");
+                _logger.LogInformation("Authorization pending. Retrying in {Seconds} seconds", delay.TotalSeconds);
                 await Task.Delay(delay, ct);
                 return;
             }
@@ -89,7 +97,7 @@ internal class GithubService : IGithubService
             {
                 var newDelay = TimeSpan.FromSeconds(response.Interval ?? intervalWrapper.Interval.TotalSeconds + 5);
                 intervalWrapper.Update(newDelay);
-                Console.WriteLine($"Slow down. Retrying in {newDelay.TotalSeconds} seconds.");
+                _logger.LogInformation("Slow down. Retrying in {Seconds} seconds", newDelay.TotalSeconds);
                 await Task.Delay(newDelay, ct);
                 return;
             }

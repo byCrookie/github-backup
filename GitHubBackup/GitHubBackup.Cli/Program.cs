@@ -33,10 +33,22 @@ return await rootCommand.InvokeAsync(args);
 Task RunAsync<TCliCommand>(GlobalArgs globalArgs, Func<IServiceProvider, TCliCommand> factory)
     where TCliCommand : class, ICliCommand
 {
-    Log.Logger = CliLoggerConfiguration.Create(globalArgs).CreateLogger();
-    var builder = Host.CreateApplicationBuilder(args);
-    builder.Services.AddTransient(factory);
-    builder.Services.AddCli<TCliCommand>();
-    var host = builder.Build();
-    return host.RunAsync();
+    try
+    {
+        Log.Logger = CliLoggerConfiguration
+            .Create(globalArgs)
+            .CreateLogger();
+        
+        var builder = Host.CreateApplicationBuilder(args);
+        builder.Services.AddTransient(factory);
+        builder.Services.AddCli<TCliCommand>();
+        
+        var host = builder.Build();
+        return host.RunAsync();
+    }
+    catch (Exception e)
+    {
+        Log.Fatal(e, "An unhandled exception occurred: {Message}", e.Message);
+        return Task.CompletedTask;
+    }
 }
