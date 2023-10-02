@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GithubBackup.Cli.Services;
 
-internal class CliCommandService : IHostedService
+internal class CliCommandService : ICliCommandService
 {
     private readonly ILogger<CliCommandService> _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;

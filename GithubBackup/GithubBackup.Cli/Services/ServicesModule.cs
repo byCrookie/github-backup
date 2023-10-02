@@ -1,19 +1,19 @@
-using GithubBackup.Cli.Commands;
+using GithubBackup.Core.DependencyInjection.Factory;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace GithubBackup.Cli.Services;
 
 internal static class ServicesModule
 {
-    public static void AddServices<TCliCommand>(this IServiceCollection services)
-        where TCliCommand : class, ICliCommand
+    /// <summary>
+    /// Registers all hosted services which are executed by the application host
+    /// during startup.
+    /// </summary>
+    /// <param name="services">Dependencies are registered on this service collection</param>
+    public static void AddServices(this IServiceCollection services)
     {
-        services.AddHostedService(sp => new CliCommandService(
-            sp.GetRequiredService<ILogger<CliCommandService>>(),
-            sp.GetRequiredService<IHostApplicationLifetime>(),
-            sp.GetRequiredService<TCliCommand>()
-        ));
+        services.AddTransient<ICliCommandService, CliCommandService>();
+        
+        services.AddHostedService(sp => sp.GetRequiredService<IFactory<ICliCommandService>>().Create());
     }
 }

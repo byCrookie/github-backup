@@ -1,7 +1,7 @@
 using GithubBackup.Cli.Github.Credentials;
 using GithubBackup.Cli.Options;
 using GithubBackup.Cli.Utils;
-using GithubBackup.Core.Github;
+using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
@@ -13,18 +13,27 @@ internal class Backup : IBackup
 {
     private readonly GlobalArgs _globalArgs;
     private readonly GithubBackupArgs _backupArgs;
-    private readonly IGithubService _githubService;
+    private readonly IAuthenticationService _authenticationService;
+    private readonly IMigrationService _migrationService;
+    private readonly IUserService _userService;
+    private readonly IRepositoryService _repositoryService;
     private readonly ICredentialStore _credentialStore;
 
     public Backup(
         GlobalArgs globalArgs,
         GithubBackupArgs backupArgs,
-        IGithubService githubService,
+        IAuthenticationService authenticationService,
+        IMigrationService migrationService,
+        IUserService userService,
+        IRepositoryService repositoryService,
         ICredentialStore credentialStore)
     {
         _globalArgs = globalArgs;
         _backupArgs = backupArgs;
-        _githubService = githubService;
+        _authenticationService = authenticationService;
+        _migrationService = migrationService;
+        _userService = userService;
+        _repositoryService = repositoryService;
         _credentialStore = credentialStore;
     }
 
@@ -35,7 +44,7 @@ internal class Backup : IBackup
 
         if (AnsiConsole.Confirm("Do you want to start a migration?", false))
         {
-            var repositories = await _githubService.GetRepositoriesAsync(ct);
+            var repositories = await _repositoryService.GetRepositoriesAsync(ct);
 
             if (!repositories.Any())
             {
@@ -57,12 +66,12 @@ internal class Backup : IBackup
             );
 
             var selectedRepositoryNames = selectedRepositories.Select(r => r.FullName).ToList();
-            await _githubService.StartMigrationAsync(new StartMigrationOptions(selectedRepositoryNames), ct);
+            await _migrationService.StartMigrationAsync(new StartMigrationOptions(selectedRepositoryNames), ct);
         }
 
         do
         {
-            var migrations = await _githubService.GetMigrationsAsync(ct);
+            var migrations = await _migrationService.GetMigrationsAsync(ct);
 
             if (!migrations.Any())
             {
@@ -71,7 +80,7 @@ internal class Backup : IBackup
             }
 
             var migrationStatus = await migrations
-                .SelectAsync(m => _githubService.GetMigrationAsync(m.Id, ct))
+                .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
                 .ToListAsync(cancellationToken: ct);
 
             AnsiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
@@ -96,7 +105,7 @@ internal class Backup : IBackup
             foreach (var migration in selectedMigrations)
             {
                 AnsiConsole.WriteLine($"Downloading migration {migration.Id} to {_backupArgs.Destination}...");
-                var file = await _githubService.DownloadMigrationAsync(new DownloadMigrationOptions(migration.Id, _backupArgs.Destination), ct);
+                var file = await _migrationService.DownloadMigrationAsync(new DownloadMigrationOptions(migration.Id, _backupArgs.Destination), ct);
                 AnsiConsole.WriteLine($"Downloaded migration {migration.Id} ({file})");
             }
         } while (AnsiConsole.Confirm("Fetch migration status again?"));
@@ -114,7 +123,7 @@ internal class Backup : IBackup
             }
             else
             {
-                var user = await _githubService.WhoAmIAsync(ct);
+                var user = await _userService.WhoAmIAsync(ct);
                 if (AnsiConsole.Confirm($"Do you want to continue as {user.Name}?"))
                 {
                     return user;
@@ -128,7 +137,7 @@ internal class Backup : IBackup
             await LoginAndStoreAsync(ct);
         }
 
-        return await _githubService.WhoAmIAsync(ct);
+        return await _userService.WhoAmIAsync(ct);
     }
 
     private async Task LoginAndStoreAsync(CancellationToken ct)
@@ -139,13 +148,15 @@ internal class Backup : IBackup
 
     private async Task<string> GetOAuthTokenAsync(CancellationToken ct)
     {
-        var deviceAndUserCodes = await _githubService.RequestDeviceAndUserCodesAsync(ct);
+        var deviceAndUserCodes = await _authenticationService.RequestDeviceAndUserCodesAsync(ct);
         Console.WriteLine(
             $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}");
         Console.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
-        var accessToken =
-            await _githubService.PollForAccessTokenAsync(deviceAndUserCodes.DeviceCode, deviceAndUserCodes.Interval,
-                ct);
+        var accessToken = await _authenticationService.PollForAccessTokenAsync(
+            deviceAndUserCodes.DeviceCode,
+            deviceAndUserCodes.Interval,
+            ct
+        );
         await _credentialStore.StoreTokenAsync(accessToken.Token, ct);
         return accessToken.Token;
     }
