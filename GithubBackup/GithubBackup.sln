@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{B58CB078-54A4-40
 		..\README.md = ..\README.md
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
+		nuget.config = nuget.config
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubBackup.Core", "GithubBackup.Core\GithubBackup.Core.csproj", "{94CE06B8-7742-4A37-93CD-662FF98D6DD1}"
