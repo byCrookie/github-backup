@@ -1,4 +1,5 @@
-﻿using Flurl;
+﻿using System.Net;
+using Flurl;
 using Flurl.Http;
 using Flurl.Http.Content;
 using GithubBackup.Core.Flurl;
@@ -6,7 +7,7 @@ using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Utils;
 using Microsoft.Net.Http.Headers;
 using Polly;
-using Polly.Retry;
+using Polly.Contrib.WaitAndRetry;
 
 namespace GithubBackup.Core.Github.Flurl;
 
@@ -14,6 +15,7 @@ public static class GithubFlurlExtensions
 {
     private const string RemainingRateLimitHeader = "x-ratelimit-remaining";
     private const string RateLimitResetHeader = "x-ratelimit-reset";
+    private const string RetryAfterHeader = "retry-after";
     private const string UserAgent = "github-backup";
     private const string Accept = "application/vnd.github.v3+json";
     private const string BaseUrl = "https://github.com";
@@ -103,12 +105,15 @@ public static class GithubFlurlExtensions
         CancellationToken? ct = null,
         HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead)
     {
+        var retryPolicy = CreateGithubRetryPolicy();
         var rateLimitPolicy = CreateGithubRateLimitPolicy(ct ?? CancellationToken.None);
-        return rateLimitPolicy.ExecuteAsync(() => request
+        var retryAfterPolicy = CreateGithubRetryAfterPolicy(ct ?? CancellationToken.None);
+        var policy = Policy.WrapAsync(retryPolicy, rateLimitPolicy, retryAfterPolicy);
+        return policy.ExecuteAsync(() => request
             .SendAsync(verb, content, ct ?? CancellationToken.None, completionOption));
     }
 
-    private static AsyncRetryPolicy<IFlurlResponse> CreateGithubRateLimitPolicy(CancellationToken ct)
+    private static IAsyncPolicy<IFlurlResponse> CreateGithubRateLimitPolicy(CancellationToken ct)
     {
         return Policy
             .HandleResult<IFlurlResponse>(response => response.Headers.GetRequired(RemainingRateLimitHeader) == "0")
@@ -120,5 +125,26 @@ public static class GithubFlurlExtensions
                 var delay = rateLimitResetDateTime - now;
                 return Task.Delay(delay, ct);
             });
+    }
+    
+    private static IAsyncPolicy<IFlurlResponse> CreateGithubRetryAfterPolicy(CancellationToken ct)
+    {
+        return Policy
+            .HandleResult<IFlurlResponse>(response => !string.IsNullOrWhiteSpace(response.Headers.Get(RetryAfterHeader)))
+            .RetryForeverAsync(response =>
+            {
+                var resetAfter = response.Result.Headers.GetRequired(RetryAfterHeader);
+                var delay = TimeSpan.FromSeconds(int.Parse(resetAfter));
+                return Task.Delay(delay, ct);
+            });
+    }
+    
+    private static IAsyncPolicy<IFlurlResponse> CreateGithubRetryPolicy()
+    {
+        var delay = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(1), retryCount: 3);
+
+        return Policy
+            .HandleResult<IFlurlResponse>(response => response.StatusCode == (int)HttpStatusCode.Forbidden)
+            .WaitAndRetryAsync(delay);
     }
 }

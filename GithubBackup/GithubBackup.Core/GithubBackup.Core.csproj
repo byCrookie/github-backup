@@ -7,6 +7,7 @@
         <PackageReference Include="Microsoft.Extensions.Http.Polly" />
         <PackageReference Include="Microsoft.Net.Http.Headers" />
         <PackageReference Include="Polly" />
+        <PackageReference Include="Polly.Contrib.WaitAndRetry" />
         <PackageReference Include="Polly.Extensions.Http" />
         <PackageReference Include="System.Linq.Async" />
         <PackageReference Include="System.Threading.RateLimiting" />
