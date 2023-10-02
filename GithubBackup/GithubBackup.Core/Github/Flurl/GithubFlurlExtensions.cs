@@ -5,6 +5,7 @@ using Flurl.Http.Content;
 using GithubBackup.Core.Flurl;
 using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Utils;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
@@ -16,6 +17,8 @@ public static class GithubFlurlExtensions
     private const string RemainingRateLimitHeader = "x-ratelimit-remaining";
     private const string RateLimitResetHeader = "x-ratelimit-reset";
     private const string RetryAfterHeader = "retry-after";
+    private const string IfNoneMatchHeader = "If-None-Match";
+    private const string ETagHeader = "ETag";
     private const string UserAgent = "github-backup";
     private const string Accept = "application/vnd.github.v3+json";
     private const string BaseUrl = "https://github.com";
@@ -29,6 +32,8 @@ public static class GithubFlurlExtensions
         .WithHeader(HeaderNames.UserAgent, UserAgent)
         .WithHeader(HeaderNames.Accept, Accept);
 
+    private static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
+    
     public static Task<List<TItem>> GetJsonGithubApiPagedAsync<TReponse, TItem>(
         this Url url,
         int perPage,
@@ -98,7 +103,7 @@ public static class GithubFlurlExtensions
         return request.SendAsync(HttpMethod.Post, content, ct ?? CancellationToken.None, completionOption);
     }
 
-    private static Task<IFlurlResponse> SendGithubApiAsync(
+    private static async Task<IFlurlResponse> SendGithubApiAsync(
         this IFlurlRequest request,
         HttpMethod verb,
         HttpContent? content = null,
@@ -109,8 +114,44 @@ public static class GithubFlurlExtensions
         var rateLimitPolicy = CreateGithubRateLimitPolicy(ct ?? CancellationToken.None);
         var retryAfterPolicy = CreateGithubRetryAfterPolicy(ct ?? CancellationToken.None);
         var policy = Policy.WrapAsync(retryPolicy, rateLimitPolicy, retryAfterPolicy);
-        return policy.ExecuteAsync(() => request
-            .SendAsync(verb, content, ct ?? CancellationToken.None, completionOption));
+        return await policy.ExecuteAsync(() => request.SendGithubApiCachedAsync(verb, content, ct, completionOption));
+    }
+    
+    private static async Task<IFlurlResponse> SendGithubApiCachedAsync(
+        this IFlurlRequest request,
+        HttpMethod verb,
+        HttpContent? content = null,
+        CancellationToken? ct = null,
+        HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead)
+    {
+        var cacheKey = await GetCacheKey(request, verb, content);
+
+        if (verb == HttpMethod.Get && Cache.TryGetValue(cacheKey, out IFlurlResponse? cachedResponse))
+        {
+            var modifiedResponse = await request
+                .WithHeader(IfNoneMatchHeader, cachedResponse!.Headers.GetRequired(ETagHeader))
+                .SendAsync(verb, content, ct ?? CancellationToken.None, completionOption);
+
+            if (modifiedResponse.StatusCode == (int)HttpStatusCode.NotModified)
+            {
+                return cachedResponse;
+            }
+        }
+        
+        var response = await request.SendAsync(verb, content, ct ?? CancellationToken.None, completionOption);
+        
+        if (verb == HttpMethod.Get && response.StatusCode == (int)HttpStatusCode.OK)
+        {
+            Cache.Set(cacheKey, response);
+        }
+        
+        return response;
+    }
+
+    private static async Task<string> GetCacheKey(IFlurlRequest request, HttpMethod verb, HttpContent? content)
+    {
+        var body = content is null ? string.Empty : await content.ReadAsStringAsync();
+        return $"{request.Url}{verb}{body}";
     }
 
     private static IAsyncPolicy<IFlurlResponse> CreateGithubRateLimitPolicy(CancellationToken ct)

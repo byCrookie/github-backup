@@ -2,6 +2,7 @@
     
     <ItemGroup>
         <PackageReference Include="Flurl.Http" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
         <PackageReference Include="Microsoft.Extensions.Hosting" />
         <PackageReference Include="Microsoft.Extensions.Http" />
         <PackageReference Include="Microsoft.Extensions.Http.Polly" />
@@ -10,6 +11,7 @@
         <PackageReference Include="Polly.Contrib.WaitAndRetry" />
         <PackageReference Include="Polly.Extensions.Http" />
         <PackageReference Include="System.Linq.Async" />
+        <PackageReference Include="System.Runtime.Caching" />
         <PackageReference Include="System.Threading.RateLimiting" />
     </ItemGroup>
 
