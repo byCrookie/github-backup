@@ -1,4 +1,5 @@
-﻿using Flurl;
+﻿using System.Text.RegularExpressions;
+using Flurl;
 using Flurl.Http;
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Flurl;
@@ -10,7 +11,7 @@ using Polly;
 
 namespace GithubBackup.Core.Github;
 
-internal class GithubService : IGithubService
+internal partial class GithubService : IGithubService
 {
     private readonly ILogger<GithubService> _logger;
     
@@ -50,11 +51,65 @@ internal class GithubService : IGithubService
         return new Migration(response.Id, response.Repositories.Select(r => new Repository(r.FullName)).ToList(), response.State, response.Url);
     }
 
-    public Task<string> DownloadMigrationAsync(long id, DirectoryInfo destination, CancellationToken ct)
+    public Task<string> DownloadMigrationAsync(DownloadMigrationOptions options, CancellationToken ct)
     {
-        var fileName = $"{DateTime.Now:yyyyMMddHHmmss}_migration_{id}.tar.gz";
-        return $"/user/migrations/{id}/archive"
-            .DownloadFileGithubApiAsync(destination.FullName, fileName);
+        if (options.Overwrite)
+        {
+            OverwriteBackups(options);
+        }
+
+        if (options.NumberOfBackups is not null)
+        {
+            ApplyRetentionRules(options);
+        }
+
+        var fileName = $"{DateTime.Now:yyyyMMddHHmmss}_migration_{options.Id}.tar.gz";
+
+        if (File.Exists(Path.Combine(options.Destination.FullName, fileName)))
+        {
+            throw new Exception($"A backup with the id {options.Id} already exists.");
+        }
+        
+        return $"/user/migrations/{options.Id}/archive"
+            .DownloadFileGithubApiAsync(options.Destination.FullName, fileName);
+    }
+
+    private static void ApplyRetentionRules(DownloadMigrationOptions options)
+    {
+        var backups = Directory
+            .GetFiles(options.Destination.FullName, "*", SearchOption.TopDirectoryOnly)
+            .Select(file => BackupFileNameRegex().Match(file))
+            .Where(match => match.Success)
+            .ToList();
+
+        if (backups.Count > options.NumberOfBackups)
+        {
+            var backupsToDelete = backups
+                .OrderByDescending(match => match.Groups["Date"].Value)
+                .Skip(options.NumberOfBackups.Value);
+
+            foreach (var backup in backupsToDelete)
+            {
+                File.Delete(Path.Combine(options.Destination.FullName, backup.Value));
+            }
+        }
+    }
+
+    private static void OverwriteBackups(DownloadMigrationOptions options)
+    {
+        var identicalBackups = Directory
+            .GetFiles(options.Destination.FullName, "*", SearchOption.TopDirectoryOnly)
+            .Select(file => BackupFileNameRegex().Match(file))
+            .Where(match => match.Success && match.Groups["Id"].Value == options.Id.ToString())
+            .ToList();
+
+        if (identicalBackups.Any())
+        {
+            foreach (var backup in identicalBackups)
+            {
+                File.Delete(Path.Combine(options.Destination.FullName, backup.Value));
+            }
+        }
     }
 
     public async Task<User> WhoAmIAsync(CancellationToken ct)
@@ -142,4 +197,7 @@ internal class GithubService : IGithubService
             }
         }
     }
+
+    [GeneratedRegex(@"^(?<Date>\d{14})_migration_(?<Id>\d+)\.tar\.gz$", RegexOptions.Compiled)]
+    private static partial Regex BackupFileNameRegex();
 }

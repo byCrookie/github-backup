@@ -14,5 +14,5 @@ public interface IGithubService
     Task<Migration> StartMigrationAsync(StartMigrationOptions options, CancellationToken ct);
     Task<List<Migration>> GetMigrationsAsync(CancellationToken ct);
     Task<Migration> GetMigrationAsync(long id, CancellationToken ct);
-    Task<string> DownloadMigrationAsync(long id, DirectoryInfo destination, CancellationToken ct);
+    Task<string> DownloadMigrationAsync(DownloadMigrationOptions options, CancellationToken ct);
 }

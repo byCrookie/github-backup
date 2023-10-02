@@ -96,7 +96,7 @@ internal class Backup : IBackup
             foreach (var migration in selectedMigrations)
             {
                 AnsiConsole.WriteLine($"Downloading migration {migration.Id} to {_backupArgs.Destination}...");
-                var file = await _githubService.DownloadMigrationAsync(migration.Id, _backupArgs.Destination, ct);
+                var file = await _githubService.DownloadMigrationAsync(new DownloadMigrationOptions(migration.Id, _backupArgs.Destination), ct);
                 AnsiConsole.WriteLine($"Downloaded migration {migration.Id} ({file})");
             }
         } while (AnsiConsole.Confirm("Fetch migration status again?"));
