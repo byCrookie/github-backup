@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using GithubBackup.Core.Github.Credentials;
 
-namespace GithubBackup.Cli.Github.Credentials;
+namespace GithubBackup.Cli.Commands.Github.Credentials;
 
 public class CredentialStore : ICredentialStore
 {

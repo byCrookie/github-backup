@@ -1,6 +1,6 @@
 ﻿using System.CommandLine;
 using GithubBackup.Cli.Commands;
-using GithubBackup.Cli.Github;
+using GithubBackup.Cli.Commands.Github;
 using GithubBackup.Cli.Logging;
 using GithubBackup.Cli.Options;
 using Microsoft.Extensions.Hosting;

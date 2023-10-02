@@ -1,4 +1,4 @@
-using GithubBackup.Cli.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Options;
 using GithubBackup.Cli.Utils;
 using GithubBackup.Core.Github.Authentication;
@@ -7,7 +7,7 @@ using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
 using Spectre.Console;
 
-namespace GithubBackup.Cli.Github;
+namespace GithubBackup.Cli.Commands.Github;
 
 internal class Backup : IBackup
 {

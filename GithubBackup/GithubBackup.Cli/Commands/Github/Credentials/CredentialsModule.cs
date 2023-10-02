@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace GithubBackup.Cli.Github.Credentials;
+namespace GithubBackup.Cli.Commands.Github.Credentials;
 
 internal static class CredentialsModule
 {

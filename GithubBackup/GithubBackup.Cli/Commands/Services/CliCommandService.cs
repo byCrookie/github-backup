@@ -1,9 +1,8 @@
 using Flurl.Http;
-using GithubBackup.Cli.Commands;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace GithubBackup.Cli.Services;
+namespace GithubBackup.Cli.Commands.Services;
 
 internal class CliCommandService : ICliCommandService
 {

@@ -1,7 +1,7 @@
 ﻿using System.CommandLine.Binding;
 using GithubBackup.Cli.Utils;
 
-namespace GithubBackup.Cli.Github;
+namespace GithubBackup.Cli.Commands.Github;
 
 public class GithubBackupArgsBinder : BinderBase<GithubBackupArgs>
 {

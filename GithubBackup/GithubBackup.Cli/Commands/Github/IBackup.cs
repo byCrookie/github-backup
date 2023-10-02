@@ -1,6 +1,4 @@
-using GithubBackup.Cli.Commands;
-
-namespace GithubBackup.Cli.Github;
+namespace GithubBackup.Cli.Commands.Github;
 
 internal interface IBackup : ICliCommand
 {

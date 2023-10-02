@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 
-namespace GithubBackup.Cli.Services;
+namespace GithubBackup.Cli.Commands.Services;
 
 internal interface ICliCommandService : IHostedService
 {

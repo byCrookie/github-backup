@@ -1,7 +1,7 @@
 using GithubBackup.Core.DependencyInjection.Factory;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GithubBackup.Cli.Services;
+namespace GithubBackup.Cli.Commands.Services;
 
 internal static class ServicesModule
 {

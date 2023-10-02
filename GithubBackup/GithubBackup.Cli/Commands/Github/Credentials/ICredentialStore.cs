@@ -1,4 +1,4 @@
-﻿namespace GithubBackup.Cli.Github.Credentials;
+﻿namespace GithubBackup.Cli.Commands.Github.Credentials;
 
 public interface ICredentialStore
 {
