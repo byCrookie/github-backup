@@ -76,17 +76,22 @@ internal partial class GithubService : IGithubService
 
     private static void ApplyRetentionRules(DownloadMigrationOptions options)
     {
+        if (options.NumberOfBackups == 0)
+        {
+            throw new Exception("The number of backups cannot be 0.");
+        }
+        
         var backups = Directory
             .GetFiles(options.Destination.FullName, "*", SearchOption.TopDirectoryOnly)
             .Select(file => BackupFileNameRegex().Match(file))
             .Where(match => match.Success)
             .ToList();
 
-        if (backups.Count > options.NumberOfBackups)
+        if (backups.Count >= options.NumberOfBackups)
         {
             var backupsToDelete = backups
                 .OrderByDescending(match => match.Groups["Date"].Value)
-                .Skip(options.NumberOfBackups.Value);
+                .Skip(options.NumberOfBackups.Value - 1);
 
             foreach (var backup in backupsToDelete)
             {
