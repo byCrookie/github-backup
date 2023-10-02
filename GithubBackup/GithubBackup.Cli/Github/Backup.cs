@@ -48,10 +48,10 @@ internal class Backup : IBackup
                     .Title("Select [green]repositories[/] to backup?")
                     .Required()
                     .PageSize(20)
-                    .MoreChoicesText("[grey](Move up and down to reveal more repositories)[/]")
+                    .MoreChoicesText("(Move up and down to reveal more repositories)")
                     .InstructionsText(
-                        "[grey](Press [blue]<space>[/] to toggle a repository, " +
-                        "[green]<enter>[/] to accept)[/]")
+                        "(Press [blue]<space>[/] to toggle a repository, " +
+                        "[green]<enter>[/] to accept)")
                     .AddChoices(repositories)
                     .UseConverter(r => r.FullName)
             );
@@ -85,10 +85,10 @@ internal class Backup : IBackup
                     .Title("Select [green]migrations[/] to download?")
                     .Required()
                     .PageSize(20)
-                    .MoreChoicesText("[grey](Move up and down to reveal more migrations)[/]")
+                    .MoreChoicesText("(Move up and down to reveal more migrations)")
                     .InstructionsText(
-                        "[grey](Press [blue]<space>[/] to toggle a migration, " +
-                        "[green]<enter>[/] to accept)[/]")
+                        "(Press [blue]<space>[/] to toggle a migration, " +
+                        "[green]<enter>[/] to accept)")
                     .AddChoices(migrations.Where(m => m.State == MigrationState.Exported))
                     .UseConverter(m => $"{m.Id} ({m.State})")
             );
