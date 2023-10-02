@@ -1,8 +1,11 @@
 using GithubBackup.Cli.Github.Credentials;
 using GithubBackup.Cli.Options;
+using GithubBackup.Cli.Utils;
 using GithubBackup.Core.Github;
 using GithubBackup.Core.Github.Migrations;
+using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
+using Spectre.Console;
 
 namespace GithubBackup.Cli.Github;
 
@@ -28,56 +31,77 @@ internal class Backup : IBackup
     public async Task RunAsync(CancellationToken ct)
     {
         var user = await LoginAsync(ct);
-        Console.WriteLine($"Logged in as {user.Name}");
+        AnsiConsole.WriteLine($"Logged in as {user.Name}");
 
-        if (ContinuePrompt(_globalArgs, "Do you want to start a migration?"))
+        if (AnsiConsole.Confirm("Do you want to start a migration?", false))
         {
             var repositories = await _githubService.GetRepositoriesAsync(ct);
 
             if (!repositories.Any())
             {
-                Console.WriteLine("No repositories found.");
-                return;
-            }
-        
-            Console.WriteLine($"Found {repositories.Count} repositories:");
-            foreach (var repository in repositories)
-            {
-                Console.WriteLine($"- {repository.FullName}");
-            }
-
-            if (!ContinuePrompt(_globalArgs, "Do you want to backup these repositories?"))
-            {
+                AnsiConsole.WriteLine("No repositories found.");
                 return;
             }
 
-            await _githubService.StartMigrationAsync(new StartMigrationOptions(repositories.Select(r => r.FullName).ToList()), ct);
+            var selectedRepositories = AnsiConsole.Prompt(
+                new MultiSelectionPrompt<Repository>()
+                    .Title("Select [green]repositories[/] to backup?")
+                    .Required()
+                    .PageSize(20)
+                    .MoreChoicesText("[grey](Move up and down to reveal more repositories)[/]")
+                    .InstructionsText(
+                        "[grey](Press [blue]<space>[/] to toggle a repository, " +
+                        "[green]<enter>[/] to accept)[/]")
+                    .AddChoices(repositories)
+                    .UseConverter(r => r.FullName)
+            );
+
+            var selectedRepositoryNames = selectedRepositories.Select(r => r.FullName).ToList();
+            await _githubService.StartMigrationAsync(new StartMigrationOptions(selectedRepositoryNames), ct);
         }
-        
-        var migrations = await _githubService.GetMigrationsAsync(ct);
-        
-        if (!migrations.Any())
+
+        do
         {
-            Console.WriteLine("No migrations found.");
-            return;
-        }
-        
-        Console.WriteLine($"Found {migrations.Count} migrations:");
-        foreach (var migration in migrations)
-        {
-            var status = await _githubService.GetMigrationAsync(migration.Id, ct);
-            Console.WriteLine($"- {status.Id} ({status.State})");
-            
-            if (status.State == "exported" && !ContinuePrompt(_globalArgs, "Do you want to download this migration?"))
+            var migrations = await _githubService.GetMigrationsAsync(ct);
+
+            if (!migrations.Any())
             {
-                continue;
+                AnsiConsole.WriteLine("No migrations found.");
+                return;
             }
-            
-            var file =await _githubService.DownloadMigrationAsync(status.Id, _backupArgs.Destination, ct);
-            Console.WriteLine($"Downloaded {file}");
-        }
+
+            var migrationStatus = await migrations
+                .SelectAsync(m => _githubService.GetMigrationAsync(m.Id, ct))
+                .ToListAsync(cancellationToken: ct);
+
+            AnsiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
+            foreach (var migration in migrationStatus)
+            {
+                AnsiConsole.WriteLine($"- {migration.Id} ({migration.State})");
+            }
+
+            var selectedMigrations = AnsiConsole.Prompt(
+                new MultiSelectionPrompt<Migration>()
+                    .Title("Select [green]migrations[/] to download?")
+                    .Required()
+                    .PageSize(20)
+                    .MoreChoicesText("[grey](Move up and down to reveal more migrations)[/]")
+                    .InstructionsText(
+                        "[grey](Press [blue]<space>[/] to toggle a migration, " +
+                        "[green]<enter>[/] to accept)[/]")
+                    .AddChoices(migrations.Where(m => m.State == MigrationState.Exported))
+                    .UseConverter(m => $"{m.Id} ({m.State})")
+            );
+
+            foreach (var migration in selectedMigrations)
+            {
+                AnsiConsole.WriteLine($"Downloading migration {migration.Id}...");
+                var file = await _githubService.DownloadMigrationAsync(migration.Id, _backupArgs.Destination, ct);
+                AnsiConsole.WriteLine($"Downloaded migration {migration.Id} ({file})");
+            }
+        } while (AnsiConsole.Confirm("Fetch migration status again?"));
     }
-    
+
     private async Task<User> LoginAsync(CancellationToken ct)
     {
         try
@@ -88,14 +112,23 @@ internal class Backup : IBackup
             {
                 await LoginAndStoreAsync(ct);
             }
-            
-            return await _githubService.WhoAmIAsync(ct);
+            else
+            {
+                var user = await _githubService.WhoAmIAsync(ct);
+                if (AnsiConsole.Confirm($"Do you want to continue as {user.Name}?"))
+                {
+                    return user;
+                }
+
+                await LoginAndStoreAsync(ct);
+            }
         }
         catch (Exception)
         {
             await LoginAndStoreAsync(ct);
-            return await _githubService.WhoAmIAsync(ct);
         }
+
+        return await _githubService.WhoAmIAsync(ct);
     }
 
     private async Task LoginAndStoreAsync(CancellationToken ct)
@@ -107,23 +140,13 @@ internal class Backup : IBackup
     private async Task<string> GetOAuthTokenAsync(CancellationToken ct)
     {
         var deviceAndUserCodes = await _githubService.RequestDeviceAndUserCodesAsync(ct);
-        Console.WriteLine($"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}");
+        Console.WriteLine(
+            $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}");
         Console.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
-        var accessToken = await _githubService.PollForAccessTokenAsync(deviceAndUserCodes.DeviceCode, deviceAndUserCodes.Interval, ct);
+        var accessToken =
+            await _githubService.PollForAccessTokenAsync(deviceAndUserCodes.DeviceCode, deviceAndUserCodes.Interval,
+                ct);
         await _credentialStore.StoreTokenAsync(accessToken.Token, ct);
         return accessToken.Token;
-    }
-    
-    private static bool ContinuePrompt(GlobalArgs globalArgs, string message)
-    {
-        if (globalArgs.Interactive)
-        {
-            Console.WriteLine($"{message} (y/n)");
-            var key = Console.ReadKey();
-            Console.WriteLine();
-            return key.Key == ConsoleKey.Y;
-        }
-
-        return true;
     }
 }

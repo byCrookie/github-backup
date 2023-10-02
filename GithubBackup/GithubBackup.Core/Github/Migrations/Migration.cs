@@ -6,10 +6,10 @@ public class Migration
 {
     public long Id { get; }
     public List<Repository> Repositories { get; }
-    public string? State { get; }
+    public MigrationState? State { get; }
     public string Url { get; }
 
-    public Migration(long id, List<Repository> repositories, string? state, string url)
+    public Migration(long id, List<Repository> repositories, MigrationState? state, string url)
     {
         Id = id;
         Repositories = repositories;

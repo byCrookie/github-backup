@@ -11,4 +11,12 @@ public static class ListExtensions
 
         return source;
     }
+    
+    public static async IAsyncEnumerable<TResult> SelectAsync<TItem, TResult>(this IEnumerable<TItem> source, Func<TItem, Task<TResult>> selector)
+    {
+        foreach (var item in source)
+        {
+            yield return await selector(item);
+        }
+    }
 }

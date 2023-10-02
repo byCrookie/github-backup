@@ -11,12 +11,19 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 
 var rootCommand = new RootCommand("Github Backup");
-rootCommand.AddGlobalOption(GlobalArgs.VerbosityOption);
-rootCommand.AddGlobalOption(GlobalArgs.QuietOption);
-rootCommand.AddGlobalOption(GlobalArgs.LogFileOption);
-rootCommand.AddGlobalOption(GlobalArgs.InteractiveOption);
 
-rootCommand.AddOption(GithubBackupArgs.DestinationOption);
+rootCommand.AddGlobalOptions(new List<Option>
+{
+    GlobalArgs.VerbosityOption,
+    GlobalArgs.QuietOption,
+    GlobalArgs.LogFileOption,
+    GlobalArgs.InteractiveOption
+});
+
+rootCommand.AddOptions(new List<Option>
+{
+    GithubBackupArgs.DestinationOption
+});
 
 rootCommand.SetHandler(
     (globalArgs, backupArgs) => RunAsync<IBackup>(
