@@ -1,18 +1,15 @@
-﻿using GithubBackup.Core.Github.Authentication;
-using GithubBackup.Core.Github.Migrations;
+﻿using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
-using Microsoft.Extensions.DependencyInjection;
+using StrongInject;
+
 
 namespace GithubBackup.Core.Github;
 
-internal static class GithubModule
+[RegisterModule(typeof(MigrationModule))]
+[RegisterModule(typeof(Authentication.AuthenticationModule))]
+[RegisterModule(typeof(UserModule))]
+[RegisterModule(typeof(RepositoryModule))]
+public class GithubModule
 {
-   public static void AddGithub(this IServiceCollection services)
-   {
-      services.AddMigration();
-      services.AddAuthentication();
-      services.AddUser();
-      services.AddRepository();
-   }
 }

@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿
+
+using StrongInject;
 
 namespace GithubBackup.Cli.Commands.Github.Credentials;
 
-internal static class CredentialsModule
+[Register<CredentialStore, ICredentialStore>]
+internal class CredentialsModule
 {
-    public static void AddCredentials(this IServiceCollection services)
-    {
-        services.AddTransient<ICredentialStore, CredentialStore>();
-    }
 }

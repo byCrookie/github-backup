@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Cli.Commands.Github;
 
-public class GithubBackupArgs
+internal class GithubBackupArgs
 {
     public DirectoryInfo Destination { get; }
 

@@ -1,16 +1,9 @@
-using GithubBackup.Core.DependencyInjection;
-using GithubBackup.Core.Flurl;
-using GithubBackup.Core.Github;
-using Microsoft.Extensions.DependencyInjection;
+﻿using GithubBackup.Core.Github;
+using StrongInject;
 
 namespace GithubBackup.Core;
 
-public static class CoreModule
+[RegisterModule(typeof(GithubModule))]
+public class CoreModule
 {
-    public static void AddCore(this IServiceCollection services)
-    {
-        services.AddDependencyInjection();
-        services.AddGithub();
-        services.AddFlurl();
-    }
 }

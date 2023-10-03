@@ -10,6 +10,7 @@
         <PackageReference Include="Polly" />
         <PackageReference Include="Polly.Contrib.WaitAndRetry" />
         <PackageReference Include="Polly.Extensions.Http" />
+        <PackageReference Include="StrongInject.Extensions.DependencyInjection" />
         <PackageReference Include="System.Linq.Async" />
         <PackageReference Include="System.Runtime.Caching" />
         <PackageReference Include="System.Threading.RateLimiting" />

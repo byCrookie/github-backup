@@ -1,14 +1,11 @@
 ﻿using GithubBackup.Cli.Commands.Github.Credentials;
-using Microsoft.Extensions.DependencyInjection;
+using StrongInject;
+
 
 namespace GithubBackup.Cli.Commands.Github;
 
-internal static class GithubModule
+[RegisterModule(typeof(CredentialsModule))]
+[Register<Backup>]
+internal class GithubModule
 {
-    public static void AddGithub(this IServiceCollection services)
-    {
-        services.AddTransient<IBackup, Backup>();
-        
-        services.AddCredentials();
-    }
 }

@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿
+
+using StrongInject;
 
 namespace GithubBackup.Core.Github.Users;
 
-internal static class UserModule
+[Register<UserService, IUserService>]
+public class UserModule
 {
-   public static void AddUser(this IServiceCollection services)
-   {
-      services.AddTransient<IUserService, UserService>();
-   }
 }

@@ -3,7 +3,7 @@ using System.CommandLine.Parsing;
 
 namespace GithubBackup.Cli.Utils;
 
-public static class OptionExtensions
+internal static class OptionExtensions
 {
     public static T GetRequiredValueForOption<T>(this ParseResult result, Option<T> option)
     {

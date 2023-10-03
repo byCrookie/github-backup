@@ -12,7 +12,7 @@ using Polly.Contrib.WaitAndRetry;
 
 namespace GithubBackup.Core.Github.Flurl;
 
-public static class GithubFlurlExtensions
+internal static class GithubFlurlExtensions
 {
     private const string RemainingRateLimitHeader = "x-ratelimit-remaining";
     private const string RateLimitResetHeader = "x-ratelimit-reset";

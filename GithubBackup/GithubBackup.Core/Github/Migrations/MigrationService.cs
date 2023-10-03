@@ -5,7 +5,7 @@ using GithubBackup.Core.Github.Repositories;
 
 namespace GithubBackup.Core.Github.Migrations;
 
-internal partial class MigrationService : IMigrationService
+public partial class MigrationService : IMigrationService
 {
     public async Task<Migration> StartMigrationAsync(StartMigrationOptions options, CancellationToken ct)
     {

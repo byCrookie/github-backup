@@ -1,11 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using StrongInject;
 
 namespace GithubBackup.Core.Github.Authentication;
 
-internal static class AuthenticationModule
+[Register<AuthenticationService, IAuthenticationService>]
+public class AuthenticationModule
 {
-   public static void AddAuthentication(this IServiceCollection services)
-   {
-      services.AddTransient<IAuthenticationService, AuthenticationService>();
-   }
 }

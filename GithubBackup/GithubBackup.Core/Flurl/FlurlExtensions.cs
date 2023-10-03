@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Core.Flurl;
 
-public static class FlurlExtensions
+internal static class FlurlExtensions
 {
     public static async Task<List<TItem>> GetPagedJsonAsync<TReponse, TItem>(
         this IFlurlRequest request,

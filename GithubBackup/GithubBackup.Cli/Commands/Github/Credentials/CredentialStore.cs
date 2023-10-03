@@ -3,7 +3,7 @@ using GithubBackup.Core.Github.Credentials;
 
 namespace GithubBackup.Cli.Commands.Github.Credentials;
 
-public class CredentialStore : ICredentialStore
+internal class CredentialStore : ICredentialStore
 {
     private const string Key = "LBaZO3iFnF";
     private const string Salt = "fqCKmp5nwk";

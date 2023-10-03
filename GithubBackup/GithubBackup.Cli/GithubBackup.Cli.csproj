@@ -19,6 +19,7 @@
         <PackageReference Include="Serilog.Sinks.Console" />
         <PackageReference Include="Serilog.Sinks.File" />
         <PackageReference Include="Spectre.Console" />
+        <PackageReference Include="StrongInject.Extensions.DependencyInjection" />
         <PackageReference Include="System.CommandLine" />
         <PackageReference Include="System.CommandLine.Hosting" />
         <PackageReference Include="System.Linq.Async" />
@@ -33,5 +34,9 @@
 
     <ItemGroup>
       <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Commands\Services\ServicesModule.cs" />
     </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github;
 
-internal class Backup : IBackup
+internal class Backup : ICliCommand
 {
     private readonly GlobalArgs _globalArgs;
     private readonly GithubBackupArgs _backupArgs;
@@ -105,7 +105,8 @@ internal class Backup : IBackup
             foreach (var migration in selectedMigrations)
             {
                 AnsiConsole.WriteLine($"Downloading migration {migration.Id} to {_backupArgs.Destination}...");
-                var file = await _migrationService.DownloadMigrationAsync(new DownloadMigrationOptions(migration.Id, _backupArgs.Destination), ct);
+                var file = await _migrationService.DownloadMigrationAsync(
+                    new DownloadMigrationOptions(migration.Id, _backupArgs.Destination), ct);
                 AnsiConsole.WriteLine($"Downloaded migration {migration.Id} ({file})");
             }
         } while (AnsiConsole.Confirm("Fetch migration status again?"));

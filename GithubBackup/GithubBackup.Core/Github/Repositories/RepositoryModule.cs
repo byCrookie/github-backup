@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿
+
+using StrongInject;
 
 namespace GithubBackup.Core.Github.Repositories;
 
-internal static class RepositoryModule
+[Register<RepositoryService, IRepositoryService>]
+public class RepositoryModule
 {
-   public static void AddRepository(this IServiceCollection services)
-   {
-      services.AddTransient<IRepositoryService, RepositoryService>();
-   }
 }

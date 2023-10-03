@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿
+
+using StrongInject;
 
 namespace GithubBackup.Core.Github.Migrations;
 
-internal static class MigrationModule
+[Register<MigrationService, IMigrationService>]
+public class MigrationModule
 {
-   public static void AddMigration(this IServiceCollection services)
-   {
-      services.AddTransient<IMigrationService, MigrationService>();
-   }
 }

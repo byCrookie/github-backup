@@ -1,6 +1,6 @@
 ﻿namespace GithubBackup.Core.Github.Authentication;
 
-public class IntervalWrapper
+internal class IntervalWrapper
 {
     public TimeSpan Interval { get; private set; }
 

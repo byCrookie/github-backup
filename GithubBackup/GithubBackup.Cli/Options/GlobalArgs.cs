@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GithubBackup.Cli.Options;
 
-public class GlobalArgs
+internal class GlobalArgs
 {
     public LogLevel Verbosity { get; }
     public bool Quiet { get; }
