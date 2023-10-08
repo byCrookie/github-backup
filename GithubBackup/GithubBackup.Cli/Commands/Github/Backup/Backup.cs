@@ -1,5 +1,4 @@
 using GithubBackup.Cli.Commands.Github.Credentials;
-using GithubBackup.Cli.Options;
 using GithubBackup.Cli.Utils;
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Migrations;
@@ -7,11 +6,10 @@ using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
 using Spectre.Console;
 
-namespace GithubBackup.Cli.Commands.Github;
+namespace GithubBackup.Cli.Commands.Github.Backup;
 
 internal class Backup : IBackup
 {
-    private readonly GlobalArgs _globalArgs;
     private readonly GithubBackupArgs _backupArgs;
     private readonly IAuthenticationService _authenticationService;
     private readonly IMigrationService _migrationService;
@@ -20,7 +18,6 @@ internal class Backup : IBackup
     private readonly ICredentialStore _credentialStore;
 
     public Backup(
-        GlobalArgs globalArgs,
         GithubBackupArgs backupArgs,
         IAuthenticationService authenticationService,
         IMigrationService migrationService,
@@ -28,7 +25,6 @@ internal class Backup : IBackup
         IRepositoryService repositoryService,
         ICredentialStore credentialStore)
     {
-        _globalArgs = globalArgs;
         _backupArgs = backupArgs;
         _authenticationService = authenticationService;
         _migrationService = migrationService;

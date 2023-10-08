@@ -1,6 +1,6 @@
 ﻿using System.CommandLine;
 
-namespace GithubBackup.Cli.Commands.Github;
+namespace GithubBackup.Cli.Commands.Github.Backup;
 
 public class GithubBackupArgs
 {
