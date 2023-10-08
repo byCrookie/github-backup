@@ -1,29 +1,24 @@
 {
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "GithubBackup.Cli Destination": {
-      "commandName": "Project",
-      "commandLineArgs": "backup -i",
-      "environmentVariables": {}
-    },
-    "GithubBackup.Cli Destination Log Information Console": {
-      "commandName": "Project",
-      "commandLineArgs": "backup --verbosity Information --quiet false",
-      "environmentVariables": {}
-    },
     "GithubBackup.Cli Help": {
       "commandName": "Project",
       "commandLineArgs": "--help",
       "environmentVariables": {}
     },
-    "GithubBackup.Cli Backup Help": {
+    "GithubBackup.Cli Manual Backup Help": {
       "commandName": "Project",
-      "commandLineArgs": "backup --help",
+      "commandLineArgs": "manual --help",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Migrate Help": {
       "commandName": "Project",
       "commandLineArgs": "migrate --help",
+      "environmentVariables": {}
+    },
+    "GithubBackup.Cli Login Help": {
+      "commandName": "Project",
+      "commandLineArgs": "login --help",
       "environmentVariables": {}
     }
   }

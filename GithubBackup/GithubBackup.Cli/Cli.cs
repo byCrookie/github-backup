@@ -1,9 +1,11 @@
 ﻿using System.CommandLine;
 using GithubBackup.Cli.Commands;
+using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Manual;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Logging;
 using GithubBackup.Cli.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
@@ -32,7 +34,13 @@ internal static class Cli
             (_, globalArgs, migrateArgs) => RunAsync<Migrate, MigrateArgs>(args, globalArgs, migrateArgs),
             args
         );
+        
+        var loginCommand = LoginCommand.Create(
+            (_, globalArgs, loginArgs) => RunAsync<Login, LoginArgs>(args, globalArgs, loginArgs),
+            args
+        );
 
+        rootCommand.AddCommand(loginCommand);
         rootCommand.AddCommand(manualBackupCommand);
         rootCommand.AddCommand(migrateCommand);
         
@@ -56,6 +64,9 @@ internal static class Cli
             .CreateLogger();
 
         var builder = Host.CreateApplicationBuilder(args);
+        
+        builder.Configuration.AddEnvironmentVariables("GITHUB_BACKUP_");
+        
         builder.Services.AddCli<TCliCommand, TCommandArgs>(globalArgs, commandArgs);
 
         var host = builder.Build();

@@ -6,7 +6,7 @@ namespace GithubBackup.Cli.Commands.Github.Manual;
 internal static class ManualBackupCommand
 {
     private const string CommandName = "manual";
-    private const string CommandDescription = "Manually backup a Github user. Interactive is always enabled for this command.";
+    private const string CommandDescription = "Manually backup a Github user. This command is interactive.";
     
     public static Command Create(Func<string[], GlobalArgs, ManualBackupArgs, Task> runAsync, string[] args)
     {
