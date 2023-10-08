@@ -59,11 +59,15 @@ internal static class Cli
 
         var builder = Host.CreateApplicationBuilder(args);
         builder.Services.AddSerilog();
-        builder.Services.AddTransient<IContainer<CliCommandService>>(s =>
-            new Container<TCliCommand, TCommandArgs>(s, globalArgs, commandArgs));
-        builder.Services.AddTransientServiceUsingContainer<IContainer<Backup>, Backup>();
-        builder.Services.AddTransientServiceUsingScopedContainer<IContainer<CliCommandService>, CliCommandService>();
-        builder.Services.AddHostedService(sp => sp.GetRequiredService<CliCommandService>());
+        builder.Services.AddSingleton(globalArgs);
+        builder.Services.AddSingleton(commandArgs);
+        builder.Services.AddTransient<IContainer<CliCommandService<TCliCommand, TCommandArgs>>>(
+            s => new Container<TCliCommand, TCommandArgs>(s));
+        builder.Services.AddTransientServiceUsingScopedContainer<IContainer<TCliCommand>, TCliCommand>();
+        builder.Services.AddTransientServiceUsingScopedContainer<
+            IContainer<CliCommandService<TCliCommand, TCommandArgs>>,
+            CliCommandService<TCliCommand, TCommandArgs>>();
+        builder.Services.AddHostedService(sp => sp.GetRequiredService<CliCommandService<TCliCommand, TCommandArgs>>());
 
         var host = builder.Build();
         Core.Core.Initialize();

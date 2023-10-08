@@ -4,7 +4,7 @@ using StrongInject;
 
 namespace GithubBackup.Cli.Commands.Services;
 
-[Register<CliCommandService>]
+[Register(typeof(CliCommandService<,>))]
 internal class ServicesModule
 {
 }

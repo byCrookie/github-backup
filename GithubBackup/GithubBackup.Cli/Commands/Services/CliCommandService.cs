@@ -1,42 +1,51 @@
 using Flurl.Http;
+using GithubBackup.Cli.Options;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace GithubBackup.Cli.Commands.Services;
 
-internal class CliCommandService : IHostedService
+internal class CliCommandService<TCliCommand, TCliArguments> : IHostedService
+    where TCliCommand : class, ICliCommand
+    where TCliArguments : class
 {
-    private readonly ILogger<CliCommandService> _logger;
+    private readonly ILogger<CliCommandService<TCliCommand, TCliArguments>> _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
-    private readonly ICliCommand _cliCommand;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly Func<GlobalArgs, TCliArguments, TCliCommand> _cliCommandFactory;
 
     public CliCommandService(
-        ILogger<CliCommandService> logger,
+        ILogger<CliCommandService<TCliCommand, TCliArguments>> logger,
         IHostApplicationLifetime hostApplicationLifetime,
-        ICliCommand cliCommand)
+        IServiceProvider serviceProvider,
+        Func<GlobalArgs, TCliArguments, TCliCommand> cliCommandFactory)
     {
         _logger = logger;
         _hostApplicationLifetime = hostApplicationLifetime;
-        _cliCommand = cliCommand;
+        _serviceProvider = serviceProvider;
+        _cliCommandFactory = cliCommandFactory;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         try
         {
-            await _cliCommand.RunAsync(cancellationToken);
+            var globalArgs = _serviceProvider.GetRequiredService<GlobalArgs>();
+            var commandArgs = _serviceProvider.GetRequiredService<TCliArguments>();
+            await _cliCommandFactory(globalArgs, commandArgs).RunAsync(cancellationToken);
         }
         catch (FlurlHttpException e)
         {
             var error = await e.GetResponseStringAsync();
             _logger.LogCritical(e, "Unhandled exception (Command: {Type}):{NewLine}{Message}",
-                _cliCommand.GetType().Name, Environment.NewLine, error);
+                typeof(TCliCommand).Name, Environment.NewLine, error);
             Environment.ExitCode = 1;
         }
         catch (Exception e)
         {
             _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}",
-                _cliCommand.GetType().Name, e.Message);
+                typeof(TCliCommand).Name, e.Message);
             Environment.ExitCode = 1;
         }
 

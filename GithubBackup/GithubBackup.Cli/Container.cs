@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using GithubBackup.Cli.Commands;
+﻿using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Commands.Github;
 using GithubBackup.Cli.Commands.Services;
 using GithubBackup.Cli.Options;
@@ -11,28 +10,24 @@ using StrongInject;
 namespace GithubBackup.Cli;
 
 [RegisterModule(typeof(CliModule))]
-internal partial class Container<TCliCommand, TCommandArgs> : IContainer<CliCommandService>, IContainer<Backup>
-    where TCommandArgs : class
+internal partial class Container<TCliCommand, TCliArguments> 
+    : IContainer<CliCommandService<TCliCommand, TCliArguments>>, IContainer<TCliCommand>
     where TCliCommand : class, ICliCommand
+    where TCliArguments : class
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly GlobalArgs _globalArgs;
-    private readonly TCommandArgs _commandArgs;
 
-    public Container(
-        IServiceProvider serviceProvider,
-        GlobalArgs globalArgs,
-        TCommandArgs commandArgs)
+    public Container(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _globalArgs = globalArgs;
-        _commandArgs = commandArgs;
     }
+    
+    [Factory]
+    private IServiceProvider GetServiceProvider() => _serviceProvider;
 
-    // [Factory]
-    // private ICliCommand GetCliCommand() => ActivatorUtilities
-    //     .CreateInstance<TCliCommand>(GetService<IServiceProvider>(), _globalArgs, _commandArgs);
-
-    [FactoryOf(typeof(ILogger<>)), FactoryOf(typeof(IHostApplicationLifetime))]
+    [FactoryOf(typeof(ILogger<>)),
+     FactoryOf(typeof(IHostApplicationLifetime)),
+     FactoryOf(typeof(GlobalArgs)),
+     FactoryOf(typeof(GithubBackupArgs))]
     private T GetService<T>() where T : notnull => _serviceProvider.GetRequiredService<T>();
 }
