@@ -7,5 +7,6 @@ internal static class CredentialsModule
     public static void AddCredentials(this IServiceCollection services)
     {
         services.AddTransient<ICredentialStore, CredentialStore>();
+        services.AddTransient<ILoginService, LoginService>();
     }
 }

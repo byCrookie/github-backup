@@ -1,4 +1,6 @@
+using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Utils;
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Migrations;
@@ -10,27 +12,27 @@ namespace GithubBackup.Cli.Commands.Github.Backup;
 
 internal class Backup : IBackup
 {
-    private readonly GithubBackupArgs _backupArgs;
     private readonly IAuthenticationService _authenticationService;
     private readonly IMigrationService _migrationService;
     private readonly IUserService _userService;
     private readonly IRepositoryService _repositoryService;
     private readonly ICredentialStore _credentialStore;
+    private readonly IFileSystem _fileSystem;
 
     public Backup(
-        GithubBackupArgs backupArgs,
         IAuthenticationService authenticationService,
         IMigrationService migrationService,
         IUserService userService,
         IRepositoryService repositoryService,
-        ICredentialStore credentialStore)
+        ICredentialStore credentialStore,
+        IFileSystem fileSystem)
     {
-        _backupArgs = backupArgs;
         _authenticationService = authenticationService;
         _migrationService = migrationService;
         _userService = userService;
         _repositoryService = repositoryService;
         _credentialStore = credentialStore;
+        _fileSystem = fileSystem;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -61,8 +63,38 @@ internal class Backup : IBackup
                     .UseConverter(r => r.FullName)
             );
 
-            var selectedRepositoryNames = selectedRepositories.Select(r => r.FullName).ToList();
-            await _migrationService.StartMigrationAsync(new StartMigrationOptions(selectedRepositoryNames), ct);
+            var selectedOptions = AnsiConsole.Prompt(
+                new MultiSelectionPrompt<Description>()
+                    .Title("Select [green]options[/] to start migration?")
+                    .PageSize(20)
+                    .MoreChoicesText("(Move up and down to reveal more options)")
+                    .InstructionsText(
+                        "(Press [blue]<space>[/] to toggle a option, " +
+                        "[green]<enter>[/] to accept)")
+                    .AddChoices(
+                        MigrateArgDescriptions.LockRepositories,
+                        MigrateArgDescriptions.ExcludeMetadata,
+                        MigrateArgDescriptions.ExcludeGitData,
+                        MigrateArgDescriptions.ExcludeAttachements,
+                        MigrateArgDescriptions.ExcludeReleases,
+                        MigrateArgDescriptions.ExcludeOwnerProjects,
+                        MigrateArgDescriptions.ExcludeMetadataOnly
+                    )
+                    .UseConverter(d => $"{d.Display} - {d.Long}")
+            );
+
+            var options = new StartMigrationOptions(
+                selectedRepositories.Select(r => r.FullName).ToArray(),
+                selectedOptions.Contains(MigrateArgDescriptions.LockRepositories),
+                selectedOptions.Contains(MigrateArgDescriptions.ExcludeMetadata),
+                selectedOptions.Contains(MigrateArgDescriptions.ExcludeGitData),
+                selectedOptions.Contains(MigrateArgDescriptions.ExcludeAttachements),
+                selectedOptions.Contains(MigrateArgDescriptions.ExcludeReleases),
+                selectedOptions.Contains(MigrateArgDescriptions.ExcludeOwnerProjects),
+                selectedOptions.Contains(MigrateArgDescriptions.ExcludeMetadataOnly)
+            );
+
+            await _migrationService.StartMigrationAsync(options, ct);
         }
 
         do
@@ -98,10 +130,17 @@ internal class Backup : IBackup
                     .UseConverter(m => $"{m.Id} ({m.State})")
             );
 
+            var destination = AnsiConsole.Ask<string>("Where do you want to save the migration files?");
+
+            while (!_fileSystem.Directory.Exists(destination))
+            {
+                destination = AnsiConsole.Ask<string>("The destination directory does not exist. Please enter a valid directory.");
+            }
+
             foreach (var migration in selectedMigrations)
             {
-                AnsiConsole.WriteLine($"Downloading migration {migration.Id} to {_backupArgs.Destination}...");
-                var file = await _migrationService.DownloadMigrationAsync(new DownloadMigrationOptions(migration.Id, _backupArgs.Destination), ct);
+                AnsiConsole.WriteLine($"Downloading migration {migration.Id} to {destination}...");
+                var file = await _migrationService.DownloadMigrationAsync(new DownloadMigrationOptions(migration.Id, _fileSystem.DirectoryInfo.New(destination)), ct);
                 AnsiConsole.WriteLine($"Downloaded migration {migration.Id} ({file})");
             }
         } while (AnsiConsole.Confirm("Fetch migration status again?"));

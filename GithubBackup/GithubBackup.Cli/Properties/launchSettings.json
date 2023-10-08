@@ -3,17 +3,27 @@
   "profiles": {
     "GithubBackup.Cli Destination": {
       "commandName": "Project",
-      "commandLineArgs": "--destination C:\\Home\\Privat\\Temp\\github-backup -i",
+      "commandLineArgs": "backup -i",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Destination Log Information Console": {
       "commandName": "Project",
-      "commandLineArgs": "--destination C:\\Home\\Privat\\Temp\\github-backup --verbosity Information --quiet false",
+      "commandLineArgs": "backup --verbosity Information --quiet false",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Help": {
       "commandName": "Project",
       "commandLineArgs": "--help",
+      "environmentVariables": {}
+    },
+    "GithubBackup.Cli Backup Help": {
+      "commandName": "Project",
+      "commandLineArgs": "backup --help",
+      "environmentVariables": {}
+    },
+    "GithubBackup.Cli Migrate Help": {
+      "commandName": "Project",
+      "commandLineArgs": "migrate --help",
       "environmentVariables": {}
     }
   }

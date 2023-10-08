@@ -2,7 +2,6 @@
 using System.Text.RegularExpressions;
 using Flurl.Http;
 using GithubBackup.Core.Github.Flurl;
-using GithubBackup.Core.Github.Repositories;
 
 namespace GithubBackup.Core.Github.Migrations;
 
@@ -14,34 +13,43 @@ internal partial class MigrationService : IMigrationService
     {
         _fileSystem = fileSystem;
     }
-    
+
     public async Task<Migration> StartMigrationAsync(StartMigrationOptions options, CancellationToken ct)
     {
-        var request = new MigrationRequest(options.Repositories);
-        
+        var request = new MigrationRequest(
+            options.Repositories,
+            options.LockRepositories,
+            options.ExcludeMetadata,
+            options.ExcludeGitData,
+            options.ExcludeAttachements,
+            options.ExcludeReleases,
+            options.ExcludeOwnerProjects,
+            options.ExcludeMetadataOnly
+        );
+
         var response = await "/user/migrations"
             .PostJsonGithubApiAsync(request, ct)
             .ReceiveJson<MigrationReponse>();
 
-        return new Migration(response.Id, response.Repositories.Select(r => new Repository(r.FullName)).ToList(), response.State, response.Url);
+        return new Migration(response.Id, response.State);
     }
-    
+
     public async Task<List<Migration>> GetMigrationsAsync(CancellationToken ct)
     {
         var response = await "/user/migrations"
             .GetGithubApiAsync(ct)
             .ReceiveJson<List<MigrationReponse>>();
 
-        return response.Select(m => new Migration(m.Id, m.Repositories.Select(r => new Repository(r.FullName)).ToList(), m.State, m.Url)).ToList();
+        return response.Select(m => new Migration(m.Id, m.State)).ToList();
     }
-    
+
     public async Task<Migration> GetMigrationAsync(long id, CancellationToken ct)
     {
         var response = await $"/user/migrations/{id}"
             .GetGithubApiAsync(ct)
             .ReceiveJson<MigrationReponse>();
 
-        return new Migration(response.Id, response.Repositories.Select(r => new Repository(r.FullName)).ToList(), response.State, response.Url);
+        return new Migration(response.Id, response.State);
     }
 
     public Task<string> DownloadMigrationAsync(DownloadMigrationOptions options, CancellationToken ct)
@@ -62,7 +70,7 @@ internal partial class MigrationService : IMigrationService
         {
             throw new Exception($"A backup with the id {options.Id} already exists.");
         }
-        
+
         return $"/user/migrations/{options.Id}/archive"
             .DownloadFileGithubApiAsync(options.Destination.FullName, fileName);
     }
@@ -73,7 +81,7 @@ internal partial class MigrationService : IMigrationService
         {
             throw new Exception("The number of backups cannot be 0.");
         }
-        
+
         var backups = _fileSystem.Directory
             .GetFiles(options.Destination.FullName, "*", SearchOption.TopDirectoryOnly)
             .Select(file => BackupFileNameRegex().Match(file))
@@ -95,7 +103,7 @@ internal partial class MigrationService : IMigrationService
 
     private void OverwriteBackups(DownloadMigrationOptions options)
     {
-        var identicalBackups = Directory
+        var identicalBackups = _fileSystem.Directory
             .GetFiles(options.Destination.FullName, "*", SearchOption.TopDirectoryOnly)
             .Select(file => BackupFileNameRegex().Match(file))
             .Where(match => match.Success && match.Groups["Id"].Value == options.Id.ToString())
@@ -109,7 +117,7 @@ internal partial class MigrationService : IMigrationService
             }
         }
     }
-    
+
     [GeneratedRegex(@"^(?<Date>\d{14})_migration_(?<Id>\d+)\.tar\.gz$", RegexOptions.Compiled)]
     private static partial Regex BackupFileNameRegex();
 }
