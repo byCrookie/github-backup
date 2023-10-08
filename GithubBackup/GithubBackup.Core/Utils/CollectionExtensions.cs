@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Core.Utils;
 
-public static class CollectionExtensions
+internal static class CollectionExtensions
 {
     public static T GetRequired<T>(this INameValueListBase<T> query, string key) where T : class
     {

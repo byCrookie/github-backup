@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Cli.Commands.Github.Credentials;
 
-public interface ILoginService
+internal interface ILoginService
 {
     public Task<User> ValidateLoginAsync(CancellationToken ct);
 }

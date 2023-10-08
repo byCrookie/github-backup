@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Core.Github.Authentication;
 
-public class DeviceAndUserCodesResponse
+internal class DeviceAndUserCodesResponse
 {
     [JsonPropertyName("device_code")]
     public string DeviceCode { get; }

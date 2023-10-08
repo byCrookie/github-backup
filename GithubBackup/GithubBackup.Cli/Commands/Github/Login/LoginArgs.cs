@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Cli.Commands.Github.Login;
 
-public class LoginArgs
+internal class LoginArgs
 {
     public string Token { get; }
     public bool DeviceFlowAuth { get; }

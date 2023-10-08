@@ -6,7 +6,7 @@ using Convert = System.Convert;
 
 namespace GithubBackup.Cli.Commands.Github.Credentials;
 
-public class CredentialStore : ICredentialStore
+internal class CredentialStore : ICredentialStore
 {
     private readonly IFileSystem _fileSystem;
     

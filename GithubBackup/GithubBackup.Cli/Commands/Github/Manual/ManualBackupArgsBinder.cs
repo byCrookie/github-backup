@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Cli.Commands.Github.Manual;
 
-public class ManualBackupArgsBinder : BinderBase<ManualBackupArgs>
+internal class ManualBackupArgsBinder : BinderBase<ManualBackupArgs>
 {
     protected override ManualBackupArgs GetBoundValue(BindingContext bindingContext)
     {

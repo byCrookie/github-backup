@@ -3,7 +3,7 @@ using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Login;
 
-public class LoginArgsBinder : BinderBase<LoginArgs>
+internal class LoginArgsBinder : BinderBase<LoginArgs>
 {
     protected override LoginArgs GetBoundValue(BindingContext bindingContext)
     {

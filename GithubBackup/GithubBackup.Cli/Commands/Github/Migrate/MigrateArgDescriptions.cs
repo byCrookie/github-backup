@@ -1,6 +1,6 @@
 ﻿namespace GithubBackup.Cli.Commands.Github.Migrate;
 
-public static class MigrateArgDescriptions
+internal static class MigrateArgDescriptions
 {
     public static readonly Description Repositories = new("Repositories", "Repositories", "The repositories to backup e.g. 'owner/repo'");
     public static readonly Description LockRepositories = new("LockRepositories", "Lock Repositories", "Lock the repositories being migrated at the start of the migration");

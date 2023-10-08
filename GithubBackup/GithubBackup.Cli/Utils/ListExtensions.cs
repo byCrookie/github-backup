@@ -1,6 +1,6 @@
 ﻿namespace GithubBackup.Cli.Utils;
 
-public static class ListExtensions
+internal static class ListExtensions
 {
     public static ICollection<T> AddAll<T>(this ICollection<T> source, IEnumerable<T> items)
     {
