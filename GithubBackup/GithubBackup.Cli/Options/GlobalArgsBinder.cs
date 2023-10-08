@@ -3,7 +3,7 @@ using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Options;
 
-internal class GlobalArgsBinder : BinderBase<GlobalArgs>
+internal sealed class GlobalArgsBinder : BinderBase<GlobalArgs>
 {
     protected override GlobalArgs GetBoundValue(BindingContext bindingContext)
     {

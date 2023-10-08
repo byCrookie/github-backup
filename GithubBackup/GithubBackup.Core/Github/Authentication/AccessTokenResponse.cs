@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Core.Github.Authentication;
 
-internal class AccessTokenResponse
+internal sealed class AccessTokenResponse
 {
     [JsonPropertyName("access_token")]
     public string? AccessToken { get; set; }

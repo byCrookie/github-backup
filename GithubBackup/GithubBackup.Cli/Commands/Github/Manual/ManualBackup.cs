@@ -10,7 +10,7 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Manual;
 
-internal class ManualBackup : IManualBackup
+internal sealed class ManualBackup : IManualBackup
 {
     private readonly IAuthenticationService _authenticationService;
     private readonly IMigrationService _migrationService;

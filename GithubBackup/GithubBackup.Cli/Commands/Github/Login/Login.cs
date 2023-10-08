@@ -7,7 +7,7 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Login;
 
-internal class Login : ILogin
+internal sealed class Login : ILogin
 {
     private readonly GlobalArgs _globalArgs;
     private readonly LoginArgs _loginArgs;

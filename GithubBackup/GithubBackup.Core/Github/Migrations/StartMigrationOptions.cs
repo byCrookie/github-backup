@@ -1,6 +1,6 @@
 ﻿namespace GithubBackup.Core.Github.Migrations;
 
-public class StartMigrationOptions
+public sealed class StartMigrationOptions
 {
     public string[] Repositories { get; }
     public bool LockRepositories { get; }

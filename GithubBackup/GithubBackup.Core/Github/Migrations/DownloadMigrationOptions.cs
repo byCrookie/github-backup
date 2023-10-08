@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Core.Github.Migrations;
 
-public class DownloadMigrationOptions
+public sealed class DownloadMigrationOptions
 {
     public long Id { get; }
     public IDirectoryInfo Destination { get; }

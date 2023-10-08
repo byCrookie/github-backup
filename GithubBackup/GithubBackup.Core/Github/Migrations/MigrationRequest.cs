@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Core.Github.Migrations;
 
-internal class MigrationRequest
+internal sealed class MigrationRequest
 {
     [JsonPropertyName("repositories")]
     public string[] Repositories { get; }

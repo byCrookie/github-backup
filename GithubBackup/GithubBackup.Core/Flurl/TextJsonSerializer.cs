@@ -4,7 +4,7 @@ using Flurl.Http.Configuration;
 
 namespace GithubBackup.Core.Flurl;
 
-internal class TextJsonSerializer : ISerializer
+internal sealed class TextJsonSerializer : ISerializer
 {
     private static JsonSerializerOptions Options => new()
     {

@@ -1,5 +1,5 @@
 ﻿namespace GithubBackup.Cli.Commands.Github.Manual;
 
-internal class ManualBackupArgs
+internal sealed class ManualBackupArgs
 {
 }

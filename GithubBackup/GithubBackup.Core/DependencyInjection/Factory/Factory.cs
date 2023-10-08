@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Core.DependencyInjection.Factory;
 
-internal class Factory : IFactory
+internal sealed class Factory : IFactory
 {
     private readonly IServiceProvider _serviceProvider;
 

@@ -3,7 +3,7 @@ using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Migrate;
 
-internal class MigrateArgsBinder : BinderBase<MigrateArgs>
+internal sealed class MigrateArgsBinder : BinderBase<MigrateArgs>
 {
     protected override MigrateArgs GetBoundValue(BindingContext bindingContext)
     {

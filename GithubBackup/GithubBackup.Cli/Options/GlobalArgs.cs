@@ -4,7 +4,7 @@ using Serilog;
 
 namespace GithubBackup.Cli.Options;
 
-internal class GlobalArgs
+internal sealed class GlobalArgs
 {
     public LogLevel Verbosity { get; }
     public bool Quiet { get; }

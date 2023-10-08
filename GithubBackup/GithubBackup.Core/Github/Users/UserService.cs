@@ -3,7 +3,7 @@ using GithubBackup.Core.Github.Flurl;
 
 namespace GithubBackup.Core.Github.Users;
 
-internal class UserService : IUserService
+internal sealed class UserService : IUserService
 {
     public async Task<User> WhoAmIAsync(CancellationToken ct)
     {

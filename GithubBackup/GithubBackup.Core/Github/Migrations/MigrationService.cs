@@ -5,7 +5,7 @@ using GithubBackup.Core.Github.Flurl;
 
 namespace GithubBackup.Core.Github.Migrations;
 
-internal partial class MigrationService : IMigrationService
+internal sealed partial class MigrationService : IMigrationService
 {
     private readonly IFileSystem _fileSystem;
 

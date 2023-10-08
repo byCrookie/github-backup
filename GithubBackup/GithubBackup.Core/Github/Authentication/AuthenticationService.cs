@@ -5,7 +5,7 @@ using Polly;
 
 namespace GithubBackup.Core.Github.Authentication;
 
-internal class AuthenticationService : IAuthenticationService
+internal sealed class AuthenticationService : IAuthenticationService
 {
     private readonly ILogger<AuthenticationService> _logger;
 

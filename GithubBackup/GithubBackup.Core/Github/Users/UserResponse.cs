@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Core.Github.Users;
 
-internal class UserResponse
+internal sealed class UserResponse
 {
     [JsonPropertyName("login")]
     public string Login { get; set; }

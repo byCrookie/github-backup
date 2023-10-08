@@ -1,6 +1,6 @@
 ﻿namespace GithubBackup.Core.Github.Migrations;
 
-public class Migration
+public sealed class Migration
 {
     public long Id { get; }
     public MigrationState? State { get; }

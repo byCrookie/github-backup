@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Cli.Commands.Github.Migrate;
 
-internal class MigrateArgs
+internal sealed class MigrateArgs
 {
     public string[] Repositories { get; }
     public bool LockRepositories { get; }

@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Core.Github.Migrations;
 
-internal class MigrationReponse
+internal sealed class MigrationReponse
 {
     [JsonPropertyName("id")]
     public long Id { get; }

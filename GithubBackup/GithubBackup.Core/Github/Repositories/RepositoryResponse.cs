@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Core.Github.Repositories;
 
-internal class RepositoryResponse
+internal sealed class RepositoryResponse
 {
     [JsonPropertyName("full_name")]
     public string FullName { get; }
