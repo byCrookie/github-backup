@@ -1,31 +1,41 @@
-﻿using System.Security.Cryptography;
+﻿using System.IO.Abstractions;
+using System.Security.Cryptography;
 using GithubBackup.Core.Github.Credentials;
+using static System.Text.Encoding;
+using Convert = System.Convert;
 
 namespace GithubBackup.Cli.Commands.Github.Credentials;
 
 public class CredentialStore : ICredentialStore
 {
+    private readonly IFileSystem _fileSystem;
+    
     private const string Key = "LBaZO3iFnF";
     private const string Salt = "fqCKmp5nwk";
     private const string TokenFileName = ".token";
 
+    public CredentialStore(IFileSystem fileSystem)
+    {
+        _fileSystem = fileSystem;
+    }
+
     public Task StoreTokenAsync(string accessToken, CancellationToken ct)
     {
         GithubTokenStore.Set(accessToken);
-        var path = GetPath();
-        Directory.CreateDirectory(path);
+        var path = GetBackupPath();
+        _fileSystem.Directory.CreateDirectory(path);
         var encryptedToken = EncryptString(accessToken, Key, Salt);
-        return File.WriteAllTextAsync(Path.Combine(path, TokenFileName), encryptedToken, ct);
+        return _fileSystem.File.WriteAllTextAsync(_fileSystem.Path.Combine(path, TokenFileName), encryptedToken, ct);
     }
 
     public async Task<string?> LoadTokenAsync(CancellationToken ct)
     {
-        var path = GetPath();
-        var filePath = Path.Combine(path, TokenFileName);
+        var path = GetBackupPath();
+        var filePath = _fileSystem.Path.Combine(path, TokenFileName);
 
-        if (File.Exists(filePath))
+        if (_fileSystem.File.Exists(filePath))
         {
-            var encryptedToken = await File.ReadAllTextAsync(filePath, ct);
+            var encryptedToken = await _fileSystem.File.ReadAllTextAsync(filePath, ct);
             var decryptedToken = DecryptString(encryptedToken, Key, Salt);
             GithubTokenStore.Set(decryptedToken);
             return decryptedToken;
@@ -37,8 +47,8 @@ public class CredentialStore : ICredentialStore
 
     private static string EncryptString(string plaintext, string key, string salt)
     {
-        var plaintextBytes = System.Text.Encoding.UTF8.GetBytes(plaintext);
-        var saltBytes = System.Text.Encoding.UTF8.GetBytes(salt);
+        var plaintextBytes = UTF8.GetBytes(plaintext);
+        var saltBytes = UTF8.GetBytes(salt);
         var passwordBytes = new Rfc2898DeriveBytes(key, saltBytes, 20, HashAlgorithmName.SHA256);
         var encryptor = Aes.Create();
         encryptor.Key = passwordBytes.GetBytes(32);
@@ -56,7 +66,7 @@ public class CredentialStore : ICredentialStore
     private static string DecryptString(string encrypted, string key, string salt)
     {
         var encryptedBytes = Convert.FromBase64String(encrypted);
-        var saltBytes = System.Text.Encoding.UTF8.GetBytes(salt);
+        var saltBytes = UTF8.GetBytes(salt);
         var passwordBytes = new Rfc2898DeriveBytes(key, saltBytes, 20, HashAlgorithmName.SHA256);
         var encryptor = Aes.Create();
         encryptor.Key = passwordBytes.GetBytes(32);
@@ -67,12 +77,12 @@ public class CredentialStore : ICredentialStore
             {
                 cs.Write(encryptedBytes, 0, encryptedBytes.Length);
             }
-            return System.Text.Encoding.UTF8.GetString(ms.ToArray());
+            return UTF8.GetString(ms.ToArray());
         }
     }
 
-    private static string GetPath()
+    private string GetBackupPath()
     {
-        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GithubBackup");
+        return _fileSystem.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GithubBackup");
     }
 }

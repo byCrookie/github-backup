@@ -21,6 +21,7 @@
         <PackageReference Include="Spectre.Console" />
         <PackageReference Include="System.CommandLine" />
         <PackageReference Include="System.CommandLine.Hosting" />
+        <PackageReference Include="System.IO.Abstractions" />
         <PackageReference Include="System.Linq.Async" />
         <PackageReference Include="System.Threading.RateLimiting" />
     </ItemGroup>

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.IO.Abstractions;
+using System.Text.RegularExpressions;
 using Flurl.Http;
 using GithubBackup.Core.Github.Flurl;
 using GithubBackup.Core.Github.Repositories;
@@ -7,6 +8,13 @@ namespace GithubBackup.Core.Github.Migrations;
 
 internal partial class MigrationService : IMigrationService
 {
+    private readonly IFileSystem _fileSystem;
+
+    public MigrationService(IFileSystem fileSystem)
+    {
+        _fileSystem = fileSystem;
+    }
+    
     public async Task<Migration> StartMigrationAsync(StartMigrationOptions options, CancellationToken ct)
     {
         var request = new MigrationRequest(options.Repositories);
@@ -50,7 +58,7 @@ internal partial class MigrationService : IMigrationService
 
         var fileName = $"{DateTime.Now:yyyyMMddHHmmss}_migration_{options.Id}.tar.gz";
 
-        if (File.Exists(Path.Combine(options.Destination.FullName, fileName)))
+        if (_fileSystem.File.Exists(_fileSystem.Path.Combine(options.Destination.FullName, fileName)))
         {
             throw new Exception($"A backup with the id {options.Id} already exists.");
         }
@@ -59,14 +67,14 @@ internal partial class MigrationService : IMigrationService
             .DownloadFileGithubApiAsync(options.Destination.FullName, fileName);
     }
 
-    private static void ApplyRetentionRules(DownloadMigrationOptions options)
+    private void ApplyRetentionRules(DownloadMigrationOptions options)
     {
         if (options.NumberOfBackups == 0)
         {
             throw new Exception("The number of backups cannot be 0.");
         }
         
-        var backups = Directory
+        var backups = _fileSystem.Directory
             .GetFiles(options.Destination.FullName, "*", SearchOption.TopDirectoryOnly)
             .Select(file => BackupFileNameRegex().Match(file))
             .Where(match => match.Success)
@@ -80,12 +88,12 @@ internal partial class MigrationService : IMigrationService
 
             foreach (var backup in backupsToDelete)
             {
-                File.Delete(Path.Combine(options.Destination.FullName, backup.Value));
+                _fileSystem.File.Delete(_fileSystem.Path.Combine(options.Destination.FullName, backup.Value));
             }
         }
     }
 
-    private static void OverwriteBackups(DownloadMigrationOptions options)
+    private void OverwriteBackups(DownloadMigrationOptions options)
     {
         var identicalBackups = Directory
             .GetFiles(options.Destination.FullName, "*", SearchOption.TopDirectoryOnly)
@@ -97,7 +105,7 @@ internal partial class MigrationService : IMigrationService
         {
             foreach (var backup in identicalBackups)
             {
-                File.Delete(Path.Combine(options.Destination.FullName, backup.Value));
+                _fileSystem.File.Delete(_fileSystem.Path.Combine(options.Destination.FullName, backup.Value));
             }
         }
     }

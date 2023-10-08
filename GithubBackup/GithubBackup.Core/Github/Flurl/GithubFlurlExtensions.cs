@@ -103,7 +103,7 @@ public static class GithubFlurlExtensions
         return request.SendAsync(HttpMethod.Post, content, ct ?? CancellationToken.None, completionOption);
     }
 
-    private static async Task<IFlurlResponse> SendGithubApiAsync(
+    private static Task<IFlurlResponse> SendGithubApiAsync(
         this IFlurlRequest request,
         HttpMethod verb,
         HttpContent? content = null,
@@ -114,7 +114,7 @@ public static class GithubFlurlExtensions
         var rateLimitPolicy = CreateGithubRateLimitPolicy(ct ?? CancellationToken.None);
         var retryAfterPolicy = CreateGithubRetryAfterPolicy(ct ?? CancellationToken.None);
         var policy = Policy.WrapAsync(retryPolicy, rateLimitPolicy, retryAfterPolicy);
-        return await policy.ExecuteAsync(() => request.SendGithubApiCachedAsync(verb, content, ct, completionOption));
+        return policy.ExecuteAsync(() => request.SendGithubApiCachedAsync(verb, content, ct, completionOption));
     }
     
     private static async Task<IFlurlResponse> SendGithubApiCachedAsync(
@@ -124,7 +124,7 @@ public static class GithubFlurlExtensions
         CancellationToken? ct = null,
         HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead)
     {
-        var cacheKey = await GetCacheKey(request, verb, content);
+        var cacheKey = await GetCacheKeyAsync(request, verb, content);
 
         if (verb == HttpMethod.Get && Cache.TryGetValue(cacheKey, out IFlurlResponse? cachedResponse))
         {
@@ -148,7 +148,7 @@ public static class GithubFlurlExtensions
         return response;
     }
 
-    private static async Task<string> GetCacheKey(IFlurlRequest request, HttpMethod verb, HttpContent? content)
+    private static async Task<string> GetCacheKeyAsync(IFlurlRequest request, HttpMethod verb, HttpContent? content)
     {
         var body = content is null ? string.Empty : await content.ReadAsStringAsync();
         return $"{request.Url}{verb}{body}";
