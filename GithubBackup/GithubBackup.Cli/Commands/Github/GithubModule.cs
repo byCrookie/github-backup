@@ -1,5 +1,5 @@
-﻿using GithubBackup.Cli.Commands.Github.Backup;
-using GithubBackup.Cli.Commands.Github.Credentials;
+﻿using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Manual;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +9,7 @@ internal static class GithubModule
 {
     public static void AddGithub(this IServiceCollection services)
     {
-        services.AddTransient<IBackup, Backup.Backup>();
+        services.AddTransient<IManualBackup, ManualBackup>();
         services.AddTransient<IMigrate, Migrate.Migrate>();
         
         services.AddCredentials();

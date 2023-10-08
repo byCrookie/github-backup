@@ -8,9 +8,9 @@ using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
 using Spectre.Console;
 
-namespace GithubBackup.Cli.Commands.Github.Backup;
+namespace GithubBackup.Cli.Commands.Github.Manual;
 
-internal class Backup : IBackup
+internal class ManualBackup : IManualBackup
 {
     private readonly IAuthenticationService _authenticationService;
     private readonly IMigrationService _migrationService;
@@ -19,7 +19,7 @@ internal class Backup : IBackup
     private readonly ICredentialStore _credentialStore;
     private readonly IFileSystem _fileSystem;
 
-    public Backup(
+    public ManualBackup(
         IAuthenticationService authenticationService,
         IMigrationService migrationService,
         IUserService userService,

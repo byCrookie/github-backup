@@ -32,24 +32,24 @@ public class GlobalArgs
         QuietOption = new Option<bool>(
             aliases: new[] { "-q", "--quiet" },
             getDefaultValue: () => false,
-            description: "Do not print logs to console. Can only be used when interactive mode is disabled."
+            description: GlobalArgDescriptions.Quiet.Long
         );
 
         LogFileOption = new Option<FileInfo?>(
             aliases: new[] { "-l", "--log-file" },
-            description: "The path to the log file"
+            description: GlobalArgDescriptions.LogFile.Long
         );
 
         VerbosityOption = new Option<LogLevel>(
             aliases: new[] { "-v", "--verbosity" },
             getDefaultValue: () => LogLevel.Warning,
-            description: "The verbosity of the logs"
+            description: GlobalArgDescriptions.Verbosity.Long
         );
 
         InteractiveOption = new Option<bool>(
             aliases: new[] { "-i", "--interactive" },
             getDefaultValue: () => false,
-            description: "Enable interactive mode. This will prompt for user input when needed."
+            description: GlobalArgDescriptions.Interactive.Long
         );
 
         QuietOption.AddValidator(result =>

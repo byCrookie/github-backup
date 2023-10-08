@@ -1,6 +1,6 @@
 ﻿using System.CommandLine;
 using GithubBackup.Cli.Commands;
-using GithubBackup.Cli.Commands.Github.Backup;
+using GithubBackup.Cli.Commands.Github.Manual;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Logging;
 using GithubBackup.Cli.Options;
@@ -22,36 +22,18 @@ internal static class Cli
             GlobalArgs.LogFileOption,
             GlobalArgs.InteractiveOption
         });
-        
-        var backupCommand = new Command("backup", "Backup a Github user. Interactive is always enabled for this command.");
 
-        backupCommand.SetHandler(
-            (globalArgs, backupArgs) => RunAsync<Backup, GithubBackupArgs>(args, globalArgs, backupArgs),
-            new GlobalArgsBinder(),
-            new GithubBackupArgsBinder()
+        var manualBackupCommand = ManualBackupCommand.Create(
+            (_, globalArgs, manualBackupArgs) => RunAsync<ManualBackup, ManualBackupArgs>(args, globalArgs, manualBackupArgs),
+            args
         );
         
-        var migrateCommand = new Command("migrate", "Start a Github user migration.");
-        
-        migrateCommand.AddOptions(new List<Option>
-        {
-            MigrateArgs.RepositoriesOption,
-            MigrateArgs.LockRepositoriesOption,
-            MigrateArgs.ExcludeMetadataOption,
-            MigrateArgs.ExcludeGitDataOption,
-            MigrateArgs.ExcludeAttachementsOption,
-            MigrateArgs.ExcludeReleasesOption,
-            MigrateArgs.ExcludeOwnerProjectsOption,
-            MigrateArgs.ExcludeMetadataOnlyOption
-        });
-        
-        migrateCommand.SetHandler(
-            (globalArgs, migrateArgs) => RunAsync<Migrate, MigrateArgs>(args, globalArgs, migrateArgs),
-            new GlobalArgsBinder(),
-            new MigrateArgsBinder()
+        var migrateCommand = MigrateCommand.Create(
+            (_, globalArgs, migrateArgs) => RunAsync<Migrate, MigrateArgs>(args, globalArgs, migrateArgs),
+            args
         );
 
-        rootCommand.AddCommand(backupCommand);
+        rootCommand.AddCommand(manualBackupCommand);
         rootCommand.AddCommand(migrateCommand);
         
         await rootCommand.InvokeAsync(args);
