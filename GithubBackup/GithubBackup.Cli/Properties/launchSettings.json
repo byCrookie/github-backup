@@ -30,6 +30,11 @@
       "commandName": "Project",
       "commandLineArgs": "repositories --help",
       "environmentVariables": {}
+    },
+    "GithubBackup.Cli Download Help": {
+      "commandName": "Project",
+      "commandLineArgs": "download --help",
+      "environmentVariables": {}
     }
   }
 }

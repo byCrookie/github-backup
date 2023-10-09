@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using GithubBackup.Cli.Commands;
+using GithubBackup.Cli.Commands.Github.Download;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Manual;
 using GithubBackup.Cli.Commands.Github.Migrate;
@@ -52,11 +53,17 @@ internal static class Cli
             args
         );
 
+        var downloadCommand = DownloadCommand.Create(
+            (_, globalArgs, migrationsArgs) => RunAsync<Download, DownloadArgs>(args, globalArgs, migrationsArgs),
+            args
+        );
+
         rootCommand.AddCommand(loginCommand);
         rootCommand.AddCommand(manualBackupCommand);
         rootCommand.AddCommand(migrateCommand);
         rootCommand.AddCommand(migrationsCommand);
         rootCommand.AddCommand(repositoriesCommand);
+        rootCommand.AddCommand(downloadCommand);
         
         await rootCommand.InvokeAsync(args);
         return Environment.ExitCode;

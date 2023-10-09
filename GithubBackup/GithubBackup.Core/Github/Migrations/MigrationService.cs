@@ -31,7 +31,7 @@ internal sealed partial class MigrationService : IMigrationService
             .PostJsonGithubApiAsync(request, ct)
             .ReceiveJson<MigrationReponse>();
 
-        return new Migration(response.Id, response.State);
+        return new Migration(response.Id, response.State, response.CreatedAt);
     }
 
     public async Task<List<Migration>> GetMigrationsAsync(CancellationToken ct)
@@ -40,7 +40,7 @@ internal sealed partial class MigrationService : IMigrationService
             .GetGithubApiAsync(ct)
             .ReceiveJson<List<MigrationReponse>>();
 
-        return response.Select(m => new Migration(m.Id, m.State)).ToList();
+        return response.Select(m => new Migration(m.Id, m.State, m.CreatedAt)).ToList();
     }
 
     public async Task<Migration> GetMigrationAsync(long id, CancellationToken ct)
@@ -49,7 +49,7 @@ internal sealed partial class MigrationService : IMigrationService
             .GetGithubApiAsync(ct)
             .ReceiveJson<MigrationReponse>();
 
-        return new Migration(response.Id, response.State);
+        return new Migration(response.Id, response.State, response.CreatedAt);
     }
 
     public Task<string> DownloadMigrationAsync(DownloadMigrationOptions options, CancellationToken ct)

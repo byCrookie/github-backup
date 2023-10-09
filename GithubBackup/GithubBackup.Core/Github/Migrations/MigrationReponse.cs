@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Runtime.InteropServices.JavaScript;
+using System.Text.Json.Serialization;
 
 namespace GithubBackup.Core.Github.Migrations;
 
@@ -9,10 +10,14 @@ internal sealed class MigrationReponse
     
     [JsonPropertyName("state")]
     public MigrationState? State { get; }
+    
+    [JsonPropertyName("created_at")]
+    public DateTime CreatedAt { get; }
 
-    public MigrationReponse(long id, MigrationState? state)
+    public MigrationReponse(long id, MigrationState? state, DateTime createdAt)
     {
         Id = id;
         State = state;
+        CreatedAt = createdAt;
     }
 }
