@@ -20,6 +20,11 @@
       "commandName": "Project",
       "commandLineArgs": "login --help",
       "environmentVariables": {}
+    },
+    "GithubBackup.Cli Migrations Help": {
+      "commandName": "Project",
+      "commandLineArgs": "migrations --help",
+      "environmentVariables": {}
     }
   }
 }
