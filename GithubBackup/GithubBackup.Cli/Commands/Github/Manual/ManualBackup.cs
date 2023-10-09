@@ -42,7 +42,13 @@ internal sealed class ManualBackup : IManualBackup
 
         if (AnsiConsole.Confirm("Do you want to start a migration?", false))
         {
-            var repositories = await _repositoryService.GetRepositoriesAsync(ct);
+            var type = AnsiConsole.Ask<RepositoryType?>("What type of repositories do you want to backup? If selected, no affiliation or visibility can be selected.", null);
+            var affiliation = AnsiConsole.Ask<RepositoryAffiliation?>("What affiliation do you want to backup?", RepositoryAffiliation.Owner);
+            var visibility = AnsiConsole.Ask<RepositoryVisibility?>("What visibility do you want to backup?", RepositoryVisibility.All);
+
+            var repositoryOptions = new RepositoryOptions(type, affiliation, visibility);
+            
+            var repositories = await _repositoryService.GetRepositoriesAsync(repositoryOptions, ct);
 
             if (!repositories.Any())
             {

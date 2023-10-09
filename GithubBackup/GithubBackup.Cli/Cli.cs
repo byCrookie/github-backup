@@ -4,6 +4,7 @@ using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Manual;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Github.Migrations;
+using GithubBackup.Cli.Commands.Github.Repositories;
 using GithubBackup.Cli.Logging;
 using GithubBackup.Cli.Options;
 using Microsoft.Extensions.Configuration;
@@ -45,11 +46,17 @@ internal static class Cli
             (_, globalArgs, migrationsArgs) => RunAsync<Migrations, MigrationsArgs>(args, globalArgs, migrationsArgs),
             args
         );
+        
+        var repositoriesCommand = RepositoriesCommand.Create(
+            (_, globalArgs, migrationsArgs) => RunAsync<Repositories, RepositoriesArgs>(args, globalArgs, migrationsArgs),
+            args
+        );
 
         rootCommand.AddCommand(loginCommand);
         rootCommand.AddCommand(manualBackupCommand);
         rootCommand.AddCommand(migrateCommand);
         rootCommand.AddCommand(migrationsCommand);
+        rootCommand.AddCommand(repositoriesCommand);
         
         await rootCommand.InvokeAsync(args);
         return Environment.ExitCode;

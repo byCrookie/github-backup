@@ -35,13 +35,16 @@ internal static class GithubFlurlExtensions
     private static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
     
     public static Task<List<TItem>> GetJsonGithubApiPagedAsync<TReponse, TItem>(
-        this Url url,
+        this IFlurlRequest request,
         int perPage,
         Func<TReponse, List<TItem>> getItems,
         CancellationToken ct)
     {
-        return ApiClient
-            .Request(url)
+        var newRequest = ApiClient.Request(request.Url);
+        request.Url = newRequest.Url;
+        
+        return request
+            .WithClient(ApiClient)
             .WithOAuthBearerToken(GithubTokenStore.Get())
             .SetQueryParam("per_page", perPage)
             .GetPagedJsonAsync(
