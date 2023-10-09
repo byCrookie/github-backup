@@ -126,7 +126,7 @@ internal sealed class ManualBackup : IManualBackup
                     .InstructionsText(
                         "(Press [blue]<space>[/] to toggle a migration, " +
                         "[green]<enter>[/] to accept)")
-                    .AddChoices(migrations.Where(m => m.State == MigrationState.Exported))
+                    .AddChoices(migrationStatus.Where(m => m.State == MigrationState.Exported))
                     .UseConverter(m => $"{m.Id} ({m.State})")
             );
 

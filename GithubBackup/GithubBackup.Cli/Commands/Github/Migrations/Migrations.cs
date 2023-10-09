@@ -28,12 +28,12 @@ internal sealed class Migrations : IMigrations
     public async Task RunAsync(CancellationToken ct)
     {
         var user = await _loginService.ValidateLoginAsync(ct);
-        
+
         if (!_globalArgs.Quiet)
         {
             AnsiConsole.WriteLine($"Logged in as {user.Name}");
         }
-        
+
         var migrations = await _migrationService.GetMigrationsAsync(ct);
 
         if (!migrations.Any())
@@ -42,29 +42,54 @@ internal sealed class Migrations : IMigrations
             {
                 AnsiConsole.WriteLine("No migrations found.");
             }
-            
+
             return;
         }
 
-        switch (_migrationsArgs.Id)
+        if (_globalArgs.Interactive)
         {
-            case false:
-            {
-                var migrationStatus = await migrations
-                    .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
-                    .ToListAsync(cancellationToken: ct);
-                
-                AnsiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
-                foreach (var migration in migrationStatus)
-                {
-                    AnsiConsole.WriteLine($"- {migration.Id} ({migration.State})");
-                }
+            var migrationStatus = await migrations
+                .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
+                .ToListAsync(cancellationToken: ct);
 
-                break;
+            AnsiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
+            foreach (var migration in migrationStatus)
+            {
+                AnsiConsole.WriteLine($"- {migration.Id} ({migration.State})");
             }
-            case true:
-                AnsiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
-                break;
+
+            var selectedMigrations = AnsiConsole.Prompt(
+                new MultiSelectionPrompt<Migration>()
+                    .Title("Select [green]migrations[/] to print?")
+                    .Required()
+                    .PageSize(20)
+                    .MoreChoicesText("(Move up and down to reveal more migrations)")
+                    .InstructionsText(
+                        "(Press [blue]<space>[/] to toggle a migration, " +
+                        "[green]<enter>[/] to accept)")
+                    .AddChoices(migrationStatus.Where(m => m.State == MigrationState.Exported))
+                    .UseConverter(m => $"{m.Id} ({m.State})")
+            );
+
+            AnsiConsole.WriteLine(string.Join(" ", selectedMigrations.Select(m => m.Id)));
+            return;
+        }
+
+        if (_migrationsArgs.Id)
+        {
+            AnsiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
+        }
+        else
+        {
+            var migrationStatus = await migrations
+                .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
+                .ToListAsync(cancellationToken: ct);
+
+            AnsiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
+            foreach (var migration in migrationStatus)
+            {
+                AnsiConsole.WriteLine($"- {migration.Id} ({migration.State})");
+            }
         }
     }
 }
