@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Core.Tests.Flurl;
 
-public class ItemResponse
+internal class ItemResponse
 {
     [JsonPropertyName("items")]
     public List<Item> Items { get; }

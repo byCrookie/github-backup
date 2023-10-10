@@ -2,13 +2,17 @@
 
 namespace GithubBackup.Core.Tests.Flurl;
 
-public class Item
+internal class Item
 {
     [JsonPropertyName("id")]
     public string Id { get; }
 
-    public Item(string id)
+    [JsonPropertyName("itemEnum")]
+    public ItemEnum ItemEnum { get; }
+
+    public Item(string id, ItemEnum itemEnum)
     {
         Id = id;
+        ItemEnum = itemEnum;
     }
 }
