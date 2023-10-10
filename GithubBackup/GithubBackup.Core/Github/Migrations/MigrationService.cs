@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Flurl.Http;
 using GithubBackup.Core.Github.Flurl;
+using Polly;
 
 namespace GithubBackup.Core.Github.Migrations;
 
@@ -52,6 +53,22 @@ internal sealed partial class MigrationService : IMigrationService
         return new Migration(response.Id, response.State, response.CreatedAt);
     }
 
+    public async Task<string> PollAndDownloadMigrationAsync(DownloadMigrationOptions options,
+        Func<Migration, Task> onPollAsync, CancellationToken ct)
+    {
+        await Policy
+            .HandleResult<Migration>(e => e.State != MigrationState.Exported)
+            .WaitAndRetryForeverAsync(retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
+            .ExecuteAsync(async () =>
+            {
+                var migrationStatus = await GetMigrationAsync(options.Id, ct);
+                await onPollAsync(migrationStatus);
+                return migrationStatus;
+            });
+
+        return await DownloadMigrationAsync(options, ct);
+    }
+
     public Task<string> DownloadMigrationAsync(DownloadMigrationOptions options, CancellationToken ct)
     {
         if (options.Overwrite)
@@ -88,7 +105,7 @@ internal sealed partial class MigrationService : IMigrationService
             .Where(match => match.Success)
             .ToList();
 
-        if (backups.Count >= options.NumberOfBackups)
+        if (backups.Count < options.NumberOfBackups)
         {
             var backupsToDelete = backups
                 .OrderByDescending(match => match.Groups["Date"].Value)
@@ -109,12 +126,14 @@ internal sealed partial class MigrationService : IMigrationService
             .Where(match => match.Success && match.Groups["Id"].Value == options.Id.ToString())
             .ToList();
 
-        if (identicalBackups.Any())
+        if (!identicalBackups.Any())
         {
-            foreach (var backup in identicalBackups)
-            {
-                _fileSystem.File.Delete(_fileSystem.Path.Combine(options.Destination.FullName, backup.Value));
-            }
+            return;
+        }
+
+        foreach (var backup in identicalBackups)
+        {
+            _fileSystem.File.Delete(_fileSystem.Path.Combine(options.Destination.FullName, backup.Value));
         }
     }
 

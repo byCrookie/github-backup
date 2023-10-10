@@ -1,7 +1,6 @@
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Options;
 using GithubBackup.Core.Github.Migrations;
-using Polly;
 using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Backup;
@@ -52,20 +51,11 @@ internal sealed class Backup : IBackup
             AnsiConsole.WriteLine($"Migration started with id {migration.Id}");
         }
 
-        await Policy
-            .HandleResult<Migration>(e => e.State != MigrationState.Exported)
-            .WaitAndRetryForeverAsync(retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
-            .ExecuteAsync(async () =>
-            {
-                var migrationStatus = await _migrationService.GetMigrationAsync(migration.Id, ct);
-
-                if (!_globalArgs.Quiet)
-                {
-                    AnsiConsole.WriteLine($"Migration {migration.Id} is {migrationStatus.State}");
-                }
-
-                return migrationStatus;
-            });
+        if (!_globalArgs.Quiet)
+        {
+            AnsiConsole.WriteLine(
+                $"Downloading migration {migration.Id} to {_backupArgs.DownloadArgs.Destination} when ready...");
+        }
 
         var downloadOptions = new DownloadMigrationOptions(
             migration.Id,
@@ -74,18 +64,16 @@ internal sealed class Backup : IBackup
             _backupArgs.DownloadArgs.Overwrite
         );
 
-        if (!_globalArgs.Quiet)
-        {
-            AnsiConsole.WriteLine($"Downloading migration {migration.Id} to {_backupArgs.DownloadArgs.Destination}...");
-        }
+        var file = await _migrationService.PollAndDownloadMigrationAsync(
+            downloadOptions,
+            update =>
+            {
+                AnsiConsole.WriteLine($"Migration {update.Id} is {update.State}...");
+                return Task.CompletedTask;
+            },
+            ct
+        );
 
-        var file = await _migrationService.DownloadMigrationAsync(downloadOptions, ct);
-
-        if (!_globalArgs.Quiet)
-        {
-            AnsiConsole.WriteLine($"Downloaded migration {migration.Id} ({file})");
-        }
-
-        AnsiConsole.WriteLine(file);
+        AnsiConsole.WriteLine(!_globalArgs.Quiet ? $"Downloaded migration {migration.Id} ({file})" : file);
     }
 }
