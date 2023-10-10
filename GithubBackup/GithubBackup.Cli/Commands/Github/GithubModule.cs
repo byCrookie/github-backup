@@ -1,4 +1,7 @@
-﻿using GithubBackup.Cli.Commands.Github.Credentials;
+﻿using GithubBackup.Cli.Commands.Github.Backup;
+using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Download;
+using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Manual;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Github.Migrations;
@@ -15,6 +18,9 @@ internal static class GithubModule
         services.AddTransient<IMigrate, Migrate.Migrate>();
         services.AddTransient<IMigrations, Migrations.Migrations>();
         services.AddTransient<IRepositories, Repositories.Repositories>();
+        services.AddTransient<IBackup, Backup.Backup>();
+        services.AddTransient<ILogin, Login.Login>();
+        services.AddTransient<IDownload, Download.Download>();
         
         services.AddCredentials();
     }

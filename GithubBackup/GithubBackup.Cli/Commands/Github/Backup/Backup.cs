@@ -1,12 +1,6 @@
-using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Credentials;
-using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Options;
-using GithubBackup.Cli.Utils;
-using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Migrations;
-using GithubBackup.Core.Github.Repositories;
-using GithubBackup.Core.Github.Users;
 using Polly;
 using Spectre.Console;
 
@@ -16,34 +10,19 @@ internal sealed class Backup : IBackup
 {
     private readonly GlobalArgs _globalArgs;
     private readonly BackupArgs _backupArgs;
-    private readonly IAuthenticationService _authenticationService;
     private readonly IMigrationService _migrationService;
-    private readonly IUserService _userService;
-    private readonly IRepositoryService _repositoryService;
-    private readonly ICredentialStore _credentialStore;
     private readonly ILoginService _loginService;
-    private readonly IFileSystem _fileSystem;
 
     public Backup(
         GlobalArgs globalArgs,
         BackupArgs backupArgs,
-        IAuthenticationService authenticationService,
         IMigrationService migrationService,
-        IUserService userService,
-        IRepositoryService repositoryService,
-        ICredentialStore credentialStore,
-        ILoginService loginService,
-        IFileSystem fileSystem)
+        ILoginService loginService)
     {
         _globalArgs = globalArgs;
         _backupArgs = backupArgs;
-        _authenticationService = authenticationService;
         _migrationService = migrationService;
-        _userService = userService;
-        _repositoryService = repositoryService;
-        _credentialStore = credentialStore;
         _loginService = loginService;
-        _fileSystem = fileSystem;
     }
 
     public async Task RunAsync(CancellationToken ct)
