@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using GithubBackup.Cli.Commands;
+using GithubBackup.Cli.Commands.Github.Backup;
 using GithubBackup.Cli.Commands.Github.Download;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Manual;
@@ -57,8 +58,14 @@ internal static class Cli
             (_, globalArgs, migrationsArgs) => RunAsync<Download, DownloadArgs>(args, globalArgs, migrationsArgs),
             args
         );
+        
+        var backupCommand = BackupCommand.Create(
+            (_, globalArgs, backupArgs) => RunAsync<Backup, BackupArgs>(args, globalArgs, backupArgs),
+            args
+        );
 
         rootCommand.AddCommand(loginCommand);
+        rootCommand.AddCommand(backupCommand);
         rootCommand.AddCommand(manualBackupCommand);
         rootCommand.AddCommand(migrateCommand);
         rootCommand.AddCommand(migrationsCommand);

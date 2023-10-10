@@ -10,20 +10,20 @@ internal static class LoginCommand
     
     public static Command Create(Func<string[], GlobalArgs, LoginArgs, Task> runAsync, string[] args)
     {
-        var migrateCommand = new Command(CommandName, CommandDescription);
+        var command = new Command(CommandName, CommandDescription);
         
-        migrateCommand.AddOptions(new List<Option>
+        command.AddOptions(new List<Option>
         {
             LoginArgs.TokenOption,
             LoginArgs.DeviceFlowAuthOption
         });
         
-        migrateCommand.SetHandler(
+        command.SetHandler(
             (globalArgs, loginArgs) => runAsync(args, globalArgs, loginArgs),
             new GlobalArgsBinder(),
             new LoginArgsBinder()
         );
 
-        return migrateCommand;
+        return command;
     }
 }

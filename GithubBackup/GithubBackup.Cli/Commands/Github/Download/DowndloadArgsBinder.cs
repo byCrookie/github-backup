@@ -5,6 +5,8 @@ namespace GithubBackup.Cli.Commands.Github.Download;
 
 internal sealed class DowndloadArgsBinder : BinderBase<DownloadArgs>
 {
+    public DownloadArgs Get(BindingContext bindingContext) => GetBoundValue(bindingContext);
+
     protected override DownloadArgs GetBoundValue(BindingContext bindingContext)
     {
         var migrations = bindingContext.ParseResult.GetRequiredValueForOption(DownloadArgs.MigrationsOption);

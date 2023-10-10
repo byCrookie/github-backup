@@ -5,6 +5,8 @@ namespace GithubBackup.Cli.Commands.Github.Migrate;
 
 internal sealed class MigrateArgsBinder : BinderBase<MigrateArgs>
 {
+    public MigrateArgs Get(BindingContext bindingContext) => GetBoundValue(bindingContext);
+    
     protected override MigrateArgs GetBoundValue(BindingContext bindingContext)
     {
         var repositories = bindingContext.ParseResult.GetRequiredValueForOption(MigrateArgs.RepositoriesOption);

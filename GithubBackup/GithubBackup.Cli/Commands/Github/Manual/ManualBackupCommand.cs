@@ -10,14 +10,14 @@ internal static class ManualBackupCommand
     
     public static Command Create(Func<string[], GlobalArgs, ManualBackupArgs, Task> runAsync, string[] args)
     {
-        var manualBackupCommand = new Command(CommandName, CommandDescription);
+        var command = new Command(CommandName, CommandDescription);
 
-        manualBackupCommand.SetHandler(
+        command.SetHandler(
             (globalArgs, manualBackupArgs) => runAsync(args, globalArgs, manualBackupArgs),
             new GlobalArgsBinder(),
             new ManualBackupArgsBinder()
         );
 
-        return manualBackupCommand;
+        return command;
     }
 }

@@ -10,9 +10,9 @@ internal static class MigrateCommand
     
     public static Command Create(Func<string[], GlobalArgs, MigrateArgs, Task> runAsync, string[] args)
     {
-        var migrateCommand = new Command(CommandName, CommandDescription);
+        var command = new Command(CommandName, CommandDescription);
         
-        migrateCommand.AddOptions(new List<Option>
+        command.AddOptions(new List<Option>
         {
             MigrateArgs.RepositoriesOption,
             MigrateArgs.LockRepositoriesOption,
@@ -24,12 +24,12 @@ internal static class MigrateCommand
             MigrateArgs.ExcludeMetadataOnlyOption
         });
         
-        migrateCommand.SetHandler(
+        command.SetHandler(
             (globalArgs, migrateArgs) => runAsync(args, globalArgs, migrateArgs),
             new GlobalArgsBinder(),
             new MigrateArgsBinder()
         );
 
-        return migrateCommand;
+        return command;
     }
 }
