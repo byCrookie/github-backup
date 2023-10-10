@@ -20,5 +20,9 @@
         <PackageReference Include="TestableIO.System.IO.Abstractions" />
         <PackageReference Include="TestableIO.System.IO.Abstractions.Extensions" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <InternalsVisibleTo Include="GithubBackup.Core.Tests" />
+    </ItemGroup>
 
 </Project>

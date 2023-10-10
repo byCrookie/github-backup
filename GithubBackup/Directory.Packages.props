@@ -1,5 +1,8 @@
 <Project>
   <ItemGroup>
+    <PackageVersion Include="AutoBogus" Version="2.13.1" />
+    <PackageVersion Include="Bogus" Version="34.0.2" />
+    <PackageVersion Include="FluentAssertions" Version="7.0.0-alpha.1" />
     <PackageVersion Include="Flurl.Http" Version="3.2.4" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0-rc.1.23419.4" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
