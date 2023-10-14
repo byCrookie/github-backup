@@ -2,37 +2,37 @@
 
 public interface IFactory
 {
-    T Create<T>() where T : notnull;
+    TService Create<TService>() where TService : notnull;
     object Create(Type type);
-    T Create<T>(Type type) where T : notnull;
+    TService Create<TService>(Type type) where TService : notnull;
 }
     
-public interface IFactory<out T> where T : notnull
+public interface IFactory<out TService> where TService : notnull
 {
-    T Create();
+    TService Create();
 }
     
-public interface IFactory<in TParameter, out T> where T : notnull
+public interface IFactory<in TParameter, out TImplementation> where TImplementation : notnull
 {
-    T Create(TParameter parameter);
+    TImplementation Create(TParameter parameter);
 }
     
-public interface IFactory<in TParameter1, in TParameter2, out T> where T : notnull
+public interface IFactory<in TParameter1, in TParameter2, out TImplementation> where TImplementation : notnull
 {
-    T Create(TParameter1 parameter1, TParameter2 parameter2);
+    TImplementation Create(TParameter1 parameter1, TParameter2 parameter2);
 }
     
-public interface IFactory<in TParameter1, in TParameter2, in TParameter3, out T> where T : notnull
+public interface IFactory<in TParameter1, in TParameter2, in TParameter3, out TImplementation> where TImplementation : notnull
 {
-    T Create(TParameter1 parameter1, TParameter2 parameter2, TParameter3 parameter3);
+    TImplementation Create(TParameter1 parameter1, TParameter2 parameter2, TParameter3 parameter3);
 }
     
-public interface IFactory<in TParameter1, in TParameter2, in TParameter3, in TParameter4, out T> where T : notnull
+public interface IFactory<in TParameter1, in TParameter2, in TParameter3, in TParameter4, out TImplementation> where TImplementation : notnull
 {
-    T Create(TParameter1 parameter1, TParameter2 parameter2, TParameter3 parameter3, TParameter4 parameter4);
+    TImplementation Create(TParameter1 parameter1, TParameter2 parameter2, TParameter3 parameter3, TParameter4 parameter4);
 }
     
-public interface IFactory<in TParameter1, in TParameter2, in TParameter3, in TParameter4, in TParameter5, out T> where T : notnull
+public interface IFactory<in TParameter1, in TParameter2, in TParameter3, in TParameter4, in TParameter5, out TImplementation> where TImplementation : notnull
 {
-    T Create(TParameter1 parameter1, TParameter2 parameter2, TParameter3 parameter3, TParameter4 parameter4, TParameter5 parameter5);
+    TImplementation Create(TParameter1 parameter1, TParameter2 parameter2, TParameter3 parameter3, TParameter4 parameter4, TParameter5 parameter5);
 }
