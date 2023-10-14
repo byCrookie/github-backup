@@ -12,7 +12,7 @@ using Polly.Contrib.WaitAndRetry;
 
 namespace GithubBackup.Core.Github.Flurl;
 
-internal static class GithubFlurlExtensions
+internal static class GithubFlurl
 {
     private const string RemainingRateLimitHeader = "x-ratelimit-remaining";
     private const string RateLimitResetHeader = "x-ratelimit-reset";
@@ -34,13 +34,33 @@ internal static class GithubFlurlExtensions
 
     private static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
     
+    public static IFlurlRequest RequestApi(this string urlSegments)
+    {
+        return new Url(urlSegments).RequestApi();
+    }
+    
+    public static IFlurlRequest RequestWeb(this string urlSegments)
+    {
+        return new Url(urlSegments).RequestWeb();
+    }
+    
+    public static IFlurlRequest RequestApi(this Url url)
+    {
+        return ApiClient.Request(url);
+    }
+    
+    public static IFlurlRequest RequestWeb(this Url url)
+    {
+        return WebClient.Request(url);
+    }
+    
     public static Task<List<TItem>> GetJsonGithubApiPagedAsync<TReponse, TItem>(
         this IFlurlRequest request,
         int perPage,
         Func<TReponse, List<TItem>> getItems,
         CancellationToken ct)
     {
-        var newRequest = ApiClient.Request(request.Url);
+        var newRequest = request.Url.RequestApi();
         request.Url = newRequest.Url;
         
         return request
@@ -63,8 +83,8 @@ internal static class GithubFlurlExtensions
         int bufferSize = 4096,
         CancellationToken? ct = null)
     {
-        return ApiClient
-            .Request(urlSegments)
+        return urlSegments
+            .RequestApi()
             .WithOAuthBearerToken(GithubTokenStore.Get())
             .DownloadFileAsync(localFolderPath, localFileName, bufferSize, ct ?? CancellationToken.None);
     }
@@ -74,8 +94,8 @@ internal static class GithubFlurlExtensions
         CancellationToken? ct = null,
         HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead)
     {
-        var request = ApiClient
-            .Request(urlSegments)
+        var request = urlSegments
+            .RequestApi()
             .WithOAuthBearerToken(GithubTokenStore.Get());
 
         return SendGithubApiAsync(request, HttpMethod.Get, null, ct, completionOption);
@@ -87,8 +107,8 @@ internal static class GithubFlurlExtensions
         CancellationToken? ct = null,
         HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead)
     {
-        var request = ApiClient
-            .Request(urlSegments)
+        var request = urlSegments
+            .RequestApi()
             .WithOAuthBearerToken(GithubTokenStore.Get());
         
         var content = new CapturedJsonContent(request.Settings.JsonSerializer.Serialize(data));
@@ -101,7 +121,7 @@ internal static class GithubFlurlExtensions
         CancellationToken? ct = null,
         HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead)
     {
-        var request = WebClient.Request(urlSegments);
+        var request = urlSegments.RequestWeb();
         var content = new CapturedJsonContent(request.Settings.JsonSerializer.Serialize(data));
         return request.SendAsync(HttpMethod.Post, content, ct ?? CancellationToken.None, completionOption);
     }

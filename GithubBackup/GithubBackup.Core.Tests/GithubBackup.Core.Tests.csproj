@@ -23,9 +23,5 @@
     <ItemGroup>
         <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj"/>
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Github\" />
-    </ItemGroup>
 
 </Project>
