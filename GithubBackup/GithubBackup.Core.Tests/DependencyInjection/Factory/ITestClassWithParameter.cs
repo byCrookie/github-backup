@@ -1,4 +1,4 @@
-﻿namespace GithubBackup.Core.Tests.Integration.DependencyInjection.Factory;
+﻿namespace GithubBackup.Core.Tests.DependencyInjection.Factory;
 
 public interface ITestClassWithParameter
 {

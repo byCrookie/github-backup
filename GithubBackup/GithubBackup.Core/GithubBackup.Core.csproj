@@ -23,7 +23,6 @@
     
     <ItemGroup>
         <InternalsVisibleTo Include="GithubBackup.Core.Tests" />
-        <InternalsVisibleTo Include="GithubBackup.Core.Tests.Integration" />
     </ItemGroup>
 
 </Project>
