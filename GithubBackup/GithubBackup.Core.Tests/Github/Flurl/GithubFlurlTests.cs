@@ -1,4 +1,5 @@
-﻿using AutoBogus;
+﻿using System.Net;
+using AutoBogus;
 using FluentAssertions;
 using Flurl;
 using Flurl.Http;
@@ -85,19 +86,19 @@ public class GithubFlurlTests : IDisposable
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 1)
-            .RespondWithJson(new TestPageResponse(itemsBatch1), 200, GetHeaders(new KeyValuePair<string, string>("ETag", "1")));
+            .RespondWithJson(new TestPageResponse(itemsBatch1), (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>("ETag", "1")));
 
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 2)
-            .RespondWithJson(new TestPageResponse(itemsBatch2), 200, GetHeaders(new KeyValuePair<string, string>("ETag", "2")));
+            .RespondWithJson(new TestPageResponse(itemsBatch2), (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>("ETag", "2")));
 
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 3)
-            .RespondWithJson(new TestPageResponse(itemsBatch3), 200, GetHeaders(new KeyValuePair<string, string>("ETag", "3")));
+            .RespondWithJson(new TestPageResponse(itemsBatch3), (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>("ETag", "3")));
 
         var result = await "/test"
             .RequestApi()
@@ -123,7 +124,7 @@ public class GithubFlurlTests : IDisposable
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
-            .RespondWithJson(new TestPageResponse(itemsBatch), 200, GetHeaders());
+            .RespondWithJson(new TestPageResponse(itemsBatch), (int)HttpStatusCode.OK, GetHeaders());
 
         var result = await "/test"
             .RequestApi()
@@ -156,7 +157,7 @@ public class GithubFlurlTests : IDisposable
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
-            .RespondWithJson(new TestPageResponse(items), 200, GetHeaders());
+            .RespondWithJson(new TestPageResponse(items), (int)HttpStatusCode.OK, GetHeaders());
 
         var result = await "/test"
             .GetGithubApiAsync(CancellationToken.None)
@@ -188,7 +189,7 @@ public class GithubFlurlTests : IDisposable
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Post)
             .WithRequestJson(body)
-            .RespondWithJson(new TestPageResponse(items), 200, GetHeaders());
+            .RespondWithJson(new TestPageResponse(items), (int)HttpStatusCode.OK, GetHeaders());
 
         var result = await "/test"
             .PostJsonGithubApiAsync(body, CancellationToken.None)
@@ -220,7 +221,7 @@ public class GithubFlurlTests : IDisposable
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Post)
             .WithRequestJson(body)
-            .RespondWithJson(new TestPageResponse(items), 200, GetHeaders());
+            .RespondWithJson(new TestPageResponse(items), (int)HttpStatusCode.OK, GetHeaders());
 
         var result = await "/test"
             .PostJsonGithubWebAsync(body, CancellationToken.None)
