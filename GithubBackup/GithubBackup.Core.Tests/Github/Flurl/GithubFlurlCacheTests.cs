@@ -46,6 +46,8 @@ public class GithubFlurlCacheTests : IDisposable
             .ReceiveJson<TestPageResponse>();
 
         result1.Should().BeSameAs(result2);
+        result1.Should().Be(cachedResponse);
+        result2.Should().Be(cachedResponse);
     }
     
     [Fact]
@@ -79,8 +81,60 @@ public class GithubFlurlCacheTests : IDisposable
             .ReceiveJson<TestPageResponse>();
 
         result1.Should().NotBeSameAs(result2);
+        result1.Should().Be(cachedResponse);
+        result2.Should().Be(newResponse);
     }
 
+    [Fact]
+    public async Task GetGithubApiAsync_WhenCacheHitAndETagsDontMatch_ReturnMakeCall()
+    {
+        var response1 = new TestPageResponse(new List<TestPageItem>());
+        var response2 = new TestPageResponse(new List<TestPageItem>());
+        
+        using var httpTest = new HttpTest();
+
+        httpTest
+            .RespondWithJson(response1, (int)HttpStatusCode.NotModified, GetHeaders(new KeyValuePair<string, string>("ETag", "1")))
+            .RespondWithJson(response2, (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>("ETag", "1")));
+
+        var result1 = await "/test"
+            .GetGithubApiAsync(CancellationToken.None)
+            .ReceiveJson<TestPageResponse>();
+        
+        var result2 = await "/test"
+            .GetGithubApiAsync(CancellationToken.None)
+            .ReceiveJson<TestPageResponse>();
+
+        result1.Should().NotBeSameAs(result2);
+        result1.Should().Be(response1);
+        result2.Should().Be(response2);
+    }
+    
+    [Fact]
+    public async Task GetGithubApiAsync_WhenCacheHitAndNoETag_ReturnMakeCall()
+    {
+        var response1 = new TestPageResponse(new List<TestPageItem>());
+        var response2 = new TestPageResponse(new List<TestPageItem>());
+        
+        using var httpTest = new HttpTest();
+
+        httpTest
+            .RespondWithJson(response1, (int)HttpStatusCode.OK, GetHeaders())
+            .RespondWithJson(response2, (int)HttpStatusCode.OK, GetHeaders());
+
+        var result1 = await "/test"
+            .GetGithubApiAsync(CancellationToken.None)
+            .ReceiveJson<TestPageResponse>();
+        
+        var result2 = await "/test"
+            .GetGithubApiAsync(CancellationToken.None)
+            .ReceiveJson<TestPageResponse>();
+
+        result1.Should().NotBeSameAs(result2);
+        result1.Should().Be(response1);
+        result2.Should().Be(response2);
+    }
+    
     private static Dictionary<string, string> GetHeaders(params KeyValuePair<string, string>[] headers)
     {
         var allHeaders = new Dictionary<string, string>
