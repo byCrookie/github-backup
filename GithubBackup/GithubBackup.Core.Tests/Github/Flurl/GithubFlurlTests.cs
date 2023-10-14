@@ -196,6 +196,38 @@ public class GithubFlurlTests : IDisposable
 
         result.Items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
     }
+    
+    [Fact]
+    public async Task PostJsonGithubWebAsync_Reponse_Result()
+    {
+        const string url = "https://github.com/test";
+
+        var items = new List<TestPageItem>
+        {
+            new(1, "name")
+        };
+
+        var expectedItems = new List<TestPageItem>
+        {
+            new(1, "name")
+        };
+
+        using var httpTest = new HttpTest();
+
+        var body = new { Test = "test" };
+
+        httpTest
+            .ForCallsTo(url)
+            .WithVerb(HttpMethod.Post)
+            .WithRequestJson(body)
+            .RespondWithJson(new TestPageResponse(items), 200, GetHeaders());
+
+        var result = await "/test"
+            .PostJsonGithubWebAsync(body, CancellationToken.None)
+            .ReceiveJson<TestPageResponse>();
+
+        result.Items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
+    }
 
     private static Dictionary<string, string> GetHeaders(params KeyValuePair<string, string>[] headers)
     {
