@@ -3,10 +3,11 @@ using FluentAssertions;
 using Flurl.Http;
 using Flurl.Http.Testing;
 using GithubBackup.Core.Flurl;
+using GithubBackup.Core.Github.Flurl;
 
 namespace GithubBackup.Core.Tests.Flurl;
 
-public class FlurlExtensionsTests
+public class FlurlExtensionsTests : IDisposable
 {
     [Fact]
     public async Task GetPagedJsonAsync_WhenHasNoPages_ThenReturnEmptyList()
@@ -82,5 +83,10 @@ public class FlurlExtensionsTests
             );
         
         items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
+    }
+
+    public void Dispose()
+    {
+        GithubFlurl.ClearCache();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoBogus;
 using FluentAssertions;
 using Flurl;
+using Flurl.Http;
 using Flurl.Http.Testing;
 using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Flurl;
@@ -9,7 +10,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace GithubBackup.Core.Tests.Github.Flurl;
 
-public class GithubFlurlTests
+public class GithubFlurlTests : IDisposable
 {
     private const string Token = "token";
 
@@ -84,36 +85,21 @@ public class GithubFlurlTests
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 1)
-            .RespondWithJson(new TestPageResponse(itemsBatch1), 200, new Dictionary<string, object>
-            {
-                { "x-ratelimit-remaining", "4999" },
-                { "x-ratelimit-reset", "1614556800" },
-                { "ETag", "1"}
-            });
+            .RespondWithJson(new TestPageResponse(itemsBatch1), 200, GetHeaders(new KeyValuePair<string, string>("ETag", "1")));
 
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 2)
-            .RespondWithJson(new TestPageResponse(itemsBatch2), 200, new Dictionary<string, object>
-            {
-                { "x-ratelimit-remaining", "4999" },
-                { "x-ratelimit-reset", "1614556800" },
-                { "ETag", "2"}
-            });
+            .RespondWithJson(new TestPageResponse(itemsBatch2), 200, GetHeaders(new KeyValuePair<string, string>("ETag", "2")));
 
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 3)
-            .RespondWithJson(new TestPageResponse(itemsBatch3), 200, new Dictionary<string, object>
-            {
-                { "x-ratelimit-remaining", "4999" },
-                { "x-ratelimit-reset", "1614556800" },
-                { "ETag", "3"}
-            });
+            .RespondWithJson(new TestPageResponse(itemsBatch3), 200, GetHeaders(new KeyValuePair<string, string>("ETag", "3")));
 
-        var result = await "https://api.github.com/test"
+        var result = await "/test"
             .RequestApi()
             .GetJsonGithubApiPagedAsync<TestPageResponse, TestPageItem>(
                 pageSize,
@@ -123,7 +109,7 @@ public class GithubFlurlTests
 
         result.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
     }
-    
+
     [Fact]
     public async Task GetJsonGithubApiPagedAsync_WhenHasNoPages_ThenReturnEmptyList()
     {
@@ -133,17 +119,13 @@ public class GithubFlurlTests
         var itemsBatch = new List<TestPageItem>();
 
         using var httpTest = new HttpTest();
-        
+
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
-            .RespondWithJson(new TestPageResponse(itemsBatch), 200, new Dictionary<string, object>
-            {
-                { "x-ratelimit-remaining", "4999" },
-                { "x-ratelimit-reset", "1614556800" }
-            });
+            .RespondWithJson(new TestPageResponse(itemsBatch), 200, GetHeaders());
 
-        var result = await "https://api.github.com/test"
+        var result = await "/test"
             .RequestApi()
             .GetJsonGithubApiPagedAsync<TestPageResponse, TestPageItem>(
                 pageSize,
@@ -152,5 +134,87 @@ public class GithubFlurlTests
             );
 
         result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task GetGithubApiAsync_Reponse_Result()
+    {
+        const string url = "https://api.github.com/test";
+
+        var items = new List<TestPageItem>
+        {
+            new(1, "name")
+        };
+
+        var expectedItems = new List<TestPageItem>
+        {
+            new(1, "name")
+        };
+
+        using var httpTest = new HttpTest();
+
+        httpTest
+            .ForCallsTo(url)
+            .WithVerb(HttpMethod.Get)
+            .RespondWithJson(new TestPageResponse(items), 200, GetHeaders());
+
+        var result = await "/test"
+            .GetGithubApiAsync(CancellationToken.None)
+            .ReceiveJson<TestPageResponse>();
+
+        result.Items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
+    }
+
+    [Fact]
+    public async Task PostJsonGithubApiAsync_Reponse_Result()
+    {
+        const string url = "https://api.github.com/test";
+
+        var items = new List<TestPageItem>
+        {
+            new(1, "name")
+        };
+
+        var expectedItems = new List<TestPageItem>
+        {
+            new(1, "name")
+        };
+
+        using var httpTest = new HttpTest();
+
+        var body = new { Test = "test" };
+
+        httpTest
+            .ForCallsTo(url)
+            .WithVerb(HttpMethod.Post)
+            .WithRequestJson(body)
+            .RespondWithJson(new TestPageResponse(items), 200, GetHeaders());
+
+        var result = await "/test"
+            .PostJsonGithubApiAsync(body, CancellationToken.None)
+            .ReceiveJson<TestPageResponse>();
+
+        result.Items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
+    }
+
+    private static Dictionary<string, string> GetHeaders(params KeyValuePair<string, string>[] headers)
+    {
+        var allHeaders = new Dictionary<string, string>
+        {
+            { "x-ratelimit-remaining", "4999" },
+            { "x-ratelimit-reset", "1614556800" }
+        };
+
+        foreach (var header in headers)
+        {
+            allHeaders.Add(header.Key, header.Value);
+        }
+
+        return allHeaders;
+    }
+
+    public void Dispose()
+    {
+        GithubFlurl.ClearCache();
     }
 }

@@ -32,7 +32,13 @@ internal static class GithubFlurl
         .WithHeader(HeaderNames.UserAgent, UserAgent)
         .WithHeader(HeaderNames.Accept, Accept);
 
-    private static readonly IMemoryCache Cache = new MemoryCache(new MemoryCacheOptions());
+    private static IMemoryCache _cache = new MemoryCache(new MemoryCacheOptions());
+    
+    public static void ClearCache()
+    {
+        _cache.Dispose();
+        _cache = new MemoryCache(new MemoryCacheOptions());
+    }
     
     public static IFlurlRequest RequestApi(this string urlSegments)
     {
@@ -149,7 +155,7 @@ internal static class GithubFlurl
     {
         var cacheKey = await GetCacheKeyAsync(request, verb, content);
 
-        if (verb == HttpMethod.Get && Cache.TryGetValue(cacheKey, out IFlurlResponse? cachedResponse))
+        if (verb == HttpMethod.Get && _cache.TryGetValue(cacheKey, out IFlurlResponse? cachedResponse))
         {
             var modifiedResponse = await request
                 .WithHeader(IfNoneMatchHeader, cachedResponse!.Headers.GetRequired(ETagHeader))
@@ -165,7 +171,7 @@ internal static class GithubFlurl
         
         if (verb == HttpMethod.Get && response.StatusCode == (int)HttpStatusCode.OK)
         {
-            Cache.Set(cacheKey, response);
+            _cache.Set(cacheKey, response);
         }
         
         return response;

@@ -7,7 +7,7 @@ using Microsoft.Net.Http.Headers;
 
 namespace GithubBackup.Core.Tests.Github.Users;
 
-public class UserServiceTests
+public class UserServiceTests : IDisposable
 {
     private readonly UserService _sut;
     private const string Token = "token";
@@ -41,5 +41,10 @@ public class UserServiceTests
 
         result.Login.Should().Be(login);
         result.Name.Should().Be(name);
+    }
+
+    public void Dispose()
+    {
+        GithubFlurl.ClearCache();
     }
 }
