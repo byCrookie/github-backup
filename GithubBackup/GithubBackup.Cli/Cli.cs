@@ -1,4 +1,6 @@
 ﻿using System.CommandLine;
+using System.CommandLine.Builder;
+using System.CommandLine.Parsing;
 using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Commands.Github.Backup;
 using GithubBackup.Cli.Commands.Github.Download;
@@ -20,6 +22,21 @@ internal static class Cli
 {
     public static async Task<int> RunAsync(string[] args)
     {
+        var rootCommand = SetupCommands(args);
+        var commandLineBuilder = new CommandLineBuilder(rootCommand);
+        commandLineBuilder.UseDefaults();
+        commandLineBuilder.UseExceptionHandler((exception, _) =>
+        {
+            Console.Error.WriteLine(exception.Message);
+            Environment.ExitCode = 1;
+        });
+        var parser = commandLineBuilder.Build();
+        await parser.InvokeAsync(args);
+        return Environment.ExitCode;
+    }
+
+    private static RootCommand SetupCommands(string[] args)
+    {
         var rootCommand = new RootCommand("Github Backup");
 
         rootCommand.AddGlobalOptions(new List<Option>
@@ -34,22 +51,22 @@ internal static class Cli
             (_, globalArgs, manualBackupArgs) => RunAsync<ManualBackup, ManualBackupArgs>(args, globalArgs, manualBackupArgs),
             args
         );
-        
+
         var migrateCommand = MigrateCommand.Create(
             (_, globalArgs, migrateArgs) => RunAsync<Migrate, MigrateArgs>(args, globalArgs, migrateArgs),
             args
         );
-        
+
         var loginCommand = LoginCommand.Create(
             (_, globalArgs, loginArgs) => RunAsync<Login, LoginArgs>(args, globalArgs, loginArgs),
             args
         );
-        
+
         var migrationsCommand = MigrationsCommand.Create(
             (_, globalArgs, migrationsArgs) => RunAsync<Migrations, MigrationsArgs>(args, globalArgs, migrationsArgs),
             args
         );
-        
+
         var repositoriesCommand = RepositoriesCommand.Create(
             (_, globalArgs, migrationsArgs) => RunAsync<Repositories, RepositoriesArgs>(args, globalArgs, migrationsArgs),
             args
@@ -59,7 +76,7 @@ internal static class Cli
             (_, globalArgs, migrationsArgs) => RunAsync<Download, DownloadArgs>(args, globalArgs, migrationsArgs),
             args
         );
-        
+
         var backupCommand = BackupCommand.Create(
             (_, globalArgs, backupArgs) => RunAsync<Backup, BackupArgs>(args, globalArgs, backupArgs),
             args
@@ -72,9 +89,7 @@ internal static class Cli
         rootCommand.AddCommand(migrationsCommand);
         rootCommand.AddCommand(repositoriesCommand);
         rootCommand.AddCommand(downloadCommand);
-        
-        await rootCommand.InvokeAsync(args);
-        return Environment.ExitCode;
+        return rootCommand;
     }
 
     /// <summary>Configures the host and runs the CLI.</summary>

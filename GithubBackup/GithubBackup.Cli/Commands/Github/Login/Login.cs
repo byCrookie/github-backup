@@ -71,9 +71,9 @@ internal sealed class Login : ILogin
     private async Task<string> GetOAuthTokenAsync(CancellationToken ct)
     {
         var deviceAndUserCodes = await _authenticationService.RequestDeviceAndUserCodesAsync(ct);
-        Console.WriteLine(
+        AnsiConsole.WriteLine(
             $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}");
-        Console.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
+        AnsiConsole.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
         var accessToken = await _authenticationService.PollForAccessTokenAsync(
             deviceAndUserCodes.DeviceCode,
             deviceAndUserCodes.Interval,

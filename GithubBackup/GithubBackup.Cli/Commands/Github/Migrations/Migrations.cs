@@ -90,6 +90,8 @@ internal sealed class Migrations : IMigrations
             {
                 AnsiConsole.WriteLine($"- {migration.Id} ({migration.State})");
             }
+            
+            AnsiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
         }
     }
 }

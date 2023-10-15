@@ -19,7 +19,7 @@ internal sealed class MigrateArgsBinder : BinderBase<MigrateArgs>
         var excludeMetadataOnly = bindingContext.ParseResult.GetRequiredValueForOption(MigrateArgs.ExcludeMetadataOnlyOption);
 
         return new MigrateArgs(
-            repositories,
+            repositories.Any() ? repositories : StandardInput.ReadStrings(),
             lockRepositories,
             excludeMetadata,
             excludeGitData,

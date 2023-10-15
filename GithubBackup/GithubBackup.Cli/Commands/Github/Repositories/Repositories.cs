@@ -53,24 +53,30 @@ internal sealed class Repositories : IRepositories
 
         if (!_globalArgs.Interactive)
         {
+            AnsiConsole.WriteLine($"Found {repositories.Count} repositories:");
+            foreach (var repository in repositories)
+            {
+                AnsiConsole.WriteLine($"- {repository.FullName}");
+            }
+            
             AnsiConsole.WriteLine(string.Join(" ", repositories.Select(r => r.FullName)));
         }
+        else
+        {
+            var selectedRepositories = AnsiConsole.Prompt(
+                new MultiSelectionPrompt<Repository>()
+                    .Title("Select [green]repositories[/] to print?")
+                    .Required(false)
+                    .PageSize(20)
+                    .MoreChoicesText("(Move up and down to reveal more repositories)")
+                    .InstructionsText(
+                        "(Press [blue]<space>[/] to toggle a repository, " +
+                        "[green]<enter>[/] to accept)")
+                    .AddChoices(repositories)
+                    .UseConverter(r => r.FullName)
+            );
 
-        AnsiConsole.WriteLine($"Found {repositories.Count} repositories:");
-
-        var selectedRepositories = AnsiConsole.Prompt(
-            new MultiSelectionPrompt<Repository>()
-                .Title("Select [green]repositories[/] to print?")
-                .Required()
-                .PageSize(20)
-                .MoreChoicesText("(Move up and down to reveal more repositories)")
-                .InstructionsText(
-                    "(Press [blue]<space>[/] to toggle a repository, " +
-                    "[green]<enter>[/] to accept)")
-                .AddChoices(repositories)
-                .UseConverter(r => r.FullName)
-        );
-
-        AnsiConsole.WriteLine(string.Join(" ", selectedRepositories.Select(r => r.FullName)));
+            AnsiConsole.WriteLine(string.Join(" ", selectedRepositories.Select(r => r.FullName)));   
+        }
     }
 }

@@ -29,7 +29,6 @@ internal static class BackupCommand
         
         command.AddOptions(new List<Option>
         {
-            DownloadArgs.MigrationsOption,
             DownloadArgs.LatestOption,
             DownloadArgs.DestinationOption,
             DownloadArgs.OverwriteOption

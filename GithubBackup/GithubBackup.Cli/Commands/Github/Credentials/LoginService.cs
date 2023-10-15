@@ -30,11 +30,7 @@ internal sealed class LoginService : ILoginService
 
         if (string.IsNullOrWhiteSpace(token))
         {
-            if (!_globalArgs.Quiet)
-            {
-                _logger.LogWarning("No token found");
-            }
-
+            _logger.LogDebug("No token found");
             throw new Exception("Login first using the 'login' command.");
         }
 
@@ -58,7 +54,7 @@ internal sealed class LoginService : ILoginService
         {
             if (!_globalArgs.Quiet)
             {
-                _logger.LogWarning("Token is invalid");
+                _logger.LogDebug("Token is invalid");
             }
         }
 

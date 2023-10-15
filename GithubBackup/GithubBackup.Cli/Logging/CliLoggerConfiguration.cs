@@ -8,8 +8,9 @@ internal static class CliLoggerConfiguration
 {
     public static LoggerConfiguration Create(GlobalArgs globalArgs)
     {
-        var configuration = new LoggerConfiguration()
-            .MinimumLevel.Is(globalArgs.Verbosity.MicrosoftToSerilogLevel());
+        var logEventLevel = globalArgs.Verbosity.MicrosoftToSerilogLevel();
+        
+        var configuration = new LoggerConfiguration();
 
         if (globalArgs.LogFile is not null)
         {
@@ -19,9 +20,9 @@ internal static class CliLoggerConfiguration
                 fileSizeLimitBytes: 100_000_000,
                 retainedFileCountLimit: 10,
                 rollingInterval: RollingInterval.Infinite
-            );
+            ).MinimumLevel.Is(logEventLevel);
         }
-
+        
         return configuration;
     }
 }

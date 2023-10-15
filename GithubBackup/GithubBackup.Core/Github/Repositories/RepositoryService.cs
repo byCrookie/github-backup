@@ -1,6 +1,6 @@
-﻿using Flurl;
-using Flurl.Http;
+﻿using Flurl.Http;
 using GithubBackup.Core.Github.Clients;
+using GithubBackup.Core.Utils;
 
 namespace GithubBackup.Core.Github.Repositories;
 
@@ -17,11 +17,13 @@ internal sealed class RepositoryService : IRepositoryService
     {
         if (options.Type is not null)
         {
-            return GetRepositoryResponseAsync(rq => rq.SetQueryParam("type", options.Type), ct);
+            return GetRepositoryResponseAsync(rq => rq.SetQueryParam("type", options.Type.Value.GetEnumMemberValue()), ct);
         }
 
         return GetRepositoryResponseAsync(
-            rq => rq.SetQueryParam("affiliation", options.Affiliation).SetQueryParam("visibility", options.Visibility),
+            rq => rq
+                .SetQueryParam("affiliation", options.Affiliation!.Value.GetEnumMemberValue())
+                .SetQueryParam("visibility", options.Visibility!.Value.GetEnumMemberValue()),
             ct
         );
     }

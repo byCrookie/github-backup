@@ -10,13 +10,13 @@ internal sealed class DowndloadArgsBinder : BinderBase<DownloadArgs>
     protected override DownloadArgs GetBoundValue(BindingContext bindingContext)
     {
         var migrations = bindingContext.ParseResult.GetRequiredValueForOption(DownloadArgs.MigrationsOption);
-        var latest = bindingContext.ParseResult.GetRequiredValueForOption(DownloadArgs.LatestOption);
+        var latest = bindingContext.ParseResult.GetValueForOption(DownloadArgs.LatestOption);
         var destination = bindingContext.ParseResult.GetRequiredValueForOption(DownloadArgs.DestinationOption);
-        var numberOfBackups = bindingContext.ParseResult.GetRequiredValueForOption(DownloadArgs.NumberOfBackupsOption);
-        var overwrite = bindingContext.ParseResult.GetRequiredValueForOption(DownloadArgs.OverwriteOption);
+        var numberOfBackups = bindingContext.ParseResult.GetValueForOption(DownloadArgs.NumberOfBackupsOption);
+        var overwrite = bindingContext.ParseResult.GetValueForOption(DownloadArgs.OverwriteOption);
 
         return new DownloadArgs(
-            migrations,
+            migrations.Any() ? migrations : StandardInput.ReadLongs(),
             latest,
             destination,
             numberOfBackups,

@@ -31,12 +31,14 @@ internal sealed class CliCommandService : ICliCommandService
             var error = await e.GetResponseStringAsync();
             _logger.LogCritical(e, "Unhandled exception (Command: {Type}):{NewLine}{Message}",
                 _cliCommand.GetType().Name, Environment.NewLine, error);
+            await Console.Error.WriteLineAsync(e.Message);
             Environment.ExitCode = 1;
         }
         catch (Exception e)
         {
             _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}",
                 _cliCommand.GetType().Name, e.Message);
+            await Console.Error.WriteLineAsync(e.Message);
             Environment.ExitCode = 1;
         }
 

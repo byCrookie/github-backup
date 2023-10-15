@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Options;
 using GithubBackup.Core.Github.Migrations;
@@ -11,17 +12,20 @@ internal sealed class Backup : IBackup
     private readonly BackupArgs _backupArgs;
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
+    private readonly IFileSystem _fileSystem;
 
     public Backup(
         GlobalArgs globalArgs,
         BackupArgs backupArgs,
         IMigrationService migrationService,
-        ILoginService loginService)
+        ILoginService loginService,
+        IFileSystem fileSystem)
     {
         _globalArgs = globalArgs;
         _backupArgs = backupArgs;
         _migrationService = migrationService;
         _loginService = loginService;
+        _fileSystem = fileSystem;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -59,7 +63,7 @@ internal sealed class Backup : IBackup
 
         var downloadOptions = new DownloadMigrationOptions(
             migration.Id,
-            _backupArgs.DownloadArgs.Destination,
+            _fileSystem.DirectoryInfo.Wrap(_backupArgs.DownloadArgs.Destination),
             _backupArgs.DownloadArgs.NumberOfBackups,
             _backupArgs.DownloadArgs.Overwrite
         );

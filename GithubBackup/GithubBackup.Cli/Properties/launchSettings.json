@@ -40,6 +40,21 @@
       "commandName": "Project",
       "commandLineArgs": "backup --help",
       "environmentVariables": {}
+    },
+    "GithubBackup.Cli Backup": {
+      "commandName": "Project",
+      "commandLineArgs": "backup --destination M:\\Development\\Temp\\github-backup",
+      "environmentVariables": {}
+    },
+    "GithubBackup.Cli Download": {
+      "commandName": "Project",
+      "commandLineArgs": "download --destination M:\\Development\\Temp\\github-backup",
+      "environmentVariables": {}
+    },
+    "GithubBackup.Cli Manual Backup": {
+      "commandName": "Project",
+      "commandLineArgs": "manual",
+      "environmentVariables": {}
     }
   }
 }

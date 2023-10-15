@@ -1,3 +1,4 @@
+using System.IO.Abstractions;
 using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Options;
 using GithubBackup.Core;
@@ -27,6 +28,7 @@ internal static class CliModule
     {
         services.AddCore();
         services.AddSerilog();
+        services.AddTransient<IFileSystem, FileSystem>();
         
         services.AddCommands<TCliCommand, TCommandArgs>(globalArgs, commandArgs);
     }

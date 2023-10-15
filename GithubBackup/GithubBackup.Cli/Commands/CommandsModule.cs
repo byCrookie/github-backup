@@ -27,10 +27,12 @@ internal static class CommandsModule
         where TCliCommand : class, ICliCommand
     {
         services.AddGithub();
+        
+        services.AddSingleton(globalArgs);
 
         services.AddTransient<ICliCommand>(s => s
-            .GetRequiredService<IFactory<GlobalArgs, TCommandArgs, TCliCommand>>()
-            .Create(globalArgs, commandArgs));
+            .GetRequiredService<IFactory<TCommandArgs, TCliCommand>>()
+            .Create(commandArgs));
 
         services.AddServices();
     }

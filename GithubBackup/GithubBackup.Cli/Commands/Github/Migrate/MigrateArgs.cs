@@ -24,6 +24,11 @@ internal sealed class MigrateArgs
         bool excludeMetadataOnly
     )
     {
+        if (!repositories.Any())
+        {
+            throw new ArgumentException("At least one repository must be specified.");
+        }
+        
         Repositories = repositories;
         LockRepositories = lockRepositories;
         ExcludeMetadata = excludeMetadata;

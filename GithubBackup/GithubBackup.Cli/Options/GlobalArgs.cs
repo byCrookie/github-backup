@@ -42,7 +42,7 @@ internal sealed class GlobalArgs
 
         VerbosityOption = new Option<LogLevel>(
             aliases: new[] { "-v", "--verbosity" },
-            getDefaultValue: () => LogLevel.Warning,
+            getDefaultValue: () => LogLevel.Information,
             description: GlobalArgDescriptions.Verbosity.Long
         );
 

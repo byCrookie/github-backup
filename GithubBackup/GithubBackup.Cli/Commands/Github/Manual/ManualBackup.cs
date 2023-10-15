@@ -20,6 +20,10 @@ internal sealed class ManualBackup : IManualBackup
     private readonly IFileSystem _fileSystem;
 
     public ManualBackup(
+        // Needs to be passed in because of the way ICommand's are resolved in
+        // the cli service.
+        // ReSharper disable once UnusedParameter.Local
+        ManualBackupArgs _,
         IAuthenticationService authenticationService,
         IMigrationService migrationService,
         IUserService userService,
@@ -42,9 +46,31 @@ internal sealed class ManualBackup : IManualBackup
 
         if (AnsiConsole.Confirm("Do you want to start a migration?", false))
         {
-            var type = AnsiConsole.Ask<RepositoryType?>("What type of repositories do you want to backup? If selected, no affiliation or visibility can be selected.", null);
-            var affiliation = AnsiConsole.Ask<RepositoryAffiliation?>("What affiliation do you want to backup?", RepositoryAffiliation.Owner);
-            var visibility = AnsiConsole.Ask<RepositoryVisibility?>("What visibility do you want to backup?", RepositoryVisibility.All);
+            var byType = AnsiConsole.Confirm("Do you want to select repositories by type? If selected, no affiliation or visibility can be selected.", false);
+            var type = (RepositoryType?)null;
+            var affiliation = (RepositoryAffiliation?)RepositoryAffiliation.Owner;
+            var visibility = (RepositoryVisibility?)RepositoryVisibility.All;
+
+            switch (byType)
+            {
+                case true:
+                    type = AnsiConsole.Prompt(new SelectionPrompt<RepositoryType>()
+                        .Title("What type of repositories do you want to backup?")
+                        .PageSize(20)
+                        .AddChoices(Enum.GetValues<RepositoryType>()));
+                    break;
+                case false:
+                    affiliation = AnsiConsole.Prompt(new SelectionPrompt<RepositoryAffiliation>()
+                        .Title("Which affiliation type do you want to backup?")
+                        .PageSize(20)
+                        .AddChoices(Enum.GetValues<RepositoryAffiliation>()));
+                
+                    visibility = AnsiConsole.Prompt(new SelectionPrompt<RepositoryVisibility>()
+                        .Title("Which visibility type do you want to backup?")
+                        .PageSize(20)
+                        .AddChoices(Enum.GetValues<RepositoryVisibility>()));
+                    break;
+            }
 
             var repositoryOptions = new RepositoryOptions(type, affiliation, visibility);
             
@@ -58,8 +84,8 @@ internal sealed class ManualBackup : IManualBackup
 
             var selectedRepositories = AnsiConsole.Prompt(
                 new MultiSelectionPrompt<Repository>()
-                    .Title("Select [green]repositories[/] to backup?")
-                    .Required()
+                    .Title("Select [green]repositories[/] to backup? If none is selected, all repositories will be backed up.")
+                    .Required(false)
                     .PageSize(20)
                     .MoreChoicesText("(Move up and down to reveal more repositories)")
                     .InstructionsText(
@@ -73,6 +99,7 @@ internal sealed class ManualBackup : IManualBackup
                 new MultiSelectionPrompt<Description>()
                     .Title("Select [green]options[/] to start migration?")
                     .PageSize(20)
+                    .Required(false)
                     .MoreChoicesText("(Move up and down to reveal more options)")
                     .InstructionsText(
                         "(Press [blue]<space>[/] to toggle a option, " +
@@ -90,7 +117,7 @@ internal sealed class ManualBackup : IManualBackup
             );
 
             var options = new StartMigrationOptions(
-                selectedRepositories.Select(r => r.FullName).ToArray(),
+                GetRepositoryNames(selectedRepositories, repositories),
                 selectedOptions.Contains(MigrateArgDescriptions.LockRepositories),
                 selectedOptions.Contains(MigrateArgDescriptions.ExcludeMetadata),
                 selectedOptions.Contains(MigrateArgDescriptions.ExcludeGitData),
@@ -152,6 +179,11 @@ internal sealed class ManualBackup : IManualBackup
         } while (AnsiConsole.Confirm("Fetch migration status again?"));
     }
 
+    private static string[] GetRepositoryNames(IReadOnlyCollection<Repository> selectedRepositories, IEnumerable<Repository> repositories)
+    {
+        return selectedRepositories.Any() ? selectedRepositories.Select(r => r.FullName).ToArray() : repositories.Select(r => r.FullName).ToArray();
+    }
+
     private async Task<User> LoginAsync(CancellationToken ct)
     {
         try
@@ -190,9 +222,9 @@ internal sealed class ManualBackup : IManualBackup
     private async Task<string> GetOAuthTokenAsync(CancellationToken ct)
     {
         var deviceAndUserCodes = await _authenticationService.RequestDeviceAndUserCodesAsync(ct);
-        Console.WriteLine(
+        AnsiConsole.WriteLine(
             $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}");
-        Console.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
+        AnsiConsole.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
         var accessToken = await _authenticationService.PollForAccessTokenAsync(
             deviceAndUserCodes.DeviceCode,
             deviceAndUserCodes.Interval,

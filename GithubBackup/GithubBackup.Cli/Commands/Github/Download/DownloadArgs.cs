@@ -1,23 +1,27 @@
 ﻿using System.CommandLine;
-using System.IO.Abstractions;
 
 namespace GithubBackup.Cli.Commands.Github.Download;
 
 internal sealed class DownloadArgs
 {
-    public int[] Migrations { get; }
+    public long[] Migrations { get; }
     public bool Latest { get; }
-    public IDirectoryInfo Destination { get; }
+    public DirectoryInfo Destination { get; }
     public int? NumberOfBackups { get; }
     public bool Overwrite { get; }
 
     public DownloadArgs(
-        int[] migrations,
+        long[] migrations,
         bool latest,
-        IDirectoryInfo destination,
+        DirectoryInfo destination,
         int? numberOfBackups,
         bool overwrite)
     {
+        if (!migrations.Any())
+        {
+            throw new ArgumentException("At least one migration must be specified.");
+        }
+        
         Migrations = migrations;
         Latest = latest;
         Destination = destination;
@@ -25,31 +29,38 @@ internal sealed class DownloadArgs
         Overwrite = overwrite;
     }
 
-    public static Option<int[]> MigrationsOption { get; }
+    public static Option<long[]> MigrationsOption { get; }
     public static Option<bool> LatestOption { get; }
-    public static Option<IDirectoryInfo> DestinationOption { get; }
+    public static Option<DirectoryInfo> DestinationOption { get; }
     public static Option<int?> NumberOfBackupsOption { get; }
     public static Option<bool> OverwriteOption { get; }
 
     static DownloadArgs()
     {
-        MigrationsOption = new Option<int[]>(
+        MigrationsOption = new Option<long[]>(
             aliases: new[] { "-m", "--migrations" },
-            description: DownloadArgDescriptions.Migrations.Long
-        ) { IsRequired = false };
+            getDefaultValue: Array.Empty<long>,
+            description: DownloadArgDescriptions.Migrations.Long)
+        {
+            IsRequired = false,
+            Arity = ArgumentArity.OneOrMore,
+            AllowMultipleArgumentsPerToken = true
+        };
 
         LatestOption = new Option<bool>(
             aliases: new[] { "-l", "--latest" },
+            getDefaultValue: () => false,
             description: DownloadArgDescriptions.Latest.Long
         ) { IsRequired = false };
 
-        DestinationOption = new Option<IDirectoryInfo>(
+        DestinationOption = new Option<DirectoryInfo>(
             aliases: new[] { "-d", "--destination" },
             description: DownloadArgDescriptions.Destination.Long
         ) { IsRequired = true };
 
         NumberOfBackupsOption = new Option<int?>(
             aliases: new[] { "-n", "--number-of-backups" },
+            getDefaultValue: () => null,
             description: DownloadArgDescriptions.NumberOfBackups.Long
         ) { IsRequired = false };
 
