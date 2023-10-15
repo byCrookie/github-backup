@@ -14,7 +14,7 @@ namespace GithubBackup.Core.Tests.Github.Clients;
 public class GithubApiClientCacheTests
 {
     private readonly GithubApiClient _sut;
-    
+
     private readonly ILogger<GithubApiClient> _logger;
 
     private const string Token = "token";
@@ -24,10 +24,15 @@ public class GithubApiClientCacheTests
     {
         var store = new GithubTokenStore();
         store.Set(Token);
-        
+
         _logger = Substitute.For<ILogger<GithubApiClient>>();
-        
-        _sut = new GithubApiClient(new MemoryCache(new MemoryCacheOptions()), store, _logger);
+
+        _sut = new GithubApiClient(
+            new MemoryCache(new MemoryCacheOptions()),
+            store,
+            new DateTimeOffsetProvider(),
+            _logger
+        );
     }
 
     [Fact]
@@ -62,7 +67,7 @@ public class GithubApiClientCacheTests
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(cachedResponse));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(cachedResponse));
-        
+
         _logger.VerifyLogs(
             (LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
             (LogLevel.Debug, "Cache - Returning cached response for GET - https://api.github.com/test")
@@ -101,7 +106,7 @@ public class GithubApiClientCacheTests
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(cachedResponse));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(newResponse));
-        
+
         _logger.VerifyLogs(
             (LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
             (LogLevel.Debug, "Cache - Resource has changed, returning new response for GET - https://api.github.com/test")
@@ -131,7 +136,7 @@ public class GithubApiClientCacheTests
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(response1));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(response2));
-        
+
         _logger.VerifyLogs(
             (LogLevel.Debug, "Caching response for GET - https://api.github.com/test"),
             (LogLevel.Debug, "Resource has changed, returning new response for GET - https://api.github.com/test"),
@@ -156,7 +161,7 @@ public class GithubApiClientCacheTests
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(response1));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(response2));
-        
+
         _logger.VerifyLogs();
     }
 

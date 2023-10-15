@@ -1,6 +1,7 @@
 using GithubBackup.Core.DependencyInjection;
 using GithubBackup.Core.Flurl;
 using GithubBackup.Core.Github;
+using GithubBackup.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GithubBackup.Core;
@@ -12,5 +13,6 @@ public static class CoreModule
         services.AddDependencyInjection();
         services.AddGithub();
         services.AddFlurl();
+        services.AddUtils();
     }
 }

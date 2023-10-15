@@ -18,6 +18,7 @@ internal class GithubApiClient : IGithubApiClient
 {
     private readonly IMemoryCache _memoryCache;
     private readonly IGithubTokenStore _githubTokenStore;
+    private readonly IDateTimeOffsetProvider _dateTimeOffsetProvider;
     private readonly ILogger<GithubApiClient> _logger;
 
     private static IEnumerable<HttpStatusCode> RetryHttpCodes => new[]
@@ -46,10 +47,12 @@ internal class GithubApiClient : IGithubApiClient
     public GithubApiClient(
         IMemoryCache memoryCache,
         IGithubTokenStore githubTokenStore,
+        IDateTimeOffsetProvider dateTimeOffsetProvider,
         ILogger<GithubApiClient> logger)
     {
         _memoryCache = memoryCache;
         _githubTokenStore = githubTokenStore;
+        _dateTimeOffsetProvider = dateTimeOffsetProvider;
         _logger = logger;
     }
 
@@ -123,7 +126,7 @@ internal class GithubApiClient : IGithubApiClient
                 {
                     var rateLimitReset = arguments.Outcome.Result!.Headers.GetRequired(RateLimitResetHeader);
                     var rateLimitResetDateTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(rateLimitReset));
-                    var now = DateTimeOffset.UtcNow;
+                    var now = _dateTimeOffsetProvider.UtcNow;
                     var delay = rateLimitResetDateTime - now;
                     _logger.LogDebug("RateLimit - Delaying for {Delay} before retrying request to {Verb} - {Url}", delay, verb, request.Url);
                     return ValueTask.FromResult<TimeSpan?>(delay);

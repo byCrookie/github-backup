@@ -6,6 +6,7 @@ using Flurl.Http.Testing;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Tests.Utils;
+using GithubBackup.Core.Utils;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Net.Http.Headers;
 
@@ -22,7 +23,12 @@ public class GithubApiClientTests
     {
         var store = new GithubTokenStore();
         store.Set(Token);
-        _sut = new GithubApiClient(new NullCache(), store, new NullLogger<GithubApiClient>());
+        _sut = new GithubApiClient(
+            new NullCache(),
+            store,
+            new DateTimeOffsetProvider(),
+            new NullLogger<GithubApiClient>()
+        );
     }
 
     [Fact]
@@ -67,19 +73,19 @@ public class GithubApiClientTests
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 1)
-            .RespondWithJson(new TestPageResponse(itemsBatch1), (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>("ETag", "1")));
+            .RespondWithJson(new TestPageResponse(itemsBatch1), (int)HttpStatusCode.OK, GetHeaders());
 
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 2)
-            .RespondWithJson(new TestPageResponse(itemsBatch2), (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>("ETag", "2")));
+            .RespondWithJson(new TestPageResponse(itemsBatch2), (int)HttpStatusCode.OK, GetHeaders());
 
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 3)
-            .RespondWithJson(new TestPageResponse(itemsBatch3), (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>("ETag", "3")));
+            .RespondWithJson(new TestPageResponse(itemsBatch3), (int)HttpStatusCode.OK, GetHeaders());
 
         var result = await _sut.ReceiveJsonPagedAsync<TestPageResponse, TestPageItem>(
             "/test",

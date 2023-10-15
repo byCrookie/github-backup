@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Flurl.Http;
 using GithubBackup.Core.Github.Clients;
+using GithubBackup.Core.Utils;
 using Microsoft.Extensions.Logging;
 using Polly;
 
@@ -11,15 +12,18 @@ internal sealed partial class MigrationService : IMigrationService
 {
     private readonly IFileSystem _fileSystem;
     private readonly IGithubApiClient _githubApiClient;
+    private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<MigrationService> _logger;
 
     public MigrationService(
         IFileSystem fileSystem,
         IGithubApiClient githubApiClient,
+        IDateTimeProvider dateTimeProvider,
         ILogger<MigrationService> logger)
     {
         _fileSystem = fileSystem;
         _githubApiClient = githubApiClient;
+        _dateTimeProvider = dateTimeProvider;
         _logger = logger;
     }
 
@@ -95,7 +99,7 @@ internal sealed partial class MigrationService : IMigrationService
             ApplyRetentionRules(options);
         }
 
-        var fileName = $"{DateTime.Now:yyyyMMddHHmmss}_migration_{options.Id}.tar.gz";
+        var fileName = $"{_dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{options.Id}.tar.gz";
 
         if (_fileSystem.File.Exists(_fileSystem.Path.Combine(options.Destination.FullName, fileName)))
         {
@@ -115,11 +119,11 @@ internal sealed partial class MigrationService : IMigrationService
 
         var backups = _fileSystem.Directory
             .GetFiles(options.Destination.FullName, "*", SearchOption.TopDirectoryOnly)
-            .Select(file => BackupFileNameRegex().Match(file))
+            .Select(file => BackupFileNameRegex().Match(_fileSystem.Path.GetFileName(file)))
             .Where(match => match.Success)
             .ToList();
 
-        if (backups.Count < options.NumberOfBackups)
+        if (backups.Count > options.NumberOfBackups)
         {
             var backupsToDelete = backups
                 .OrderByDescending(match => match.Groups["Date"].Value)
@@ -137,7 +141,7 @@ internal sealed partial class MigrationService : IMigrationService
     {
         var identicalBackups = _fileSystem.Directory
             .GetFiles(options.Destination.FullName, "*", SearchOption.TopDirectoryOnly)
-            .Select(file => BackupFileNameRegex().Match(file))
+            .Select(file => BackupFileNameRegex().Match(_fileSystem.Path.GetFileName(file)))
             .Where(match => match.Success && match.Groups["Id"].Value == options.Id.ToString())
             .ToList();
 

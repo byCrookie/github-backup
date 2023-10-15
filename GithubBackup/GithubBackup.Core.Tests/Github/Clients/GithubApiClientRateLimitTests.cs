@@ -6,6 +6,7 @@ using Flurl.Http.Testing;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Tests.Utils;
+using GithubBackup.Core.Utils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
@@ -26,7 +27,7 @@ public class GithubApiClientRateLimitTests
 
         _logger = Substitute.For<ILogger<GithubApiClient>>();
 
-        _sut = new GithubApiClient(new NullCache(), store, _logger);
+        _sut = new GithubApiClient(new NullCache(), store, new DateTimeOffsetProvider(), _logger);
     }
 
     [Fact]
