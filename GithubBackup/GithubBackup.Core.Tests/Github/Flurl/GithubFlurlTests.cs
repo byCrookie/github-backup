@@ -18,6 +18,7 @@ public class GithubFlurlTests : IDisposable
     public GithubFlurlTests()
     {
         GithubTokenStore.Set(Token);
+        GithubFlurl.ClearCache();
     }
 
     [Fact]
@@ -248,6 +249,7 @@ public class GithubFlurlTests : IDisposable
 
     public void Dispose()
     {
+        GithubTokenStore.Set(null);
         GithubFlurl.ClearCache();
     }
 }

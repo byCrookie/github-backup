@@ -9,6 +9,11 @@ namespace GithubBackup.Core.Tests.Flurl;
 
 public class FlurlExtensionsTests : IDisposable
 {
+    public FlurlExtensionsTests()
+    {
+        GithubFlurl.ClearCache();
+    }
+    
     [Fact]
     public async Task GetPagedJsonAsync_WhenHasNoPages_ThenReturnEmptyList()
     {

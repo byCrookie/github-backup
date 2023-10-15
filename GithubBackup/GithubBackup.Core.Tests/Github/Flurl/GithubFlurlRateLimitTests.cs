@@ -15,6 +15,7 @@ public class GithubFlurlRateLimitTests : IDisposable
     public GithubFlurlRateLimitTests()
     {
         GithubTokenStore.Set(Token);
+        GithubFlurl.ClearCache();
     }
 
     [Fact]
@@ -133,6 +134,7 @@ public class GithubFlurlRateLimitTests : IDisposable
 
     public void Dispose()
     {
+        GithubTokenStore.Set(null);
         GithubFlurl.ClearCache();
     }
 }

@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Net;
+using FluentAssertions;
 using Flurl.Http.Testing;
 using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Flurl;
@@ -15,6 +16,7 @@ public class UserServiceTests : IDisposable
     public UserServiceTests()
     {
         GithubTokenStore.Set(Token);
+        GithubFlurl.ClearCache();
 
         _sut = new UserService();
     }
@@ -31,7 +33,7 @@ public class UserServiceTests : IDisposable
             .ForCallsTo("/user".RequestApi().Url)
             .WithVerb(HttpMethod.Get)
             .WithHeader(HeaderNames.Authorization, $"Bearer {Token}")
-            .RespondWithJson(new UserResponse(login, name), 200, new Dictionary<string, object>
+            .RespondWithJson(new UserResponse(login, name), (int)HttpStatusCode.OK, new Dictionary<string, object>
             {
                 { "x-ratelimit-remaining", "4999" },
                 { "x-ratelimit-reset", "1614556800" }
