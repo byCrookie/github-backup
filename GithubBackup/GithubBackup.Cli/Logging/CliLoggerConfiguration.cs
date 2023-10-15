@@ -22,11 +22,6 @@ internal static class CliLoggerConfiguration
             );
         }
 
-        if (!globalArgs.Quiet)
-        {
-            configuration.WriteTo.Console();
-        }
-
         return configuration;
     }
 }
