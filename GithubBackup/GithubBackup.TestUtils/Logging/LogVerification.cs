@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace GithubBackup.Core.Tests.Utils;
+namespace GithubBackup.TestUtils.Logging;
 
 public record LogVerification(
     LogLevel? ExpectedLevel,

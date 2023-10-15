@@ -2,6 +2,7 @@
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Users;
 using GithubBackup.Core.Tests.Utils;
+using GithubBackup.TestUtils.Flurl;
 using NSubstitute;
 
 namespace GithubBackup.Core.Tests.Github.Users;
@@ -25,7 +26,7 @@ public class UserServiceTests
         const string login = "login";
         const string name = "name";
 
-        var reponse = new UserResponse(login, name).ToFlurlResponse();
+        var reponse = new UserResponse(login, name).ToFlurlJsonResponse();
 
         _githubApiClient.GetAsync("/user", null, Arg.Any<CancellationToken>())
             .Returns(reponse);

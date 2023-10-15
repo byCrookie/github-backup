@@ -4,11 +4,11 @@ using Flurl.Http.Configuration;
 using Flurl.Http.Content;
 using GithubBackup.Core.Flurl;
 
-namespace GithubBackup.Core.Tests.Utils;
+namespace GithubBackup.TestUtils.Flurl;
 
 public static class ObjectFlurlExtensions
 {
-    public static IFlurlResponse ToFlurlResponse(this object obj)
+    public static IFlurlResponse ToFlurlJsonResponse(this object obj)
     {
         var requestMessage = new HttpRequestMessage();
         requestMessage.Options.TryAdd("FlurlHttpCall", new FlurlCall

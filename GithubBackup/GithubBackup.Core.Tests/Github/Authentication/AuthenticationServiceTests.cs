@@ -2,6 +2,8 @@
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Tests.Utils;
+using GithubBackup.TestUtils.Flurl;
+using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
@@ -37,7 +39,7 @@ public class AuthenticationServiceTests
             verificationUri,
             expiresIn,
             interval
-        ).ToFlurlResponse();
+        ).ToFlurlJsonResponse();
 
         _githubWebClient
             .PostJsonAsync("/login/device/code", Arg.Any<object>(), null, Arg.Any<CancellationToken>())
@@ -73,7 +75,7 @@ public class AuthenticationServiceTests
             Error = "authorization_pending",
             ErrorDescription = null,
             Interval = interval
-        }.ToFlurlResponse();
+        }.ToFlurlJsonResponse();
         
         var reponse2 = new AccessTokenResponse
         {
@@ -83,7 +85,7 @@ public class AuthenticationServiceTests
             Error = "slow_down",
             ErrorDescription = null,
             Interval = interval + 1
-        }.ToFlurlResponse();
+        }.ToFlurlJsonResponse();
         
         var reponse3 = new AccessTokenResponse
         {
@@ -93,7 +95,7 @@ public class AuthenticationServiceTests
             Error = null,
             ErrorDescription = null,
             Interval = null
-        }.ToFlurlResponse();
+        }.ToFlurlJsonResponse();
 
         _githubWebClient
             .PostJsonAsync("/login/oauth/access_token", Arg.Any<object>(), null, Arg.Any<CancellationToken>())
@@ -123,7 +125,7 @@ public class AuthenticationServiceTests
             Error = "expired_token",
             ErrorDescription = null,
             Interval = null
-        }.ToFlurlResponse();
+        }.ToFlurlJsonResponse();
 
         _githubWebClient
             .PostJsonAsync("/login/oauth/access_token", Arg.Any<object>(), null, Arg.Any<CancellationToken>())
@@ -149,7 +151,7 @@ public class AuthenticationServiceTests
             Error = "access_denied",
             ErrorDescription = null,
             Interval = null
-        }.ToFlurlResponse();
+        }.ToFlurlJsonResponse();
 
         _githubWebClient
             .PostJsonAsync("/login/oauth/access_token", Arg.Any<object>(), null, Arg.Any<CancellationToken>())

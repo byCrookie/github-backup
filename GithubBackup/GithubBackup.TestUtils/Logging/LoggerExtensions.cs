@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
-namespace GithubBackup.Core.Tests.Utils;
+namespace GithubBackup.TestUtils.Logging;
 
 public static class LoggerExtensions
 {

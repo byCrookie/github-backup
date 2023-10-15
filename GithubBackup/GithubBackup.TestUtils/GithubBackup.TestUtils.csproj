@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Flurl.Http"/>
+        <PackageReference Include="FluentAssertions"/>
+        <PackageReference Include="NSubstitute"/>
+        <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -7,6 +7,8 @@ using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Tests.Utils;
 using GithubBackup.Core.Utils;
+using GithubBackup.TestUtils.Flurl;
+using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
@@ -38,7 +40,7 @@ public class MigrationServiceTests
         const MigrationState state = MigrationState.Exporting;
         var createdAt = DateTime.Now;
 
-        var reponse = new MigrationReponse(id, state, createdAt).ToFlurlResponse();
+        var reponse = new MigrationReponse(id, state, createdAt).ToFlurlJsonResponse();
 
         _githubApiClient
             .GetAsync($"/user/migrations/{id}", null, Arg.Any<CancellationToken>())
@@ -86,7 +88,7 @@ public class MigrationServiceTests
         const MigrationState state = MigrationState.Exporting;
         var createdAt = DateTime.Now;
 
-        var reponse = new MigrationReponse(id, state, createdAt).ToFlurlResponse();
+        var reponse = new MigrationReponse(id, state, createdAt).ToFlurlJsonResponse();
 
         _githubApiClient
             .PostJsonAsync("/user/migrations",
@@ -127,9 +129,9 @@ public class MigrationServiceTests
         const long id = 1;
         var createdAt = DateTime.Now;
 
-        var reponse1 = new MigrationReponse(id, MigrationState.Pending, createdAt).ToFlurlResponse();
-        var reponse2 = new MigrationReponse(id, MigrationState.Exporting, createdAt).ToFlurlResponse();
-        var reponse3 = new MigrationReponse(id, MigrationState.Exported, createdAt).ToFlurlResponse();
+        var reponse1 = new MigrationReponse(id, MigrationState.Pending, createdAt).ToFlurlJsonResponse();
+        var reponse2 = new MigrationReponse(id, MigrationState.Exporting, createdAt).ToFlurlJsonResponse();
+        var reponse3 = new MigrationReponse(id, MigrationState.Exported, createdAt).ToFlurlJsonResponse();
 
         var downloadPath = _mockFileSystem.DirectoryInfo.New(@"C:\Test");
 
