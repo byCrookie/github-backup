@@ -5,6 +5,7 @@ using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Utils;
 using Microsoft.Extensions.Logging;
 using Polly;
+using Polly.Retry;
 
 namespace GithubBackup.Core.Github.Migrations;
 
@@ -73,16 +74,25 @@ internal sealed partial class MigrationService : IMigrationService
     public async Task<string> PollAndDownloadMigrationAsync(DownloadMigrationOptions options,
         Func<Migration, Task> onPollAsync, CancellationToken ct)
     {
-        await Policy
-            .HandleResult<Migration>(e => e.State != MigrationState.Exported)
-            .WaitAndRetryForeverAsync(retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
-            .ExecuteAsync(async () =>
+        var resiliencePipeline = new ResiliencePipelineBuilder<Migration>()
+            .AddRetry(new RetryStrategyOptions<Migration>
             {
-                var migrationStatus = await GetMigrationAsync(options.Id, ct);
-                _logger.LogDebug("Migration {Id} is {State}", migrationStatus.Id, migrationStatus.State);
-                await onPollAsync(migrationStatus);
-                return migrationStatus;
-            });
+                ShouldHandle = new PredicateBuilder<Migration>()
+                    .HandleResult(migration => migration.State != MigrationState.Exported),
+                BackoffType = DelayBackoffType.Exponential,
+                UseJitter = true,
+                MaxDelay = TimeSpan.FromDays(1),
+                Delay = options.MedianFirstRetryDelay
+            })
+            .Build();
+
+        await resiliencePipeline.ExecuteAsync(async cancellationToken =>
+        {
+            var migrationStatus = await GetMigrationAsync(options.Id, cancellationToken);
+            _logger.LogDebug("Migration {Id} is {State}", migrationStatus.Id, migrationStatus.State);
+            await onPollAsync(migrationStatus);
+            return migrationStatus;
+        }, ct);
 
         return await DownloadMigrationAsync(options, ct);
     }

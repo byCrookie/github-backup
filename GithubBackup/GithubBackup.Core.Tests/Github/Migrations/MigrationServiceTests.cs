@@ -147,7 +147,8 @@ public class MigrationServiceTests
             id,
             downloadPath,
             null,
-            false
+            false,
+            TimeSpan.FromSeconds(1)
         );
 
         var result = await _sut.PollAndDownloadMigrationAsync(options, m =>

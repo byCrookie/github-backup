@@ -2,6 +2,7 @@
 using GithubBackup.Core.Github.Clients;
 using Microsoft.Extensions.Logging;
 using Polly;
+using Polly.Retry;
 
 namespace GithubBackup.Core.Github.Authentication;
 
@@ -41,22 +42,27 @@ internal sealed class AuthenticationService : IAuthenticationService
 
         var currentInterval = new IntervalWrapper(TimeSpan.FromSeconds(interval));
 
-        var policy = Policy
-            .HandleResult<AccessTokenResponse>(response => !string.IsNullOrWhiteSpace(response.Error))
-            .RetryForeverAsync(response => OnRetryAsync(response.Result, currentInterval, ct));
+        var resiliencePipeline = new ResiliencePipelineBuilder<AccessTokenResponse>()
+            .AddRetry(new RetryStrategyOptions<AccessTokenResponse>
+            {
+                ShouldHandle = new PredicateBuilder<AccessTokenResponse>()
+                    .HandleResult(response => !string.IsNullOrWhiteSpace(response.Error)),
+                DelayGenerator = arguments => OnRetryAsync(arguments.Outcome.Result!, currentInterval)
+            })
+            .Build();
 
-        var response = await policy.ExecuteAsync(() => _githubWebClient
+        var response = await resiliencePipeline.ExecuteAsync(async cancellationToken => await _githubWebClient
             .PostJsonAsync(
                 "/login/oauth/access_token",
                 new { client_id = ClientId, device_code = deviceCode, grant_type = grantType },
-                ct: ct
+                ct: cancellationToken
             )
-            .ReceiveJson<AccessTokenResponse>());
+            .ReceiveJson<AccessTokenResponse>(), ct);
 
         return new AccessToken(response.AccessToken!, response.TokenType!, response.Scope!);
     }
 
-    private async Task OnRetryAsync(AccessTokenResponse response, IntervalWrapper intervalWrapper, CancellationToken ct)
+    private ValueTask<TimeSpan?> OnRetryAsync(AccessTokenResponse response, IntervalWrapper intervalWrapper)
     {
         switch (response.Error)
         {
@@ -64,16 +70,14 @@ internal sealed class AuthenticationService : IAuthenticationService
             {
                 var delay = intervalWrapper.Interval;
                 _logger.LogInformation("Authorization pending. Retrying in {Seconds} seconds", delay.TotalSeconds);
-                await Task.Delay(delay, ct);
-                return;
+                return ValueTask.FromResult<TimeSpan?>(delay);
             }
             case "slow_down":
             {
                 var newDelay = TimeSpan.FromSeconds(response.Interval ?? intervalWrapper.Interval.TotalSeconds + 5);
                 intervalWrapper.Update(newDelay);
                 _logger.LogInformation("Slow down. Retrying in {Seconds} seconds", newDelay.TotalSeconds);
-                await Task.Delay(newDelay, ct);
-                return;
+                return ValueTask.FromResult<TimeSpan?>(newDelay);
             }
             case "expired_token":
             {

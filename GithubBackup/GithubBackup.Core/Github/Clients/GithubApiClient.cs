@@ -102,7 +102,8 @@ internal class GithubApiClient : IGithubApiClient
     private async Task<IFlurlResponse> SendAsync(IFlurlRequest request, HttpMethod verb,
         HttpContent? content = null, CancellationToken? ct = null)
     {
-        var delays = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(1), retryCount: 3).ToArray();
+        const int maxRetries = 3;
+        var delays = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(1), retryCount: maxRetries).ToArray();
 
         var resiliencePipeline = new ResiliencePipelineBuilder<IFlurlResponse>()
             .AddRetry(new RetryStrategyOptions<IFlurlResponse>
@@ -116,7 +117,7 @@ internal class GithubApiClient : IGithubApiClient
                     _logger.LogDebug("Retry Attempt {Attempt} - Delaying for {Delay} before retrying request to {Verb} - {Url}", arguments.AttemptNumber, delay, verb, request.Url);
                     return ValueTask.FromResult<TimeSpan?>(delay);
                 },
-                MaxRetryAttempts = 3
+                MaxRetryAttempts = maxRetries
             })
             .AddRetry(new RetryStrategyOptions<IFlurlResponse>
             {
