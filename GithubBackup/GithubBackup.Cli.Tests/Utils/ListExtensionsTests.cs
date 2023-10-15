@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using GithubBackup.Cli.Utils;
 
-namespace GithubBackup.Cli.Tests;
+namespace GithubBackup.Cli.Tests.Utils;
 
 public class ListExtensionsTests
 {
