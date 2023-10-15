@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubBackup.TestUtils", "G
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubBackup.TestUtils.Tests", "GithubBackup.TestUtils.Tests\GithubBackup.TestUtils.Tests.csproj", "{C31D87D0-93D9-4C2F-8222-70749566645D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubBackup.Cli.Tests", "GithubBackup.Cli.Tests\GithubBackup.Cli.Tests.csproj", "{964A4A65-0E9B-4103-9085-B9F458BEA48D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +50,9 @@ Global
 		{C31D87D0-93D9-4C2F-8222-70749566645D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C31D87D0-93D9-4C2F-8222-70749566645D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C31D87D0-93D9-4C2F-8222-70749566645D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{964A4A65-0E9B-4103-9085-B9F458BEA48D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{964A4A65-0E9B-4103-9085-B9F458BEA48D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{964A4A65-0E9B-4103-9085-B9F458BEA48D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{964A4A65-0E9B-4103-9085-B9F458BEA48D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

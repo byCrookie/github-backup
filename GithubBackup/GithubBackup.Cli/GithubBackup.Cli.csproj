@@ -40,4 +40,8 @@
     <ItemGroup>
       <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="GithubBackup.Cli.Tests" />
+    </ItemGroup>
 </Project>
