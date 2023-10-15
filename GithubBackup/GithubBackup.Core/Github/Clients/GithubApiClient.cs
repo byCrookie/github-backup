@@ -53,7 +53,8 @@ internal class GithubApiClient : IGithubApiClient
         _logger = logger;
     }
 
-    public Task<List<TItem>> ReceiveJsonPagedAsync<TReponse, TItem>(Url url, int perPage, Func<TReponse, List<TItem>> getItems, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
+    public Task<List<TItem>> ReceiveJsonPagedAsync<TReponse, TItem>(Url url, int perPage,
+        Func<TReponse, List<TItem>> getItems, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
     {
         var request = _client.Value.Request(url);
         configure?.Invoke(request);
@@ -69,7 +70,8 @@ internal class GithubApiClient : IGithubApiClient
             );
     }
 
-    public Task<string> DownloadFileAsync(Url url, string path, string? fileName = null, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
+    public Task<string> DownloadFileAsync(Url url, string path, string? fileName = null, 
+        Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
     {
         var request = _client.Value.Request(url)
             .WithOAuthBearerToken(_githubTokenStore.Get());

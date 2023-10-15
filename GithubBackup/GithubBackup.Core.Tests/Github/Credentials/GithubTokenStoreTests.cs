@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using GithubBackup.Core.Github.Credentials;
 
-namespace GithubBackup.Core.Tests.Credentials;
+namespace GithubBackup.Core.Tests.Github.Credentials;
 
 public class GithubTokenStoreTests
 {

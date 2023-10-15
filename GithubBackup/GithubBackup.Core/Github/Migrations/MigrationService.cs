@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Flurl.Http;
 using GithubBackup.Core.Github.Clients;
+using Microsoft.Extensions.Logging;
 using Polly;
 
 namespace GithubBackup.Core.Github.Migrations;
@@ -10,11 +11,16 @@ internal sealed partial class MigrationService : IMigrationService
 {
     private readonly IFileSystem _fileSystem;
     private readonly IGithubApiClient _githubApiClient;
+    private readonly ILogger<MigrationService> _logger;
 
-    public MigrationService(IFileSystem fileSystem, IGithubApiClient githubApiClient)
+    public MigrationService(
+        IFileSystem fileSystem,
+        IGithubApiClient githubApiClient,
+        ILogger<MigrationService> logger)
     {
         _fileSystem = fileSystem;
         _githubApiClient = githubApiClient;
+        _logger = logger;
     }
 
     public async Task<Migration> StartMigrationAsync(StartMigrationOptions options, CancellationToken ct)
@@ -40,8 +46,13 @@ internal sealed partial class MigrationService : IMigrationService
     public async Task<List<Migration>> GetMigrationsAsync(CancellationToken ct)
     {
         var response = await _githubApiClient
-            .GetAsync("/user/migrations", ct: ct)
-            .ReceiveJson<List<MigrationReponse>>();
+            .ReceiveJsonPagedAsync<List<MigrationReponse>, MigrationReponse>(
+                "/user/migrations",
+                100,
+                r => r,
+                null,
+                ct
+            );
 
         return response.Select(m => new Migration(m.Id, m.State, m.CreatedAt)).ToList();
     }
@@ -64,6 +75,7 @@ internal sealed partial class MigrationService : IMigrationService
             .ExecuteAsync(async () =>
             {
                 var migrationStatus = await GetMigrationAsync(options.Id, ct);
+                _logger.LogDebug("Migration {Id} is {State}", migrationStatus.Id, migrationStatus.State);
                 await onPollAsync(migrationStatus);
                 return migrationStatus;
             });
@@ -115,6 +127,7 @@ internal sealed partial class MigrationService : IMigrationService
 
             foreach (var backup in backupsToDelete)
             {
+                _logger.LogDebug("Deleting backup {Backup} because to many backups are present", backup.Value);
                 _fileSystem.File.Delete(_fileSystem.Path.Combine(options.Destination.FullName, backup.Value));
             }
         }
@@ -135,6 +148,7 @@ internal sealed partial class MigrationService : IMigrationService
 
         foreach (var backup in identicalBackups)
         {
+            _logger.LogDebug("Deleting identical backup {Backup}", backup.Value);
             _fileSystem.File.Delete(_fileSystem.Path.Combine(options.Destination.FullName, backup.Value));
         }
     }
