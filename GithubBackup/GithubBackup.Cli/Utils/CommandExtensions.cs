@@ -1,8 +1,8 @@
 ﻿using System.CommandLine;
 
-namespace GithubBackup.Cli.Options;
+namespace GithubBackup.Cli.Utils;
 
-internal static class OptionExtensions
+public static class CommandExtensions
 {
     public static void AddOptions(this Command command, List<Option> options)
     {

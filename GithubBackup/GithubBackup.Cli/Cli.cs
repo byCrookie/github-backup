@@ -9,6 +9,7 @@ using GithubBackup.Cli.Commands.Github.Migrations;
 using GithubBackup.Cli.Commands.Github.Repositories;
 using GithubBackup.Cli.Logging;
 using GithubBackup.Cli.Options;
+using GithubBackup.Cli.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
