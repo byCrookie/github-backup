@@ -16,7 +16,7 @@ public class NullCache : IMemoryCache
 
     public ICacheEntry CreateEntry(object key)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 
     public void Remove(object key)
