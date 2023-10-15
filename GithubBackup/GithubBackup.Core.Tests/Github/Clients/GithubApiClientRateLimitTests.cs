@@ -6,7 +6,8 @@ using Flurl.Http.Testing;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Tests.Utils;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 
 namespace GithubBackup.Core.Tests.Github.Clients;
 
@@ -14,13 +15,18 @@ public class GithubApiClientRateLimitTests
 {
     private readonly GithubApiClient _sut;
 
+    private readonly ILogger<GithubApiClient> _logger;
+
     private const string Token = "token";
 
     public GithubApiClientRateLimitTests()
     {
         var store = new GithubTokenStore();
         store.Set(Token);
-        _sut = new GithubApiClient(new MemoryCache(new MemoryCacheOptions()), store);
+
+        _logger = Substitute.For<ILogger<GithubApiClient>>();
+
+        _sut = new GithubApiClient(new NullCache(), store, _logger);
     }
 
     [Fact]
@@ -32,7 +38,7 @@ public class GithubApiClientRateLimitTests
 
         httpTest
             .RespondWith(string.Empty, (int)HttpStatusCode.TooManyRequests, GetHeaders(new KeyValuePair<string, string>("retry-after", "1")))
-            .RespondWithJson(response, (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>("ETag", "1")))
+            .RespondWithJson(response, (int)HttpStatusCode.OK, GetHeaders())
             .SimulateException(new UnreachableException());
 
         var result = await _sut
@@ -40,25 +46,10 @@ public class GithubApiClientRateLimitTests
             .ReceiveJson<TestPageResponse>();
 
         result.Should().BeEquivalentTo(response);
-    }
-
-    [Fact]
-    public void GetGithubApiAsync_WhenHitSecondaryRateLimits_RetryAfter1s()
-    {
-        var response = new TestPageResponse(new List<TestPageItem>());
-
-        using var httpTest = new HttpTest();
-
-        httpTest
-            .RespondWith(string.Empty, (int)HttpStatusCode.TooManyRequests, GetHeaders(new KeyValuePair<string, string>("retry-after", "1")))
-            .RespondWithJson(response, (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>("ETag", "1")))
-            .SimulateException(new UnreachableException());
-
-        var action = () => _sut
-            .GetAsync("/test")
-            .ReceiveJson<TestPageResponse>();
-
-        action.ExecutionTime().Should().BeCloseTo(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(0.1));
+        
+        _logger.VerifyLogs(
+            (LogLevel.Debug, "RetryAfter - Delaying for (.*) before retrying request to GET - https://api.github.com/test")
+        );
     }
 
     [Fact]
@@ -78,25 +69,10 @@ public class GithubApiClientRateLimitTests
             .ReceiveJson<TestPageResponse>();
 
         result.Should().BeEquivalentTo(response);
-    }
-
-    [Fact]
-    public void GetGithubApiAsync_WhenHitRateLimits_RetryAfter1s()
-    {
-        var response = new TestPageResponse(new List<TestPageItem>());
-
-        using var httpTest = new HttpTest();
-
-        httpTest
-            .RespondWith(string.Empty, (int)HttpStatusCode.OK, GetHeaders(0, DateTimeOffset.UtcNow.AddSeconds(2)))
-            .RespondWithJson(response, (int)HttpStatusCode.OK, GetHeaders(100, DateTimeOffset.UtcNow.AddSeconds(1)))
-            .SimulateException(new UnreachableException());
-
-        var action = () => _sut
-            .GetAsync("/test")
-            .ReceiveJson<TestPageResponse>();
-
-        action.ExecutionTime().Should().BeCloseTo(TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(0.2));
+        
+        _logger.VerifyLogs(
+            (LogLevel.Debug, "RateLimit - Delaying for (.*) before retrying request to GET - https://api.github.com/test")
+        );
     }
 
     [Fact]
@@ -107,9 +83,9 @@ public class GithubApiClientRateLimitTests
         using var httpTest = new HttpTest();
 
         httpTest
-            .RespondWithJson(response, (int)HttpStatusCode.BadRequest, GetHeaders())
-            .RespondWithJson(response, (int)HttpStatusCode.BadRequest, GetHeaders())
-            .RespondWithJson(response, (int)HttpStatusCode.BadRequest, GetHeaders())
+            .RespondWithJson(response, (int)HttpStatusCode.RequestTimeout, GetHeaders())
+            .RespondWithJson(response, (int)HttpStatusCode.InternalServerError, GetHeaders())
+            .RespondWithJson(response, (int)HttpStatusCode.ServiceUnavailable, GetHeaders())
             .RespondWithJson(response, (int)HttpStatusCode.OK, GetHeaders())
             .SimulateException(new UnreachableException());
 
@@ -118,27 +94,12 @@ public class GithubApiClientRateLimitTests
             .ReceiveJson<TestPageResponse>();
 
         result.Should().BeEquivalentTo(response);
-    }
-
-    [Fact]
-    public void GetGithubApiAsync_WhenHitException_RetriesTakeTime()
-    {
-        var response = new TestPageResponse(new List<TestPageItem>());
-
-        using var httpTest = new HttpTest();
-
-        httpTest
-            .RespondWithJson(response, (int)HttpStatusCode.BadRequest, GetHeaders())
-            .RespondWithJson(response, (int)HttpStatusCode.BadRequest, GetHeaders())
-            .RespondWithJson(response, (int)HttpStatusCode.BadRequest, GetHeaders())
-            .RespondWithJson(response, (int)HttpStatusCode.OK, GetHeaders())
-            .SimulateException(new UnreachableException());
-
-        var action = () => _sut
-            .GetAsync("/test")
-            .ReceiveJson<TestPageResponse>();
-
-        action.ExecutionTime().Should().BeGreaterThan(TimeSpan.FromSeconds(3));
+        
+        _logger.VerifyLogs(
+            (LogLevel.Debug, "Retry Attempt 0 - Delaying for (.*) before retrying request to GET - https://api.github.com/test"),
+            (LogLevel.Debug, "Retry Attempt 1 - Delaying for (.*) before retrying request to GET - https://api.github.com/test"),
+            (LogLevel.Debug, "Retry Attempt 2 - Delaying for (.*) before retrying request to GET - https://api.github.com/test")
+        );
     }
 
     private static Dictionary<string, string> GetHeaders(int rateLimitRemaining, DateTimeOffset rateLimitReset)

@@ -3,8 +3,11 @@ using FluentAssertions;
 using Flurl.Http.Testing;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Credentials;
+using GithubBackup.Core.Tests.Utils;
 using GithubBackup.Core.Utils;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 
 namespace GithubBackup.Core.Tests.Github.Clients;
 
@@ -12,6 +15,8 @@ public class GithubApiClientCacheTests
 {
     private readonly GithubApiClient _sut;
     
+    private readonly ILogger<GithubApiClient> _logger;
+
     private const string Token = "token";
     private const string TestId = "TEST-ID";
 
@@ -19,7 +24,10 @@ public class GithubApiClientCacheTests
     {
         var store = new GithubTokenStore();
         store.Set(Token);
-        _sut = new GithubApiClient(new MemoryCache(new MemoryCacheOptions()), store);
+        
+        _logger = Substitute.For<ILogger<GithubApiClient>>();
+        
+        _sut = new GithubApiClient(new MemoryCache(new MemoryCacheOptions()), store, _logger);
     }
 
     [Fact]
@@ -54,6 +62,11 @@ public class GithubApiClientCacheTests
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(cachedResponse));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(cachedResponse));
+        
+        _logger.VerifyLogs(
+            (LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
+            (LogLevel.Debug, "Cache - Returning cached response for GET - https://api.github.com/test")
+        );
     }
 
     [Fact]
@@ -88,6 +101,11 @@ public class GithubApiClientCacheTests
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(cachedResponse));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(newResponse));
+        
+        _logger.VerifyLogs(
+            (LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
+            (LogLevel.Debug, "Cache - Resource has changed, returning new response for GET - https://api.github.com/test")
+        );
     }
 
     [Fact]
@@ -113,6 +131,12 @@ public class GithubApiClientCacheTests
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(response1));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(response2));
+        
+        _logger.VerifyLogs(
+            (LogLevel.Debug, "Caching response for GET - https://api.github.com/test"),
+            (LogLevel.Debug, "Resource has changed, returning new response for GET - https://api.github.com/test"),
+            (LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test")
+        );
     }
 
     [Fact]
@@ -132,6 +156,8 @@ public class GithubApiClientCacheTests
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(response1));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(response2));
+        
+        _logger.VerifyLogs();
     }
 
     private static Dictionary<string, string> GetHeaders(params KeyValuePair<string, string>[] headers)

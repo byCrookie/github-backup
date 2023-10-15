@@ -5,7 +5,8 @@ using Flurl.Http;
 using Flurl.Http.Testing;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Credentials;
-using Microsoft.Extensions.Caching.Memory;
+using GithubBackup.Core.Tests.Utils;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Net.Http.Headers;
 
 namespace GithubBackup.Core.Tests.Github.Clients;
@@ -21,7 +22,7 @@ public class GithubApiClientTests
     {
         var store = new GithubTokenStore();
         store.Set(Token);
-        _sut = new GithubApiClient(new MemoryCache(new MemoryCacheOptions()), store);
+        _sut = new GithubApiClient(new NullCache(), store, new NullLogger<GithubApiClient>());
     }
 
     [Fact]
