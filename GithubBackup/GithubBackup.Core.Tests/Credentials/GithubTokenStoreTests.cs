@@ -3,17 +3,14 @@ using GithubBackup.Core.Github.Credentials;
 
 namespace GithubBackup.Core.Tests.Credentials;
 
-public class GithubTokenStoreTests : IDisposable
+public class GithubTokenStoreTests
 {
-    public GithubTokenStoreTests()
-    {
-        GithubTokenStore.Set(null);
-    }
-    
+    private readonly GithubTokenStore _sut = new();
+
     [Fact]
     public void Get_TokenNotSet_ThrowException()
     {
-        var result = GithubTokenStore.Get;
+        var result = _sut.Get;
         result.Should().Throw<InvalidOperationException>();
     }
     
@@ -21,13 +18,8 @@ public class GithubTokenStoreTests : IDisposable
     public void Get_TokenSet_ReturnToken()
     {
         const string token = "Token";
-        GithubTokenStore.Set(token);
-        var result = GithubTokenStore.Get();
+        _sut.Set(token);
+        var result = _sut.Get();
         result.Should().Be(token);
-    }
-
-    public void Dispose()
-    {
-        GithubTokenStore.Set(null);
     }
 }

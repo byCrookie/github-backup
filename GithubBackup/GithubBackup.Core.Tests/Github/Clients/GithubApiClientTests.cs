@@ -1,72 +1,51 @@
 ﻿using System.Net;
 using AutoBogus;
 using FluentAssertions;
-using Flurl;
 using Flurl.Http;
 using Flurl.Http.Testing;
+using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Credentials;
-using GithubBackup.Core.Github.Flurl;
-using GithubBackup.Core.Utils;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Net.Http.Headers;
 
-namespace GithubBackup.Core.Tests.Github.Flurl;
+namespace GithubBackup.Core.Tests.Github.Clients;
 
-public class GithubFlurlTests : IDisposable
+public class GithubApiClientTests
 {
+    private readonly GithubApiClient _sut;
+
     private const string Token = "token";
+    private const string Url = "https://api.github.com/test";
 
-    public GithubFlurlTests()
+    public GithubApiClientTests()
     {
-        GithubTokenStore.Set(Token);
-        GithubFlurl.ClearCache();
+        var store = new GithubTokenStore();
+        store.Set(Token);
+        _sut = new GithubApiClient(new MemoryCache(new MemoryCacheOptions()), store);
     }
 
     [Fact]
-    public void RequestApi_Create_ThenReturnApiRequest()
+    public async Task GetAsync_CallsUrl_ThenReturnResponse()
     {
-        var result = "/test".RequestApi();
+        const string message = "Test";
 
-        result.Should().NotBeNull();
-        result.Url.Should().Be(new Url("https://api.github.com/test"));
-        result.Client.Headers.GetRequired(HeaderNames.Accept).Should().Be("application/vnd.github.v3+json");
-        result.Client.Headers.GetRequired(HeaderNames.UserAgent).Should().Be("github-backup");
+        using var httpTest = new HttpTest();
+
+        httpTest
+            .ForCallsTo(Url)
+            .WithVerb(HttpMethod.Get)
+            .WithHeader(HeaderNames.Accept, "application/vnd.github.v3+json")
+            .WithHeader(HeaderNames.UserAgent, "github-backup")
+            .RespondWith(message, (int)HttpStatusCode.OK, GetHeaders());
+
+        var result = await _sut.GetAsync("/test");
+
+        result.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        (await result.GetStringAsync()).Should().Be(message);
     }
 
     [Fact]
-    public void RequestApi_Create_ThenReturnWebRequest()
-    {
-        var result = "/test".RequestWeb();
-
-        result.Should().NotBeNull();
-        result.Url.Should().Be(new Url("https://github.com/test"));
-        result.Client.Headers.GetRequired(HeaderNames.Accept).Should().Be("application/vnd.github.v3+json");
-        result.Client.Headers.GetRequired(HeaderNames.UserAgent).Should().Be("github-backup");
-    }
-
-    [Fact]
-    public void RequestApi_CreateFormUrl_ThenReturnApiRequest()
-    {
-        var result = new Url("/test").RequestApi();
-
-        result.Should().NotBeNull();
-        result.Url.Should().Be(new Url("https://api.github.com/test"));
-        result.Client.Headers.GetRequired(HeaderNames.Accept).Should().Be("application/vnd.github.v3+json");
-        result.Client.Headers.GetRequired(HeaderNames.UserAgent).Should().Be("github-backup");
-    }
-
-    [Fact]
-    public void RequestApi_CreateFromUrl_ThenReturnWebRequest()
-    {
-        var result = new Url("/test").RequestWeb();
-
-        result.Should().NotBeNull();
-        result.Url.Should().Be(new Url("https://github.com/test"));
-        result.Client.Headers.GetRequired(HeaderNames.Accept).Should().Be("application/vnd.github.v3+json");
-        result.Client.Headers.GetRequired(HeaderNames.UserAgent).Should().Be("github-backup");
-    }
-
-    [Fact]
-    public async Task GetJsonGithubApiPagedAsync_WhenHasPages_ThenReturnAllItems()
+    public async Task ReceiveJsonPagedAsync_WhenHasPages_ThenReturnAllItems()
     {
         const string url = "https://api.github.com/test";
         const string pageParam = "page";
@@ -101,13 +80,13 @@ public class GithubFlurlTests : IDisposable
             .WithQueryParam(pageParam, 3)
             .RespondWithJson(new TestPageResponse(itemsBatch3), (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>("ETag", "3")));
 
-        var result = await "/test"
-            .RequestApi()
-            .GetJsonGithubApiPagedAsync<TestPageResponse, TestPageItem>(
-                pageSize,
-                r => r.Items,
-                CancellationToken.None
-            );
+        var result = await _sut.ReceiveJsonPagedAsync<TestPageResponse, TestPageItem>(
+            "/test",
+            pageSize,
+            r => r.Items,
+            null,
+            CancellationToken.None
+        );
 
         result.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
     }
@@ -127,13 +106,13 @@ public class GithubFlurlTests : IDisposable
             .WithVerb(HttpMethod.Get)
             .RespondWithJson(new TestPageResponse(itemsBatch), (int)HttpStatusCode.OK, GetHeaders());
 
-        var result = await "/test"
-            .RequestApi()
-            .GetJsonGithubApiPagedAsync<TestPageResponse, TestPageItem>(
-                pageSize,
-                r => r.Items,
-                CancellationToken.None
-            );
+        var result = await _sut.ReceiveJsonPagedAsync<TestPageResponse, TestPageItem>(
+            "/test",
+            pageSize,
+            r => r.Items,
+            null,
+            CancellationToken.None
+        );
 
         result.Should().BeEmpty();
     }
@@ -160,8 +139,8 @@ public class GithubFlurlTests : IDisposable
             .WithVerb(HttpMethod.Get)
             .RespondWithJson(new TestPageResponse(items), (int)HttpStatusCode.OK, GetHeaders());
 
-        var result = await "/test"
-            .GetGithubApiAsync(CancellationToken.None)
+        var result = await _sut
+            .GetAsync("/test")
             .ReceiveJson<TestPageResponse>();
 
         result.Items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
@@ -192,40 +171,8 @@ public class GithubFlurlTests : IDisposable
             .WithRequestJson(body)
             .RespondWithJson(new TestPageResponse(items), (int)HttpStatusCode.OK, GetHeaders());
 
-        var result = await "/test"
-            .PostJsonGithubApiAsync(body, CancellationToken.None)
-            .ReceiveJson<TestPageResponse>();
-
-        result.Items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
-    }
-    
-    [Fact]
-    public async Task PostJsonGithubWebAsync_Reponse_Result()
-    {
-        const string url = "https://github.com/test";
-
-        var items = new List<TestPageItem>
-        {
-            new(1, "name")
-        };
-
-        var expectedItems = new List<TestPageItem>
-        {
-            new(1, "name")
-        };
-
-        using var httpTest = new HttpTest();
-
-        var body = new { Test = "test" };
-
-        httpTest
-            .ForCallsTo(url)
-            .WithVerb(HttpMethod.Post)
-            .WithRequestJson(body)
-            .RespondWithJson(new TestPageResponse(items), (int)HttpStatusCode.OK, GetHeaders());
-
-        var result = await "/test"
-            .PostJsonGithubWebAsync(body, CancellationToken.None)
+        var result = await _sut
+            .PostJsonAsync("/test", body)
             .ReceiveJson<TestPageResponse>();
 
         result.Items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
@@ -245,11 +192,5 @@ public class GithubFlurlTests : IDisposable
         }
 
         return allHeaders;
-    }
-
-    public void Dispose()
-    {
-        GithubTokenStore.Set(null);
-        GithubFlurl.ClearCache();
     }
 }

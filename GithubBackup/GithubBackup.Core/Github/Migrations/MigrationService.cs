@@ -1,7 +1,7 @@
 ﻿using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 using Flurl.Http;
-using GithubBackup.Core.Github.Flurl;
+using GithubBackup.Core.Github.Clients;
 using Polly;
 
 namespace GithubBackup.Core.Github.Migrations;
@@ -9,10 +9,12 @@ namespace GithubBackup.Core.Github.Migrations;
 internal sealed partial class MigrationService : IMigrationService
 {
     private readonly IFileSystem _fileSystem;
+    private readonly IGithubApiClient _githubApiClient;
 
-    public MigrationService(IFileSystem fileSystem)
+    public MigrationService(IFileSystem fileSystem, IGithubApiClient githubApiClient)
     {
         _fileSystem = fileSystem;
+        _githubApiClient = githubApiClient;
     }
 
     public async Task<Migration> StartMigrationAsync(StartMigrationOptions options, CancellationToken ct)
@@ -28,8 +30,8 @@ internal sealed partial class MigrationService : IMigrationService
             options.ExcludeMetadataOnly
         );
 
-        var response = await "/user/migrations"
-            .PostJsonGithubApiAsync(request, ct)
+        var response = await _githubApiClient
+            .PostJsonAsync("/user/migrations", request, ct: ct)
             .ReceiveJson<MigrationReponse>();
 
         return new Migration(response.Id, response.State, response.CreatedAt);
@@ -37,8 +39,8 @@ internal sealed partial class MigrationService : IMigrationService
 
     public async Task<List<Migration>> GetMigrationsAsync(CancellationToken ct)
     {
-        var response = await "/user/migrations"
-            .GetGithubApiAsync(ct)
+        var response = await _githubApiClient
+            .GetAsync("/user/migrations", ct: ct)
             .ReceiveJson<List<MigrationReponse>>();
 
         return response.Select(m => new Migration(m.Id, m.State, m.CreatedAt)).ToList();
@@ -46,8 +48,8 @@ internal sealed partial class MigrationService : IMigrationService
 
     public async Task<Migration> GetMigrationAsync(long id, CancellationToken ct)
     {
-        var response = await $"/user/migrations/{id}"
-            .GetGithubApiAsync(ct)
+        var response = await _githubApiClient
+            .GetAsync($"/user/migrations/{id}", ct: ct)
             .ReceiveJson<MigrationReponse>();
 
         return new Migration(response.Id, response.State, response.CreatedAt);
@@ -88,8 +90,8 @@ internal sealed partial class MigrationService : IMigrationService
             throw new Exception($"A backup with the id {options.Id} already exists.");
         }
 
-        return $"/user/migrations/{options.Id}/archive"
-            .DownloadFileGithubApiAsync(options.Destination.FullName, fileName);
+        return _githubApiClient
+            .DownloadFileAsync($"/user/migrations/{options.Id}/archive", options.Destination.FullName, fileName, ct: ct);
     }
 
     private void ApplyRetentionRules(DownloadMigrationOptions options)

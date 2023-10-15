@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace GithubBackup.Core.Tests.Github.Flurl;
+namespace GithubBackup.Core.Tests.Github.Clients;
 
 public class TestPageItem
 {

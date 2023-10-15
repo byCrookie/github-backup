@@ -1,15 +1,15 @@
 ﻿namespace GithubBackup.Core.Github.Credentials;
 
-public static class GithubTokenStore
+public class GithubTokenStore : IGithubTokenStore
 {
-    private static string? _token;
+    private string? _token;
     
-    public static void Set(string? token)
+    public void Set(string? token)
     {
         _token = token;
     }
     
-    public static string Get()
+    public string Get()
     {
         if (_token is null)
         {

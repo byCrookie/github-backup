@@ -1,5 +1,5 @@
 ﻿using Flurl.Http;
-using GithubBackup.Core.Github.Flurl;
+using GithubBackup.Core.Github.Clients;
 using Microsoft.Extensions.Logging;
 using Polly;
 
@@ -8,20 +8,22 @@ namespace GithubBackup.Core.Github.Authentication;
 internal sealed class AuthenticationService : IAuthenticationService
 {
     private readonly ILogger<AuthenticationService> _logger;
+    private readonly IGithubWebClient _githubWebClient;
 
     private const string ClientId = "e197b2a7e36e8a0d5ea9";
 
-    public AuthenticationService(ILogger<AuthenticationService> logger)
+    public AuthenticationService(ILogger<AuthenticationService> logger, IGithubWebClient githubWebClient)
     {
         _logger = logger;
+        _githubWebClient = githubWebClient;
     }
 
     public async Task<DeviceAndUserCodes> RequestDeviceAndUserCodesAsync(CancellationToken ct)
     {
         const string scope = "repo user user:email read:user";
 
-        var response = await "/login/device/code"
-            .PostJsonGithubWebAsync(new { client_id = ClientId, scope }, ct)
+        var response = await _githubWebClient
+            .PostJsonAsync("/login/device/code", new { client_id = ClientId, scope }, ct: ct)
             .ReceiveJson<DeviceAndUserCodesResponse>();
 
         return new DeviceAndUserCodes(
@@ -43,8 +45,12 @@ internal sealed class AuthenticationService : IAuthenticationService
             .HandleResult<AccessTokenResponse>(response => !string.IsNullOrWhiteSpace(response.Error))
             .RetryForeverAsync(response => OnRetryAsync(response.Result, currentInterval, ct));
 
-        var response = await policy.ExecuteAsync(() => "/login/oauth/access_token"
-            .PostJsonGithubWebAsync(new { client_id = ClientId, device_code = deviceCode, grant_type = grantType }, ct)
+        var response = await policy.ExecuteAsync(() => _githubWebClient
+            .PostJsonAsync(
+                "/login/oauth/access_token",
+                new { client_id = ClientId, device_code = deviceCode, grant_type = grantType },
+                ct: ct
+            )
             .ReceiveJson<AccessTokenResponse>());
 
         return new AccessToken(response.AccessToken!, response.TokenType!, response.Scope!);

@@ -1,4 +1,6 @@
 ﻿using GithubBackup.Core.Github.Authentication;
+using GithubBackup.Core.Github.Clients;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
@@ -14,5 +16,7 @@ internal static class GithubModule
       services.AddAuthentication();
       services.AddUser();
       services.AddRepository();
+      services.AddCredentials();
+      services.AddClients();
    }
 }

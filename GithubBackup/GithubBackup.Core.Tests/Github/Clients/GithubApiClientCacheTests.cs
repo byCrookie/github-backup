@@ -1,21 +1,25 @@
 ﻿using System.Net;
 using FluentAssertions;
 using Flurl.Http.Testing;
+using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Credentials;
-using GithubBackup.Core.Github.Flurl;
 using GithubBackup.Core.Utils;
+using Microsoft.Extensions.Caching.Memory;
 
-namespace GithubBackup.Core.Tests.Github.Flurl;
+namespace GithubBackup.Core.Tests.Github.Clients;
 
-public class GithubFlurlCacheTests : IDisposable
+public class GithubApiClientCacheTests
 {
+    private readonly GithubApiClient _sut;
+    
     private const string Token = "token";
     private const string TestId = "TEST-ID";
 
-    public GithubFlurlCacheTests()
+    public GithubApiClientCacheTests()
     {
-        GithubTokenStore.Set(Token);
-        GithubFlurl.ClearCache();
+        var store = new GithubTokenStore();
+        store.Set(Token);
+        _sut = new GithubApiClient(new MemoryCache(new MemoryCacheOptions()), store);
     }
 
     [Fact]
@@ -45,11 +49,8 @@ public class GithubFlurlCacheTests : IDisposable
                 new KeyValuePair<string, string>(TestId, nameof(notModifiedResponse))
             ));
 
-        var result1 = await "/test"
-            .GetGithubApiAsync(CancellationToken.None);
-
-        var result2 = await "/test"
-            .GetGithubApiAsync(CancellationToken.None);
+        var result1 = await _sut.GetAsync("/test");
+        var result2 = await _sut.GetAsync("/test");
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(cachedResponse));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(cachedResponse));
@@ -82,11 +83,8 @@ public class GithubFlurlCacheTests : IDisposable
                 new KeyValuePair<string, string>(TestId, nameof(newResponse))
             ));
 
-        var result1 = await "/test"
-            .GetGithubApiAsync(CancellationToken.None);
-
-        var result2 = await "/test"
-            .GetGithubApiAsync(CancellationToken.None);
+        var result1 = await _sut.GetAsync("/test");
+        var result2 = await _sut.GetAsync("/test");
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(cachedResponse));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(newResponse));
@@ -110,11 +108,8 @@ public class GithubFlurlCacheTests : IDisposable
                 new KeyValuePair<string, string>(TestId, nameof(response2))
             ));
 
-        var result1 = await "/test"
-            .GetGithubApiAsync(CancellationToken.None);
-
-        var result2 = await "/test"
-            .GetGithubApiAsync(CancellationToken.None);
+        var result1 = await _sut.GetAsync("/test");
+        var result2 = await _sut.GetAsync("/test");
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(response1));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(response2));
@@ -132,11 +127,8 @@ public class GithubFlurlCacheTests : IDisposable
             .RespondWithJson(response1, (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>(TestId, nameof(response1))))
             .RespondWithJson(response2, (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>(TestId, nameof(response2))));
 
-        var result1 = await "/test"
-            .GetGithubApiAsync(CancellationToken.None);
-
-        var result2 = await "/test"
-            .GetGithubApiAsync(CancellationToken.None);
+        var result1 = await _sut.GetAsync("/test");
+        var result2 = await _sut.GetAsync("/test");
 
         result1.Headers.GetRequired(TestId).Should().Be(nameof(response1));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(response2));
@@ -156,11 +148,5 @@ public class GithubFlurlCacheTests : IDisposable
         }
 
         return allHeaders;
-    }
-
-    public void Dispose()
-    {
-        GithubTokenStore.Set(null);
-        GithubFlurl.ClearCache();
     }
 }

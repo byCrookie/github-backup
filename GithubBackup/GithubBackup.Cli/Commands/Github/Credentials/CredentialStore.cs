@@ -9,19 +9,21 @@ namespace GithubBackup.Cli.Commands.Github.Credentials;
 internal sealed class CredentialStore : ICredentialStore
 {
     private readonly IFileSystem _fileSystem;
-    
+    private readonly IGithubTokenStore _githubTokenStore;
+
     private const string Key = "LBaZO3iFnF";
     private const string Salt = "fqCKmp5nwk";
     private const string TokenFileName = ".token";
 
-    public CredentialStore(IFileSystem fileSystem)
+    public CredentialStore(IFileSystem fileSystem, IGithubTokenStore githubTokenStore)
     {
         _fileSystem = fileSystem;
+        _githubTokenStore = githubTokenStore;
     }
 
     public Task StoreTokenAsync(string accessToken, CancellationToken ct)
     {
-        GithubTokenStore.Set(accessToken);
+        _githubTokenStore.Set(accessToken);
         var path = GetBackupPath();
         _fileSystem.Directory.CreateDirectory(path);
         var encryptedToken = EncryptString(accessToken, Key, Salt);
@@ -37,11 +39,11 @@ internal sealed class CredentialStore : ICredentialStore
         {
             var encryptedToken = await _fileSystem.File.ReadAllTextAsync(filePath, ct);
             var decryptedToken = DecryptString(encryptedToken, Key, Salt);
-            GithubTokenStore.Set(decryptedToken);
+            _githubTokenStore.Set(decryptedToken);
             return decryptedToken;
         }
 
-        GithubTokenStore.Set(null);
+        _githubTokenStore.Set(null);
         return null;
     }
 

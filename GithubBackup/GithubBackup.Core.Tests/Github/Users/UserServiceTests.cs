@@ -1,24 +1,22 @@
-﻿using System.Net;
-using FluentAssertions;
-using Flurl.Http.Testing;
-using GithubBackup.Core.Github.Credentials;
-using GithubBackup.Core.Github.Flurl;
+﻿using FluentAssertions;
+using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Users;
-using Microsoft.Net.Http.Headers;
+using GithubBackup.Core.Tests.Utils;
+using NSubstitute;
 
 namespace GithubBackup.Core.Tests.Github.Users;
 
-public class UserServiceTests : IDisposable
+public class UserServiceTests
 {
     private readonly UserService _sut;
-    private const string Token = "token";
+    
+    private readonly IGithubApiClient _githubApiClient;
 
     public UserServiceTests()
     {
-        GithubTokenStore.Set(Token);
-        GithubFlurl.ClearCache();
+        _githubApiClient = Substitute.For<IGithubApiClient>();
 
-        _sut = new UserService();
+        _sut = new UserService(_githubApiClient);
     }
 
     [Fact]
@@ -27,26 +25,14 @@ public class UserServiceTests : IDisposable
         const string login = "login";
         const string name = "name";
 
-        using var httpTest = new HttpTest();
+        var reponse = new UserResponse(login, name).ToFlurlResponse();
 
-        httpTest
-            .ForCallsTo("/user".RequestApi().Url)
-            .WithVerb(HttpMethod.Get)
-            .WithHeader(HeaderNames.Authorization, $"Bearer {Token}")
-            .RespondWithJson(new UserResponse(login, name), (int)HttpStatusCode.OK, new Dictionary<string, object>
-            {
-                { "x-ratelimit-remaining", "4999" },
-                { "x-ratelimit-reset", "1614556800" }
-            });
+        _githubApiClient.GetAsync("/user", null, Arg.Any<CancellationToken>())
+            .Returns(reponse);
 
         var result = await _sut.WhoAmIAsync(CancellationToken.None);
 
         result.Login.Should().Be(login);
         result.Name.Should().Be(name);
-    }
-
-    public void Dispose()
-    {
-        GithubFlurl.ClearCache();
     }
 }
