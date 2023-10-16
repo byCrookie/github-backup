@@ -7,15 +7,13 @@
         <Nullable>enable</Nullable>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     </PropertyGroup>
-    
+
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <DebugType>none</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Nerdbank.GitVersioning">
-            <PrivateAssets>all</PrivateAssets>
-            <Version>3.6.133</Version>
-        </PackageReference>
+        <PackageReference Include="Nerdbank.GitVersioning"/>
+        <PackageReference Include="Microsoft.DotNet.PlatformAbstractions"/>
     </ItemGroup>
 </Project>
