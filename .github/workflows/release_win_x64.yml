@@ -12,12 +12,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        
       - name: Setup dotnet
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.0.x'
-      - name: XDTesting Print Directory Structure
-        uses: FiorelaCiroku/XDTesting-Print-Directory-Structure@v1.0.2
         
       - name: Restore
         run: dotnet restore --runtime win-x64
