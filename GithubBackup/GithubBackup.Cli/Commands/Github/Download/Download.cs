@@ -2,6 +2,7 @@ using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Options;
 using GithubBackup.Core.Github.Migrations;
+using Microsoft.Extensions.Logging;
 using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Download;
@@ -13,19 +14,22 @@ internal sealed class Download : IDownload
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
     private readonly IFileSystem _fileSystem;
+    private readonly ILogger<Download> _logger;
 
     public Download(
         GlobalArgs globalArgs,
         DownloadArgs downloadArgs,
         IMigrationService migrationService,
         ILoginService loginService,
-        IFileSystem fileSystem)
+        IFileSystem fileSystem,
+        ILogger<Download> logger)
     {
         _globalArgs = globalArgs;
         _downloadArgs = downloadArgs;
         _migrationService = migrationService;
         _loginService = loginService;
         _fileSystem = fileSystem;
+        _logger = logger;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -39,10 +43,19 @@ internal sealed class Download : IDownload
 
         if (_downloadArgs.Latest)
         {
+            _logger.LogInformation("Downloading latest migration.");
+            await DownloadLatestAsync(ct);
+            return;
+        }
+        
+        if (!_downloadArgs.Migrations.Any())
+        {
+            _logger.LogInformation("No migration ids specified, downloading latest migration.");
             await DownloadLatestAsync(ct);
             return;
         }
 
+        _logger.LogInformation("Downloading migrations using ids.");
         await DownloadUsingIdsAsync(ct);
     }
 
@@ -52,11 +65,13 @@ internal sealed class Download : IDownload
 
         if (!migrations.Any())
         {
+            _logger.LogInformation("No migrations found.");
+            
             if (!_globalArgs.Quiet)
             {
                 AnsiConsole.WriteLine("No migrations found.");
             }
-
+            
             return;
         }
         
@@ -74,6 +89,8 @@ internal sealed class Download : IDownload
 
     private async Task DownloadMigrationAsync(long id, CancellationToken ct)
     {
+        _logger.LogInformation("Downloading migration {Id}.", id);
+        
         var options = new DownloadMigrationOptions(
             id,
             _fileSystem.DirectoryInfo.Wrap(_downloadArgs.Destination),
@@ -85,6 +102,7 @@ internal sealed class Download : IDownload
 
         if (migration.State != MigrationState.Exported)
         {
+            _logger.LogInformation("Migration {Id} is not yet exported, skipping.", id);
             return;
         }
 
@@ -94,6 +112,7 @@ internal sealed class Download : IDownload
         }
 
         var path = await _migrationService.DownloadMigrationAsync(options, ct);
+        _logger.LogInformation("Downloaded migration {Id} to {Path}.", id, path);
 
         if (!_globalArgs.Quiet)
         {

@@ -2,6 +2,7 @@ using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Options;
 using GithubBackup.Core.Github.Migrations;
+using Microsoft.Extensions.Logging;
 using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Backup;
@@ -45,15 +46,10 @@ internal sealed class Backup : IBackup
             _backupArgs.MigrateArgs.ExcludeAttachements,
             _backupArgs.MigrateArgs.ExcludeReleases,
             _backupArgs.MigrateArgs.ExcludeOwnerProjects,
-            _backupArgs.MigrateArgs.ExcludeMetadataOnly
+            _backupArgs.MigrateArgs.OrgMetadataOnly
         );
-
+        
         var migration = await _migrationService.StartMigrationAsync(options, ct);
-
-        if (!_globalArgs.Quiet)
-        {
-            AnsiConsole.WriteLine($"Migration started with id {migration.Id}");
-        }
 
         if (!_globalArgs.Quiet)
         {
@@ -77,7 +73,7 @@ internal sealed class Backup : IBackup
             },
             ct
         );
-
+        
         AnsiConsole.WriteLine(!_globalArgs.Quiet ? $"Downloaded migration {migration.Id} ({file})" : file);
     }
 }

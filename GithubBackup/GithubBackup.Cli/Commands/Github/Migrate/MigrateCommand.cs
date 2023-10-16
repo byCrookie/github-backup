@@ -22,7 +22,7 @@ internal static class MigrateCommand
             MigrateArgs.ExcludeAttachementsOption,
             MigrateArgs.ExcludeReleasesOption,
             MigrateArgs.ExcludeOwnerProjectsOption,
-            MigrateArgs.ExcludeMetadataOnlyOption
+            MigrateArgs.OrgMetadataOnlyOption
         });
         
         command.SetHandler(

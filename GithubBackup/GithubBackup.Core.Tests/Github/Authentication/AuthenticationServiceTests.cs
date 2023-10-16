@@ -54,10 +54,12 @@ public class AuthenticationServiceTests
             expiresIn,
             interval)
         );
-        
-        _logger.VerifyLogs();
+
+        _logger.VerifyLogs(
+            (LogLevel.Information, "Requesting device and user codes.")
+        );
     }
-    
+
     [Fact]
     public async Task PollAndDownloadMigrationAsync_IsPendingAndSlowDown_WaitWithIntervalAndExtendIt()
     {
@@ -76,7 +78,7 @@ public class AuthenticationServiceTests
             ErrorDescription = null,
             Interval = interval
         }.ToFlurlJsonResponse();
-        
+
         var reponse2 = new AccessTokenResponse
         {
             AccessToken = null,
@@ -86,7 +88,7 @@ public class AuthenticationServiceTests
             ErrorDescription = null,
             Interval = interval + 1
         }.ToFlurlJsonResponse();
-        
+
         var reponse3 = new AccessTokenResponse
         {
             AccessToken = accessToken,
@@ -104,13 +106,14 @@ public class AuthenticationServiceTests
         var result = await _sut.PollForAccessTokenAsync(deviceCode, interval, CancellationToken.None);
 
         _logger.VerifyLogs(
+            (LogLevel.Information, "Polling for access token."),
             (LogLevel.Information, "Authorization pending. Retrying in 1 seconds"),
             (LogLevel.Information, "Slow down. Retrying in 2 seconds")
         );
 
         result.Should().BeEquivalentTo(new AccessToken(accessToken, tokenType, scope));
     }
-    
+
     [Fact]
     public async Task PollAndDownloadMigrationAsync_ExpiredToken_ThrowException()
     {
@@ -136,7 +139,7 @@ public class AuthenticationServiceTests
         _logger.VerifyLogs();
         await action.Should().ThrowAsync<Exception>();
     }
-    
+
     [Fact]
     public async Task PollAndDownloadMigrationAsync_AccessDenied_ThrowException()
     {

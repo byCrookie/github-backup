@@ -29,6 +29,6 @@ internal static class MigrateArgDescriptions
     public static readonly Description ExcludeOwnerProjects = new("ExcludeOwnerProjects", "Exclude Owner Projects",
         "Indicates whether projects owned by the organization or users should be excluded.");
 
-    public static readonly Description ExcludeMetadataOnly = new("ExcludeMetadataOnly", "Exclude Metadata Only",
+    public static readonly Description OrgMetadataOnly = new("OrgMetadataOnly", "Org Metadata Only",
         "Indicates whether this should only include organization metadata (repositories array should be empty and will ignore other flags).");
 }

@@ -16,7 +16,7 @@ internal sealed class MigrateArgsBinder : BinderBase<MigrateArgs>
         var excludeAttachements = bindingContext.ParseResult.GetRequiredValueForOption(MigrateArgs.ExcludeAttachementsOption);
         var excludeReleases = bindingContext.ParseResult.GetRequiredValueForOption(MigrateArgs.ExcludeReleasesOption);
         var excludeOwnerProjects = bindingContext.ParseResult.GetRequiredValueForOption(MigrateArgs.ExcludeOwnerProjectsOption);
-        var excludeMetadataOnly = bindingContext.ParseResult.GetRequiredValueForOption(MigrateArgs.ExcludeMetadataOnlyOption);
+        var excludeMetadataOnly = bindingContext.ParseResult.GetRequiredValueForOption(MigrateArgs.OrgMetadataOnlyOption);
 
         return new MigrateArgs(
             repositories,

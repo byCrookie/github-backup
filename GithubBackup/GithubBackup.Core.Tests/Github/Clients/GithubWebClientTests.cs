@@ -2,12 +2,21 @@
 using Flurl.Http;
 using Flurl.Http.Testing;
 using GithubBackup.Core.Github.Clients;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 
 namespace GithubBackup.Core.Tests.Github.Clients;
 
 public class GithubWebClientTests
 {
-    private readonly GithubWebClient _sut = new();
+    private readonly GithubWebClient _sut;
+
+    public GithubWebClientTests()
+    {
+        var logger = Substitute.For<ILogger<GithubWebClient>>();
+
+        _sut = new GithubWebClient(logger);
+    }
 
     [Fact]
     public async Task PostJsonGithubWebAsync_Reponse_Result()

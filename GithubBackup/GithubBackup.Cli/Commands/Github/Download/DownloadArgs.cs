@@ -23,8 +23,6 @@ internal sealed class DownloadArgs
         Destination = destination;
         NumberOfBackups = numberOfBackups;
         Overwrite = overwrite;
-        
-        new DownloadArgsValidator().Validate(this);
     }
 
     public static Option<long[]> MigrationsOption { get; }
@@ -67,16 +65,5 @@ internal sealed class DownloadArgs
             getDefaultValue: () => true,
             description: DownloadArgDescriptions.Overwrite.Long
         ) { IsRequired = false };
-
-        LatestOption.AddValidator(result =>
-        {
-            var migrations = result.GetValueForOption(MigrationsOption);
-            var latest = result.GetValueForOption(LatestOption);
-
-            if (latest && migrations?.Length > 0)
-            {
-                result.ErrorMessage = "The '-l / --latest' option cannot be used with the '-m / --migrations' option.";
-            }
-        });
     }
 }

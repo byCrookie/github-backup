@@ -30,6 +30,8 @@ internal sealed partial class MigrationService : IMigrationService
 
     public async Task<Migration> StartMigrationAsync(StartMigrationOptions options, CancellationToken ct)
     {
+        _logger.LogDebug("Starting migration");
+        
         var request = new MigrationRequest(
             options.Repositories,
             options.LockRepositories,
@@ -50,6 +52,8 @@ internal sealed partial class MigrationService : IMigrationService
 
     public async Task<List<Migration>> GetMigrationsAsync(CancellationToken ct)
     {
+        _logger.LogDebug("Getting migrations");
+        
         var response = await _githubApiClient
             .ReceiveJsonPagedAsync<List<MigrationReponse>, MigrationReponse>(
                 "/user/migrations",
@@ -64,6 +68,8 @@ internal sealed partial class MigrationService : IMigrationService
 
     public async Task<Migration> GetMigrationAsync(long id, CancellationToken ct)
     {
+        _logger.LogDebug("Getting migration {Id}", id);
+        
         var response = await _githubApiClient
             .GetAsync($"/user/migrations/{id}", ct: ct)
             .ReceiveJson<MigrationReponse>();
@@ -74,6 +80,8 @@ internal sealed partial class MigrationService : IMigrationService
     public async Task<string> PollAndDownloadMigrationAsync(DownloadMigrationOptions options,
         Func<Migration, Task> onPollAsync, CancellationToken ct)
     {
+        _logger.LogInformation("Polling migration {Id}", options.Id);
+        
         var resiliencePipeline = new ResiliencePipelineBuilder<Migration>()
             .AddRetry(new RetryStrategyOptions<Migration>
             {
@@ -89,7 +97,7 @@ internal sealed partial class MigrationService : IMigrationService
         await resiliencePipeline.ExecuteAsync(async cancellationToken =>
         {
             var migrationStatus = await GetMigrationAsync(options.Id, cancellationToken);
-            _logger.LogDebug("Migration {Id} is {State}", migrationStatus.Id, migrationStatus.State);
+            _logger.LogInformation("Migration {Id} is {State}", migrationStatus.Id, migrationStatus.State);
             await onPollAsync(migrationStatus);
             return migrationStatus;
         }, ct);
@@ -101,11 +109,13 @@ internal sealed partial class MigrationService : IMigrationService
     {
         if (options.Overwrite)
         {
+            _logger.LogInformation("Overwriting backups");
             OverwriteBackups(options);
         }
 
         if (options.NumberOfBackups is not null)
         {
+            _logger.LogInformation("Applying retention rules");
             ApplyRetentionRules(options);
         }
 
@@ -137,13 +147,18 @@ internal sealed partial class MigrationService : IMigrationService
         {
             var backupsToDelete = backups
                 .OrderByDescending(match => match.Groups["Date"].Value)
-                .Skip(options.NumberOfBackups.Value - 1);
+                .Skip(options.NumberOfBackups.Value - 1)
+                .ToList();
 
             foreach (var backup in backupsToDelete)
             {
-                _logger.LogDebug("Deleting backup {Backup} because to many backups are present", backup.Value);
+                _logger.LogInformation("Deleting backup {Backup} because to many backups are present", backup.Value);
                 _fileSystem.File.Delete(_fileSystem.Path.Combine(options.Destination.FullName, backup.Value));
             }
+        }
+        else
+        {
+            _logger.LogDebug("Not to many backups");   
         }
     }
 
@@ -157,12 +172,13 @@ internal sealed partial class MigrationService : IMigrationService
 
         if (!identicalBackups.Any())
         {
+            _logger.LogInformation("No identical backups found.");
             return;
         }
 
         foreach (var backup in identicalBackups)
         {
-            _logger.LogDebug("Deleting identical backup {Backup}", backup.Value);
+            _logger.LogInformation("Deleting identical backup {Backup}", backup.Value);
             _fileSystem.File.Delete(_fileSystem.Path.Combine(options.Destination.FullName, backup.Value));
         }
     }

@@ -46,7 +46,7 @@ internal sealed class Migrate : IMigrate
             _migrateArgs.ExcludeAttachements,
             _migrateArgs.ExcludeReleases,
             _migrateArgs.ExcludeOwnerProjects,
-            _migrateArgs.ExcludeMetadataOnly
+            _migrateArgs.OrgMetadataOnly
         );
         
         var migration = await _migrationService.StartMigrationAsync(options, ct);

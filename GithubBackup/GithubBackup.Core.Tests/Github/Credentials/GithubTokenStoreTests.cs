@@ -1,11 +1,20 @@
 ﻿using FluentAssertions;
 using GithubBackup.Core.Github.Credentials;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 
 namespace GithubBackup.Core.Tests.Github.Credentials;
 
 public class GithubTokenStoreTests
 {
-    private readonly GithubTokenStore _sut = new();
+    private readonly GithubTokenStore _sut;
+
+    public GithubTokenStoreTests()
+    {
+        var logger = Substitute.For<ILogger<GithubTokenStore>>();
+
+        _sut = new GithubTokenStore(logger);
+    }
 
     [Fact]
     public void Get_TokenNotSet_ThrowException()

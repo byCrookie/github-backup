@@ -21,6 +21,8 @@ internal sealed class AuthenticationService : IAuthenticationService
 
     public async Task<DeviceAndUserCodes> RequestDeviceAndUserCodesAsync(CancellationToken ct)
     {
+        _logger.LogInformation("Requesting device and user codes.");
+        
         const string scope = "repo user user:email read:user";
 
         var response = await _githubWebClient
@@ -38,6 +40,8 @@ internal sealed class AuthenticationService : IAuthenticationService
 
     public async Task<AccessToken> PollForAccessTokenAsync(string deviceCode, int interval, CancellationToken ct)
     {
+        _logger.LogInformation("Polling for access token.");
+        
         const string grantType = "urn:ietf:params:oauth:grant-type:device_code";
 
         var currentInterval = new IntervalWrapper(TimeSpan.FromSeconds(interval));

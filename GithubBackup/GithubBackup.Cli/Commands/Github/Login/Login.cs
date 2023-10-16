@@ -3,6 +3,7 @@ using GithubBackup.Cli.Options;
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Users;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Login;
@@ -15,6 +16,7 @@ internal sealed class Login : ILogin
     private readonly ICredentialStore _credentialStore;
     private readonly IUserService _userService;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<Login> _logger;
 
     public Login(
         GlobalArgs globalArgs,
@@ -22,7 +24,8 @@ internal sealed class Login : ILogin
         IAuthenticationService authenticationService,
         ICredentialStore credentialStore,
         IUserService userService,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILogger<Login> logger)
     {
         _globalArgs = globalArgs;
         _loginArgs = loginArgs;
@@ -30,6 +33,7 @@ internal sealed class Login : ILogin
         _credentialStore = credentialStore;
         _userService = userService;
         _configuration = configuration;
+        _logger = logger;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -46,17 +50,20 @@ internal sealed class Login : ILogin
     {
         if (!string.IsNullOrWhiteSpace(_loginArgs.Token))
         {
+            _logger.LogInformation("Using token from command line");
             await _credentialStore.StoreTokenAsync(_loginArgs.Token, ct);
             return await _userService.WhoAmIAsync(ct);
         }
 
         if (_loginArgs.DeviceFlowAuth)
         {
+            _logger.LogInformation("Using device flow authentication");
             var oauthToken = await GetOAuthTokenAsync(ct);
             await _credentialStore.StoreTokenAsync(oauthToken, ct);
             return await _userService.WhoAmIAsync(ct);
         }
 
+        _logger.LogInformation("Using token from environment variable");
         var token = _configuration.GetValue<string>("TOKEN");
 
         if (string.IsNullOrWhiteSpace(token))

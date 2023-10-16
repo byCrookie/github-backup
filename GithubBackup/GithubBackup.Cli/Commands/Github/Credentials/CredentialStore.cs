@@ -55,14 +55,12 @@ internal sealed class CredentialStore : ICredentialStore
         var encryptor = Aes.Create();
         encryptor.Key = passwordBytes.GetBytes(32);
         encryptor.IV = passwordBytes.GetBytes(16);
-        using (var ms = new MemoryStream())
+        using var ms = new MemoryStream();
+        using (var cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
         {
-            using (var cs = new CryptoStream(ms, encryptor.CreateEncryptor(), CryptoStreamMode.Write))
-            {
-                cs.Write(plaintextBytes, 0, plaintextBytes.Length);
-            }
-            return Convert.ToBase64String(ms.ToArray());
+            cs.Write(plaintextBytes, 0, plaintextBytes.Length);
         }
+        return Convert.ToBase64String(ms.ToArray());
     }
  
     private static string DecryptString(string encrypted, string key, string salt)
@@ -73,14 +71,12 @@ internal sealed class CredentialStore : ICredentialStore
         var encryptor = Aes.Create();
         encryptor.Key = passwordBytes.GetBytes(32);
         encryptor.IV = passwordBytes.GetBytes(16);
-        using (var ms = new MemoryStream())
+        using var ms = new MemoryStream();
+        using (var cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
         {
-            using (var cs = new CryptoStream(ms, encryptor.CreateDecryptor(), CryptoStreamMode.Write))
-            {
-                cs.Write(encryptedBytes, 0, encryptedBytes.Length);
-            }
-            return UTF8.GetString(ms.ToArray());
+            cs.Write(encryptedBytes, 0, encryptedBytes.Length);
         }
+        return UTF8.GetString(ms.ToArray());
     }
 
     private string GetBackupPath()

@@ -48,7 +48,7 @@
     },
     "GithubBackup.Cli Download": {
       "commandName": "Project",
-      "commandLineArgs": "download --destination M:\\Development\\Temp\\github-backup",
+      "commandLineArgs": "download --migrations 1 --destination M:\\Development\\Temp\\github-backup --latest",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Manual Backup": {

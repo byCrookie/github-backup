@@ -61,6 +61,7 @@ internal class GithubApiClient : IGithubApiClient
     {
         var request = _client.Value.Request(url);
         configure?.Invoke(request);
+        _logger.LogDebug("Requesting {Url} paged", request.Url);
         return request
             .WithOAuthBearerToken(_githubTokenStore.Get())
             .SetQueryParam("per_page", perPage)
@@ -79,6 +80,7 @@ internal class GithubApiClient : IGithubApiClient
         var request = _client.Value.Request(url)
             .WithOAuthBearerToken(_githubTokenStore.Get());
         configure?.Invoke(request);
+        _logger.LogDebug("Downloading {Url}", request.Url);
         return request.DownloadFileAsync(path, fileName, 4096, ct ?? CancellationToken.None);
     }
 
@@ -87,6 +89,7 @@ internal class GithubApiClient : IGithubApiClient
         var request = _client.Value.Request(url)
             .WithOAuthBearerToken(_githubTokenStore.Get());
         configure?.Invoke(request);
+        _logger.LogDebug("Requesting {Url}", request.Url);
         return SendAsync(request, HttpMethod.Get, null, ct ?? CancellationToken.None);
     }
 
@@ -95,6 +98,7 @@ internal class GithubApiClient : IGithubApiClient
         var request = _client.Value.Request(url)
             .WithOAuthBearerToken(_githubTokenStore.Get());
         configure?.Invoke(request);
+        _logger.LogDebug("Posting to {Url}", request.Url);
         var content = new CapturedJsonContent(request.Settings.JsonSerializer.Serialize(data));
         return SendAsync(request, HttpMethod.Post, content, ct ?? CancellationToken.None);
     }

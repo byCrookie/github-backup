@@ -142,7 +142,8 @@ public class MigrationServiceTests
         const string downloadFile = @"C:\Test\Test.zip";
 
         _githubApiClient
-            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null, Arg.Any<CancellationToken>())
+            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
+                Arg.Any<CancellationToken>())
             .Returns(downloadFile);
 
         var options = new DownloadMigrationOptions(
@@ -160,9 +161,13 @@ public class MigrationServiceTests
         }, CancellationToken.None);
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, $"Migration {id} is Pending"),
-            (LogLevel.Debug, $"Migration {id} is Exporting"),
-            (LogLevel.Debug, $"Migration {id} is Exported")
+            (LogLevel.Information, "Polling migration 1"),
+            (LogLevel.Debug, "Getting migration 1"),
+            (LogLevel.Information, $"Migration {id} is Pending"),
+            (LogLevel.Debug, "Getting migration 1"),
+            (LogLevel.Information, $"Migration {id} is Exporting"),
+            (LogLevel.Debug, "Getting migration 1"),
+            (LogLevel.Information, $"Migration {id} is Exported")
         );
 
         result.Should().BeEquivalentTo(downloadFile);
@@ -186,7 +191,8 @@ public class MigrationServiceTests
         const string downloadFile = @"C:\Test\Test.zip";
 
         _githubApiClient
-            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null, Arg.Any<CancellationToken>())
+            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
+                Arg.Any<CancellationToken>())
             .Returns(downloadFile);
 
         var options = new DownloadMigrationOptions(
@@ -218,7 +224,8 @@ public class MigrationServiceTests
         _mockFileSystem.File.Create(downloadFile);
 
         _githubApiClient
-            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null, Arg.Any<CancellationToken>())
+            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
+                Arg.Any<CancellationToken>())
             .Returns(downloadFile);
 
         var options = new DownloadMigrationOptions(
@@ -233,31 +240,32 @@ public class MigrationServiceTests
         await action.Should().ThrowAsync<Exception>();
         _logger.VerifyLogs();
     }
-    
+
     [Fact]
     public async Task DownloadMigrationAsync_DownloadAndOverride_DeleteBackupsWithSameId()
     {
         const long id = 1;
-        
+
         var downloadPath = _mockFileSystem.DirectoryInfo.New(@"C:\Test");
-        
+
         _mockFileSystem.Directory.CreateDirectory(downloadPath.FullName);
-        
+
         var date10DaysAgo = new DateTime(2000, 12, 2);
         var date5DaysAgo = new DateTime(2000, 12, 7);
         var dateNow = new DateTime(2000, 12, 12);
-        
+
         var backup1 = $@"C:\Test\{date10DaysAgo:yyyyMMddHHmmss}_migration_{id}.tar.gz";
         var backup2 = $@"C:\Test\{date5DaysAgo:yyyyMMddHHmmss}_migration_{id}.tar.gz";
         var backup3 = $@"C:\Test\{dateNow:yyyyMMddHHmmss}_migration_{id + 1}.tar.gz";
         _mockFileSystem.File.Create(backup1);
         _mockFileSystem.File.Create(backup2);
         _mockFileSystem.File.Create(backup3);
-        
+
         const string downloadFile = @"C:\Test\Test.zip";
 
         _githubApiClient
-            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null, Arg.Any<CancellationToken>())
+            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
+                Arg.Any<CancellationToken>())
             .Returns(downloadFile);
 
         var options = new DownloadMigrationOptions(
@@ -272,27 +280,28 @@ public class MigrationServiceTests
         _mockFileSystem.File.Exists(backup3).Should().BeTrue();
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Deleting identical backup 20001202000000_migration_1.tar.gz"),
-            (LogLevel.Debug, "Deleting identical backup 20001207000000_migration_1.tar.gz")
+            (LogLevel.Information, "Overwriting backups"),
+            (LogLevel.Information, "Deleting identical backup 20001202000000_migration_1.tar.gz"),
+            (LogLevel.Information, "Deleting identical backup 20001207000000_migration_1.tar.gz")
         );
-        
+
         result.Should().BeEquivalentTo(downloadFile);
     }
-    
+
     [Fact]
     public async Task DownloadMigrationAsync_DownloadAndNumberOfArguments_DeleteBackupsWhenToMany()
     {
         const long id = 1;
-        
+
         var downloadPath = _mockFileSystem.DirectoryInfo.New(@"C:\Test");
-        
+
         _mockFileSystem.Directory.CreateDirectory(downloadPath.FullName);
-        
+
         var date11DaysAgo = new DateTime(2000, 12, 1);
         var date10DaysAgo = new DateTime(2000, 12, 2);
         var date5DaysAgo = new DateTime(2000, 12, 7);
         var dateNow = new DateTime(2000, 12, 12);
-        
+
         var backup0 = $@"C:\Test\{date11DaysAgo:yyyyMMddHHmmss}_migration_{id + 2}.tar.gz";
         var backup1 = $@"C:\Test\{date10DaysAgo:yyyyMMddHHmmss}_migration_{id}.tar.gz";
         var backup2 = $@"C:\Test\{date5DaysAgo:yyyyMMddHHmmss}_migration_{id}.tar.gz";
@@ -301,11 +310,12 @@ public class MigrationServiceTests
         _mockFileSystem.File.Create(backup1);
         _mockFileSystem.File.Create(backup2);
         _mockFileSystem.File.Create(backup3);
-        
+
         const string downloadFile = @"C:\Test\Test.zip";
 
         _githubApiClient
-            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null, Arg.Any<CancellationToken>())
+            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
+                Arg.Any<CancellationToken>())
             .Returns(downloadFile);
 
         var options = new DownloadMigrationOptions(
@@ -316,18 +326,22 @@ public class MigrationServiceTests
         );
 
         var result = await _sut.DownloadMigrationAsync(options, CancellationToken.None);
-        
+
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Deleting backup 20001207000000_migration_1.tar.gz because to many backups are present"),
-            (LogLevel.Debug, "Deleting backup 20001202000000_migration_1.tar.gz because to many backups are present"),
-            (LogLevel.Debug, "Deleting backup 20001201000000_migration_3.tar.gz because to many backups are present")
+            (LogLevel.Information, "Applying retention rules"),
+            (LogLevel.Information,
+                "Deleting backup 20001207000000_migration_1.tar.gz because to many backups are present"),
+            (LogLevel.Information,
+                "Deleting backup 20001202000000_migration_1.tar.gz because to many backups are present"),
+            (LogLevel.Information,
+                "Deleting backup 20001201000000_migration_3.tar.gz because to many backups are present")
         );
 
         _mockFileSystem.File.Exists(backup0).Should().BeFalse();
         _mockFileSystem.File.Exists(backup1).Should().BeFalse();
         _mockFileSystem.File.Exists(backup2).Should().BeFalse();
         _mockFileSystem.File.Exists(backup3).Should().BeTrue();
-        
+
         result.Should().BeEquivalentTo(downloadFile);
     }
 }

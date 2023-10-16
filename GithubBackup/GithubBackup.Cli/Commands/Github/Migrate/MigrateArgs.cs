@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using FluentValidation;
 using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Migrate;
@@ -12,7 +13,7 @@ internal sealed class MigrateArgs
     public bool ExcludeAttachements { get; }
     public bool ExcludeReleases { get; }
     public bool ExcludeOwnerProjects { get; }
-    public bool ExcludeMetadataOnly { get; }
+    public bool OrgMetadataOnly { get; }
 
     public MigrateArgs(
         string[] repositories,
@@ -22,7 +23,7 @@ internal sealed class MigrateArgs
         bool excludeAttachements,
         bool excludeReleases,
         bool excludeOwnerProjects,
-        bool excludeMetadataOnly
+        bool orgMetadataOnly
     )
     {
         Repositories = repositories;
@@ -32,9 +33,9 @@ internal sealed class MigrateArgs
         ExcludeAttachements = excludeAttachements;
         ExcludeReleases = excludeReleases;
         ExcludeOwnerProjects = excludeOwnerProjects;
-        ExcludeMetadataOnly = excludeMetadataOnly;
+        OrgMetadataOnly = orgMetadataOnly;
         
-        new MigrateArgsValidator().Validate(this);
+        new MigrateArgsValidator().ValidateAndThrow(this);
     }
 
     public static Option<string[]> RepositoriesOption { get; }
@@ -44,7 +45,7 @@ internal sealed class MigrateArgs
     public static Option<bool> ExcludeAttachementsOption { get; }
     public static Option<bool> ExcludeReleasesOption { get; }
     public static Option<bool> ExcludeOwnerProjectsOption { get; }
-    public static Option<bool> ExcludeMetadataOnlyOption { get; }
+    public static Option<bool> OrgMetadataOnlyOption { get; }
 
     static MigrateArgs()
     {
@@ -90,20 +91,20 @@ internal sealed class MigrateArgs
             description: MigrateArgDescriptions.ExcludeOwnerProjects.Long
         ) { IsRequired = false };
 
-        ExcludeMetadataOnlyOption = new Option<bool>(
-            aliases: new[] { "-emo", "--exclude-metadata-only" },
+        OrgMetadataOnlyOption = new Option<bool>(
+            aliases: new[] { "-omo", "--org-metadata-only" },
             getDefaultValue: () => false,
-            description: MigrateArgDescriptions.ExcludeMetadataOnly.Long
+            description: MigrateArgDescriptions.OrgMetadataOnly.Long
         ) { IsRequired = false };
 
-        ExcludeMetadataOnlyOption.AddValidator(result =>
+        OrgMetadataOnlyOption.AddValidator(result =>
         {
             var repositories = result.GetValueForOption(RepositoriesOption);
-            var excludeMetadataOnly = result.GetValueForOption(ExcludeMetadataOnlyOption);
+            var orgMetadataOnly = result.GetValueForOption(OrgMetadataOnlyOption);
 
-            if (excludeMetadataOnly && repositories?.Length > 0)
+            if (orgMetadataOnly && repositories?.Length > 0)
             {
-                result.ErrorMessage = "Cannot specify repositories when excluding metadata only";
+                result.ErrorMessage = MigrateArgsValidator.OrgMetadataOnlyMustBeUsedAlone;
             }
         });
     }

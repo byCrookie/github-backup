@@ -2,6 +2,7 @@
 using Flurl.Http;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Repositories;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 
 namespace GithubBackup.Core.Tests.Github.Repositories;
@@ -15,8 +16,9 @@ public class RepositoryServiceTests
     public RepositoryServiceTests()
     {        
         _githubApiClient = Substitute.For<IGithubApiClient>();
+        var logger = Substitute.For<ILogger<RepositoryService>>();
         
-        _sut = new RepositoryService(_githubApiClient);
+        _sut = new RepositoryService(_githubApiClient, logger);
     }
 
     [Fact]

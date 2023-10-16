@@ -8,6 +8,7 @@ internal static class DownloadArgDescriptions
         $"""
          Id's of the migrations to download.
          Instead piping can be used to provide the id's. Supported separators: {StandardInput.Separators.Values}.
+         If not specified, the latest migration will be downloaded.
          """
     );
 
@@ -15,6 +16,7 @@ internal static class DownloadArgDescriptions
         """
         Only download the latest migration.
         If the migration is not yet completed, it will be skipped.
+        If id's are specified, this flag will be ignored.
         """
     );
 

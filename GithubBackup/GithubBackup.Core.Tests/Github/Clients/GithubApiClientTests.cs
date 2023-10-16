@@ -9,6 +9,7 @@ using GithubBackup.Core.Tests.Utils;
 using GithubBackup.Core.Utils;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Net.Http.Headers;
+using NSubstitute;
 
 namespace GithubBackup.Core.Tests.Github.Clients;
 
@@ -21,11 +22,13 @@ public class GithubApiClientTests
 
     public GithubApiClientTests()
     {
-        var store = new GithubTokenStore();
-        store.Set(Token);
+        var tokenStore = Substitute.For<IGithubTokenStore>();
+        
+        tokenStore.Get().Returns(Token);
+        
         _sut = new GithubApiClient(
             new NullCache(),
-            store,
+            tokenStore,
             new DateTimeOffsetProvider(),
             new NullLogger<GithubApiClient>()
         );

@@ -45,6 +45,11 @@ public class LoggerExtensionsTests
             Valid: 2 10/12/2021 00:00:00
             Valid: 3
             Invalid: Expected log does not exist - Expected: Information 4 - Actual:  
+            
+            Received:
+            Debug - 1 10/12/2020 00:00:00
+            Critical - 2 10/12/2021 00:00:00
+            Error - 3
             """
         );
     }
@@ -68,6 +73,11 @@ public class LoggerExtensionsTests
             Valid: 1 10/12/2020 00:00:00
             Valid: 2 10/12/2021 00:00:00
             Invalid: Log is not expected - Expected:   - Actual: Error 3
+            
+            Received:
+            Debug - 1 10/12/2020 00:00:00
+            Critical - 2 10/12/2021 00:00:00
+            Error - 3
             """
         );
     }

@@ -111,7 +111,7 @@ internal sealed class ManualBackup : IManualBackup
                         MigrateArgDescriptions.ExcludeAttachements,
                         MigrateArgDescriptions.ExcludeReleases,
                         MigrateArgDescriptions.ExcludeOwnerProjects,
-                        MigrateArgDescriptions.ExcludeMetadataOnly
+                        MigrateArgDescriptions.OrgMetadataOnly
                     )
                     .UseConverter(d => $"{d.Display} - {d.Long}")
             );
@@ -124,7 +124,7 @@ internal sealed class ManualBackup : IManualBackup
                 selectedOptions.Contains(MigrateArgDescriptions.ExcludeAttachements),
                 selectedOptions.Contains(MigrateArgDescriptions.ExcludeReleases),
                 selectedOptions.Contains(MigrateArgDescriptions.ExcludeOwnerProjects),
-                selectedOptions.Contains(MigrateArgDescriptions.ExcludeMetadataOnly)
+                selectedOptions.Contains(MigrateArgDescriptions.OrgMetadataOnly)
             );
 
             await _migrationService.StartMigrationAsync(options, ct);

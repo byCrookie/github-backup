@@ -24,7 +24,7 @@ internal static class BackupCommand
             MigrateArgs.ExcludeAttachementsOption,
             MigrateArgs.ExcludeReleasesOption,
             MigrateArgs.ExcludeOwnerProjectsOption,
-            MigrateArgs.ExcludeMetadataOnlyOption
+            MigrateArgs.OrgMetadataOnlyOption
         });
         
         command.AddOptions(new List<Option>

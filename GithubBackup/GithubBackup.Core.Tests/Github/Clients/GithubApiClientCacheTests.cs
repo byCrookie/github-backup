@@ -23,14 +23,14 @@ public class GithubApiClientCacheTests
 
     public GithubApiClientCacheTests()
     {
-        var store = new GithubTokenStore();
-        store.Set(Token);
-
         _logger = Substitute.For<ILogger<GithubApiClient>>();
+        var tokenStore = Substitute.For<IGithubTokenStore>();
+
+        tokenStore.Get().Returns(Token);
 
         _sut = new GithubApiClient(
             new MemoryCache(new MemoryCacheOptions()),
-            store,
+            tokenStore,
             new DateTimeOffsetProvider(),
             _logger
         );
@@ -70,7 +70,9 @@ public class GithubApiClientCacheTests
         result2.Headers.GetRequired(TestId).Should().Be(nameof(cachedResponse));
 
         _logger.VerifyLogs(
+            (LogLevel.Debug, "Requesting https://api.github.com/test"),
             (LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
+            (LogLevel.Debug, "Requesting https://api.github.com/test"),
             (LogLevel.Debug, "Cache - Returning cached response for GET - https://api.github.com/test")
         );
     }
@@ -109,8 +111,11 @@ public class GithubApiClientCacheTests
         result2.Headers.GetRequired(TestId).Should().Be(nameof(newResponse));
 
         _logger.VerifyLogs(
+            (LogLevel.Debug, "Requesting https://api.github.com/test"),
             (LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
-            (LogLevel.Debug, "Cache - Resource has changed, returning new response for GET - https://api.github.com/test")
+            (LogLevel.Debug, "Requesting https://api.github.com/test"),
+            (LogLevel.Debug,
+                "Cache - Resource has changed, returning new response for GET - https://api.github.com/test")
         );
     }
 
@@ -139,7 +144,9 @@ public class GithubApiClientCacheTests
         result2.Headers.GetRequired(TestId).Should().Be(nameof(response2));
 
         _logger.VerifyLogs(
+            (LogLevel.Debug, "Requesting https://api.github.com/test"),
             (LogLevel.Debug, "Caching response for GET - https://api.github.com/test"),
+            (LogLevel.Debug, "Requesting https://api.github.com/test"),
             (LogLevel.Debug, "Resource has changed, returning new response for GET - https://api.github.com/test"),
             (LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test")
         );
@@ -154,8 +161,10 @@ public class GithubApiClientCacheTests
         using var httpTest = new HttpTest();
 
         httpTest
-            .RespondWithJson(response1, (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>(TestId, nameof(response1))))
-            .RespondWithJson(response2, (int)HttpStatusCode.OK, GetHeaders(new KeyValuePair<string, string>(TestId, nameof(response2))));
+            .RespondWithJson(response1, (int)HttpStatusCode.OK,
+                GetHeaders(new KeyValuePair<string, string>(TestId, nameof(response1))))
+            .RespondWithJson(response2, (int)HttpStatusCode.OK,
+                GetHeaders(new KeyValuePair<string, string>(TestId, nameof(response2))));
 
         var result1 = await _sut.GetAsync("/test");
         var result2 = await _sut.GetAsync("/test");
@@ -163,7 +172,10 @@ public class GithubApiClientCacheTests
         result1.Headers.GetRequired(TestId).Should().Be(nameof(response1));
         result2.Headers.GetRequired(TestId).Should().Be(nameof(response2));
 
-        _logger.VerifyLogs();
+        _logger.VerifyLogs(
+            (LogLevel.Debug, "Requesting https://api.github.com/test"),
+            (LogLevel.Debug, "Requesting https://api.github.com/test")
+        );
     }
 
     private static Dictionary<string, string> GetHeaders(params KeyValuePair<string, string>[] headers)
