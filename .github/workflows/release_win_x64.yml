@@ -39,8 +39,8 @@ jobs:
         working-directory: ./GithubBackup
         
       - name: Get Version
-      - id: nerbank_gitversioning
-      - uses: dotnet/nbgv@master
+        id: nerbank_gitversioning
+        uses: dotnet/nbgv@master
         with:
           setAllVars: true
         
