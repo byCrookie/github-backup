@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
-      version: ${{ steps.nerbank_gitversioning.outputs.Version }}
+      version: $GitBuildVersion
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,8 +39,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.nerbank_gitversioning.outputs.Version }}
-          release_name: Release ${{ steps.nerbank_gitversioning.outputs.Version }}
+          tag_name: $GitBuildVersion
+          release_name: Release $GitBuildVersion
           body: |
           draft: false
           prerelease: false
@@ -118,11 +118,8 @@ jobs:
         working-directory: ./GithubBackup
         
       - name: Zip
-        run: |
-          cd ./publish/linux-x64/
-          zip -r ../../ghb_linux_x64_${{ needs.release.outputs.version }}.zip ./*
-          cd ../../
-        working-directory: ./GithubBackup
+        run: zip -r ghb_linux_x64_${{ needs.release.outputs.version }}.zip ./*
+        working-directory: ./GithubBackup/publish/linux-x64/
 
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
@@ -130,7 +127,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./GithubBackup/publish/ghb_linux_x64_${{ needs.release.outputs.version }}.zip
+          asset_path: ./GithubBackup/publish/linux-x64/ghb_linux_x64_${{ needs.release.outputs.version }}.zip
           asset_name: ghb_linux_x64_${{ needs.release.outputs.version }}.zip
           asset_content_type: application/zip
   
@@ -164,11 +161,8 @@ jobs:
         working-directory: ./GithubBackup
 
       - name: Zip
-        run: |
-          cd ./publish/osx-x64/
-          zip -r ../../ghb_osx_x64_${{ needs.release.outputs.version }}.zip ./*
-          cd ../../
-        working-directory: ./GithubBackup
+        run: zip -r ghb_osx_x64_${{ needs.release.outputs.version }}.zip ./*
+        working-directory: ./GithubBackup/publish/osx-x64/
 
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
@@ -176,6 +170,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./GithubBackup/publish/ghb_osx_x64_${{ needs.release.outputs.version }}.zip
+          asset_path: ./GithubBackup/publish/osx-x64/ghb_osx_x64_${{ needs.release.outputs.version }}.zip
           asset_name: ghb_osx_x64_${{ needs.release.outputs.version }}.zip
           asset_content_type: application/zip
