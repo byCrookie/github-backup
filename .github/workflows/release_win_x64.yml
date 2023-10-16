@@ -1,0 +1,58 @@
+name: Release Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+      - name: XDTesting Print Directory Structure
+        uses: FiorelaCiroku/XDTesting-Print-Directory-Structure@v1.0.2
+        
+      - name: Restore
+        run: dotnet restore --runtime win-x64
+        working-directory: ./GithubBackup
+        
+      - name: Build
+        run: dotnet build --configuration Release --no-restore --runtime win-x64
+        working-directory: ./GithubBackup
+        
+      - name: Test
+        run: dotnet test --configuration Release --no-restore --runtime win-x64
+        working-directory: ./GithubBackup
+        
+      - name: Publish
+        run: dotnet publish GithubBackup.Cli --configuration Release --output publish/win-x64 --no-restore --runtime win-x64 --self-contained
+        working-directory: ./GithubBackup
+        
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./GithubBackup/publish/win-x64/ghb.exe
+          asset_name: win-x64/ghb.exe
+          asset_content_type: application/octet-stream
