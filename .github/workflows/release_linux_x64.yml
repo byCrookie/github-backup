@@ -23,11 +23,11 @@ jobs:
         working-directory: ./GithubBackup
         
       - name: Build
-        run: dotnet build GithubBackup --configuration Release --no-restore --runtime linux-x64
+        run: dotnet build GithubBackup.sln --configuration Release --no-restore --runtime linux-x64
         working-directory: ./GithubBackup
         
       - name: Test
-        run: dotnet test GithubBackup --configuration Release --no-restore --runtime linux-x64
+        run: dotnet test GithubBackup.sln --configuration Release --no-restore --runtime linux-x64
         working-directory: ./GithubBackup
         
       - name: Publish
