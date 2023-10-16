@@ -32,8 +32,6 @@ jobs:
       - name: Get Version
         id: nerbank_gitversioning
         uses: dotnet/nbgv@master
-        with:
-          setAllVars: true
 
       - name: Create Release
         id: create_release
