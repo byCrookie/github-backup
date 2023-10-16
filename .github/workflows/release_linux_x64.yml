@@ -19,7 +19,7 @@ jobs:
           dotnet-version: '7.0.x'
         
       - name: Restore
-        run: dotnet restore --runtime linux-x64
+        run: dotnet restore
         working-directory: ./GithubBackup
         
       - name: Build
