@@ -1,4 +1,4 @@
-name: Release Windows
+name: Test Windows
 
 permissions:
   contents: write

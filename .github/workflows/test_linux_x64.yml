@@ -1,4 +1,4 @@
-name: Release Linux
+name: Test Linux
 
 permissions:
   contents: write

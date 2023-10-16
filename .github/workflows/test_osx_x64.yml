@@ -1,4 +1,4 @@
-name: Release OSX
+name: Test OSX
 
 permissions:
   contents: write
