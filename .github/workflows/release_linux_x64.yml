@@ -23,15 +23,15 @@ jobs:
         working-directory: ./GithubBackup
         
       - name: Build
-        run: dotnet build GithubBackup.sln --configuration Release --no-restore --runtime linux-x64
+        run: dotnet build GithubBackup.sln --configuration Release --no-restore
         working-directory: ./GithubBackup
         
       - name: Test
-        run: dotnet test GithubBackup.sln --configuration Release --no-restore --runtime linux-x64
+        run: dotnet test GithubBackup.sln --configuration Release --no-restore
         working-directory: ./GithubBackup
         
       - name: Publish
-        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x64 --no-restore --runtime linux-x64 --self-contained
+        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x64 --runtime linux-x64 --self-contained
         working-directory: ./GithubBackup
         
       - name: Create Release
