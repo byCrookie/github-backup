@@ -11,4 +11,11 @@
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
         <DebugType>none</DebugType>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Nerdbank.GitVersioning">
+            <PrivateAssets>all</PrivateAssets>
+            <Version>3.6.133</Version>
+        </PackageReference>
+    </ItemGroup>
 </Project>
