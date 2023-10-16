@@ -43,19 +43,19 @@ internal sealed class Download : IDownload
 
         if (_downloadArgs.Latest)
         {
-            _logger.LogInformation("Downloading latest migration.");
+            _logger.LogInformation("Downloading latest migration");
             await DownloadLatestAsync(ct);
             return;
         }
         
         if (!_downloadArgs.Migrations.Any())
         {
-            _logger.LogInformation("No migration ids specified, downloading latest migration.");
+            _logger.LogInformation("No migration ids specified, downloading latest migration");
             await DownloadLatestAsync(ct);
             return;
         }
 
-        _logger.LogInformation("Downloading migrations using ids.");
+        _logger.LogInformation("Downloading migrations using ids");
         await DownloadUsingIdsAsync(ct);
     }
 
@@ -65,11 +65,11 @@ internal sealed class Download : IDownload
 
         if (!migrations.Any())
         {
-            _logger.LogInformation("No migrations found.");
+            _logger.LogInformation("No migrations found");
             
             if (!_globalArgs.Quiet)
             {
-                AnsiConsole.WriteLine("No migrations found.");
+                AnsiConsole.WriteLine("No migrations found");
             }
             
             return;
@@ -89,7 +89,7 @@ internal sealed class Download : IDownload
 
     private async Task DownloadMigrationAsync(long id, CancellationToken ct)
     {
-        _logger.LogInformation("Downloading migration {Id}.", id);
+        _logger.LogInformation("Downloading migration {Id}", id);
         
         var options = new DownloadMigrationOptions(
             id,
@@ -102,7 +102,7 @@ internal sealed class Download : IDownload
 
         if (migration.State != MigrationState.Exported)
         {
-            _logger.LogInformation("Migration {Id} is not yet exported, skipping.", id);
+            _logger.LogInformation("Migration {Id} is not yet exported - skipping", id);
             return;
         }
 
@@ -112,11 +112,11 @@ internal sealed class Download : IDownload
         }
 
         var path = await _migrationService.DownloadMigrationAsync(options, ct);
-        _logger.LogInformation("Downloaded migration {Id} to {Path}.", id, path);
+        _logger.LogInformation("Downloaded migration {Id} to {Path}", id, path);
 
         if (!_globalArgs.Quiet)
         {
-            AnsiConsole.WriteLine($"Downloaded migration {migration.Id} to {path}.");
+            AnsiConsole.WriteLine($"Downloaded migration {migration.Id} to {path}");
         }
     }
 }

@@ -24,7 +24,7 @@ internal sealed class CliCommandService : ICliCommandService
     {
         try
         {
-            _logger.LogDebug("Starting command: {Type}", _cliCommand.GetType().Name);
+            _logger.LogInformation("Starting command: {Type}", _cliCommand.GetType().Name);
             await _cliCommand.RunAsync(cancellationToken);
         }
         catch (FlurlHttpException e)

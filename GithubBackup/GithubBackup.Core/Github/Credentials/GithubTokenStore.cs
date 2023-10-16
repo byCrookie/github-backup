@@ -15,7 +15,7 @@ public class GithubTokenStore : IGithubTokenStore
     
     public void Set(string? token)
     {
-        _logger.LogTrace("Setting token");
+        _logger.LogDebug("Setting token");
         _token = token;
     }
     
@@ -26,7 +26,7 @@ public class GithubTokenStore : IGithubTokenStore
             throw new InvalidOperationException("Token not set");
         }
         
-        _logger.LogTrace("Getting token");
+        _logger.LogDebug("Getting token");
         return _token;
     }
 }

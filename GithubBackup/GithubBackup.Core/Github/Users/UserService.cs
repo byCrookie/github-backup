@@ -17,7 +17,7 @@ internal sealed class UserService : IUserService
     
     public async Task<User> WhoAmIAsync(CancellationToken ct)
     {
-        _logger.LogInformation("Getting user information");
+        _logger.LogDebug("Getting user information");
         
         var response = await _githubApiClient
             .GetAsync("/user", ct: ct) 

@@ -80,7 +80,7 @@ internal sealed partial class MigrationService : IMigrationService
     public async Task<string> PollAndDownloadMigrationAsync(DownloadMigrationOptions options,
         Func<Migration, Task> onPollAsync, CancellationToken ct)
     {
-        _logger.LogInformation("Polling migration {Id}", options.Id);
+        _logger.LogDebug("Polling migration {Id}", options.Id);
         
         var resiliencePipeline = new ResiliencePipelineBuilder<Migration>()
             .AddRetry(new RetryStrategyOptions<Migration>
@@ -158,7 +158,7 @@ internal sealed partial class MigrationService : IMigrationService
         }
         else
         {
-            _logger.LogDebug("Not to many backups");   
+            _logger.LogInformation("Not to many backups");   
         }
     }
 
@@ -172,7 +172,7 @@ internal sealed partial class MigrationService : IMigrationService
 
         if (!identicalBackups.Any())
         {
-            _logger.LogInformation("No identical backups found.");
+            _logger.LogInformation("No identical backups found");
             return;
         }
 

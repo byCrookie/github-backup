@@ -161,7 +161,7 @@ public class MigrationServiceTests
         }, CancellationToken.None);
 
         _logger.VerifyLogs(
-            (LogLevel.Information, "Polling migration 1"),
+            (LogLevel.Debug, "Polling migration 1"),
             (LogLevel.Debug, "Getting migration 1"),
             (LogLevel.Information, $"Migration {id} is Pending"),
             (LogLevel.Debug, "Getting migration 1"),
