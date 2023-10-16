@@ -2,6 +2,8 @@
 
 public static class StandardInput
 {
+    public static Seperators Separators { get; } = new(new[]{ ",", ":", ";", "|", "-" });
+    
     public static long[] ReadLongs()
     {
         if (!IsPipedInput())
@@ -13,7 +15,7 @@ public static class StandardInput
         while (Console.ReadLine() is { } line && !string.IsNullOrEmpty(line))
         {
             var ints = line
-                .Split(new[] { ",", ":", ";", "|", "-" }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(Separators.Values, StringSplitOptions.RemoveEmptyEntries)
                 .Select(input => long.Parse(input.Trim()));
 
             inputs.AddRange(ints);
@@ -33,7 +35,7 @@ public static class StandardInput
         while (Console.ReadLine() is { } line && !string.IsNullOrEmpty(line))
         {
             var ints = line
-                .Split(new[] { ",", ":", ";", "|", "-" }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(Separators.Values, StringSplitOptions.RemoveEmptyEntries)
                 .Select(input => input.Trim());
 
             inputs.AddRange(ints);

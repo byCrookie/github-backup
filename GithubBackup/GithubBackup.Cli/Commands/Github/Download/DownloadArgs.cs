@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Download;
 
@@ -17,16 +18,13 @@ internal sealed class DownloadArgs
         int? numberOfBackups,
         bool overwrite)
     {
-        if (!migrations.Any())
-        {
-            throw new ArgumentException("At least one migration must be specified.");
-        }
-        
         Migrations = migrations;
         Latest = latest;
         Destination = destination;
         NumberOfBackups = numberOfBackups;
         Overwrite = overwrite;
+        
+        new DownloadArgsValidator().Validate(this);
     }
 
     public static Option<long[]> MigrationsOption { get; }
@@ -39,7 +37,7 @@ internal sealed class DownloadArgs
     {
         MigrationsOption = new Option<long[]>(
             aliases: new[] { "-m", "--migrations" },
-            getDefaultValue: Array.Empty<long>,
+            getDefaultValue: StandardInput.ReadLongs,
             description: DownloadArgDescriptions.Migrations.Long)
         {
             IsRequired = false,

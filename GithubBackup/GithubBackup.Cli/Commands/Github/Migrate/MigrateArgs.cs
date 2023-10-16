@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Migrate;
 
@@ -24,11 +25,6 @@ internal sealed class MigrateArgs
         bool excludeMetadataOnly
     )
     {
-        if (!repositories.Any())
-        {
-            throw new ArgumentException("At least one repository must be specified.");
-        }
-        
         Repositories = repositories;
         LockRepositories = lockRepositories;
         ExcludeMetadata = excludeMetadata;
@@ -37,6 +33,8 @@ internal sealed class MigrateArgs
         ExcludeReleases = excludeReleases;
         ExcludeOwnerProjects = excludeOwnerProjects;
         ExcludeMetadataOnly = excludeMetadataOnly;
+        
+        new MigrateArgsValidator().Validate(this);
     }
 
     public static Option<string[]> RepositoriesOption { get; }
@@ -52,7 +50,7 @@ internal sealed class MigrateArgs
     {
         RepositoriesOption = new Option<string[]>(
             aliases: new[] { "-r", "--repositories" },
-            getDefaultValue: Array.Empty<string>,
+            getDefaultValue: StandardInput.ReadStrings,
             description: MigrateArgDescriptions.Repositories.Long
         ) { IsRequired = false, Arity = ArgumentArity.ZeroOrMore, AllowMultipleArgumentsPerToken = true };
 
