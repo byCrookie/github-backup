@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
-      version: $GitBuildVersion
+      version: ${{ env.GitBuildVersion }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,8 +39,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: $GitBuildVersion
-          release_name: Release $GitBuildVersion
+          tag_name: ${{ env.GitBuildVersion }}
+          release_name: Release ${{ env.GitBuildVersion }}
           body: |
           draft: false
           prerelease: false
