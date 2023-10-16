@@ -27,10 +27,19 @@ jobs:
       - name: Test
         run: dotnet test --configuration Release --no-restore
         working-directory: ./GithubBackup
-      - name: Publish
-        run: dotnet publish GithubBackup.Cli --configuration Release --output publish --no-restore
+        
+      - name: Publish Windows
+        run: dotnet publish GithubBackup.Cli --configuration Release --output publish/win-x64 --no-restore --runtime win-x64 --self-contained
         working-directory: ./GithubBackup
 
+      - name: Publish Linux
+        run: dotnet publish GithubBackup.Cli --configuration Release --output publish/linux-x64 --no-restore --runtime linux-x64 --self-contained
+        working-directory: ./GithubBackup
+
+      - name: Publish OSX
+        run: dotnet publish GithubBackup.Cli --configuration Release --output publish/osx-x64 --no-restore --runtime osx-x64 --self-contained
+        working-directory: ./GithubBackup
+        
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -43,12 +52,32 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Assets
+      - name: Upload Release Assets Windows
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./GithubBackup/publish/ghb.exe
-          asset_name: ghb.exe
+          asset_path: ./GithubBackup/publish/win-x64/ghb.exe
+          asset_name: win-x64/ghb.exe
+          asset_content_type: application/octet-stream
+          
+      - name: Upload Release Assets Linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./GithubBackup/publish/linux-x64/ghb.exe
+          asset_name: linux-x64/ghb.exe
+          asset_content_type: application/octet-stream
+          
+      - name: Upload Release Assets OSX
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./GithubBackup/publish/osx-x64/ghb.exe
+          asset_name: osx-x64/ghb
           asset_content_type: application/octet-stream
