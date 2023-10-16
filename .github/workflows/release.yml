@@ -1,0 +1,156 @@
+name: Release
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+
+  release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Get Version
+        id: nerbank_gitversioning
+        uses: dotnet/nbgv@master
+        with:
+          setAllVars: true
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.nerbank_gitversioning.outputs.Version }}
+          release_name: Release ${{ steps.nerbank_gitversioning.outputs.Version }}
+          body: |
+          draft: false
+          prerelease: false
+  
+  windows:
+    needs: release
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore
+        run: dotnet restore
+        working-directory: ./GithubBackup
+
+      - name: Build
+        run: dotnet build GithubBackup.sln --configuration Release --no-restore
+        working-directory: ./GithubBackup
+
+      - name: Test
+        run: dotnet test GithubBackup.sln --configuration Release --no-restore
+        working-directory: ./GithubBackup
+
+      - name: Publish
+        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x64 --runtime win-x64 --self-contained
+        working-directory: ./GithubBackup
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./GithubBackup/publish/win-x64/ghb.exe
+          asset_name: win-x64/ghb.exe
+          asset_content_type: application/octet-stream
+          
+  linux:
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore
+        run: dotnet restore
+        working-directory: ./GithubBackup
+
+      - name: Build
+        run: dotnet build GithubBackup.sln --configuration Release --no-restore
+        working-directory: ./GithubBackup
+
+      - name: Test
+        run: dotnet test GithubBackup.sln --configuration Release --no-restore
+        working-directory: ./GithubBackup
+
+      - name: Publish
+        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x64 --runtime linux-x64 --self-contained
+        working-directory: ./GithubBackup
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./GithubBackup/publish/linux-x64/ghb
+          asset_name: linux-x64/ghb.exe
+          asset_content_type: application/octet-stream
+  
+  macos:
+    needs: release
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      - name: Restore
+        run: dotnet restore
+        working-directory: ./GithubBackup
+
+      - name: Build
+        run: dotnet build GithubBackup.sln --configuration Release --no-restore
+        working-directory: ./GithubBackup
+
+      - name: Test
+        run: dotnet test GithubBackup.sln --configuration Release --no-restore
+        working-directory: ./GithubBackup
+
+      - name: Publish
+        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x64 --runtime osx-x64 --self-contained
+        working-directory: ./GithubBackup
+        
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./GithubBackup/publish/osx-x64/ghb.exe
+          asset_name: osx-x64/ghb
+          asset_content_type: application/octet-stream

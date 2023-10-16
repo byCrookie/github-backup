@@ -29,12 +29,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{2320
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{0130B520-705C-4BF2-A919-C4FBF31D40BF}"
 	ProjectSection(SolutionItems) = preProject
-		..\.github\workflows\release_linux_x64.yml = ..\.github\workflows\release_linux_x64.yml
-		..\.github\workflows\release_osx_x64.yml = ..\.github\workflows\release_osx_x64.yml
-		..\.github\workflows\release_win_x64.yml = ..\.github\workflows\release_win_x64.yml
 		..\.github\workflows\test_linux_x64.yml = ..\.github\workflows\test_linux_x64.yml
 		..\.github\workflows\test_osx_x64.yml = ..\.github\workflows\test_osx_x64.yml
 		..\.github\workflows\test_win_x64.yml = ..\.github\workflows\test_win_x64.yml
+		..\.github\workflows\release.yml = ..\.github\workflows\release.yml
 	EndProjectSection
 EndProject
 Global
