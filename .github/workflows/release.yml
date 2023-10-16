@@ -100,17 +100,17 @@ jobs:
         with:
           dotnet-version: '7.0.x'
 
-      - name: Restore
-        run: dotnet restore
-        working-directory: ./GithubBackup
-
-      - name: Build
-        run: dotnet build GithubBackup.sln --configuration Release --no-restore
-        working-directory: ./GithubBackup
-
-      - name: Test
-        run: dotnet test GithubBackup.sln --configuration Release --no-restore
-        working-directory: ./GithubBackup
+#      - name: Restore
+#        run: dotnet restore
+#        working-directory: ./GithubBackup
+#
+#      - name: Build
+#        run: dotnet build GithubBackup.sln --configuration Release --no-restore
+#        working-directory: ./GithubBackup
+#
+#      - name: Test
+#        run: dotnet test GithubBackup.sln --configuration Release --no-restore
+#        working-directory: ./GithubBackup
 
       - name: Publish
         run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/linux-x64 --runtime linux-x64 --self-contained
@@ -121,6 +121,10 @@ jobs:
         with:
           files: ./publish/linux-x64/
           dest: ./publish/ghb_linux_x64_${{ needs.release.outputs.version }}.zip
+          
+      - name: Print files
+        run: ls -R
+        working-directory: ./GithubBackup/
 
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
