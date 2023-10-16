@@ -67,10 +67,13 @@ jobs:
       - name: Publish
         run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x64 --runtime win-x64 --self-contained
         working-directory: ./GithubBackup
-        
-      - name: Zip
-        run: Compress-Archive -Path ./publish/win-x64/* -DestinationPath ./publish/ghb_win_x64_${{ needs.release.outputs.version }}.zip
 
+      - name: Zip
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: ./publish/win-x64/
+          dest: ./publish/ghb_win_x64_${{ needs.release.outputs.version }}.zip
+        
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         env:
@@ -111,7 +114,10 @@ jobs:
         working-directory: ./GithubBackup
         
       - name: Zip
-        run: Compress-Archive -Path ./publish/linux-x64/* -DestinationPath ./publish/ghb_linux_x64_${{ needs.release.outputs.version }}.zip
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: ./publish/linux-x64/
+          dest: ./publish/ghb_linux_x64_${{ needs.release.outputs.version }}.zip
 
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
@@ -153,7 +159,10 @@ jobs:
         working-directory: ./GithubBackup
 
       - name: Zip
-        run: Compress-Archive -Path ./publish/osx-x64/* -DestinationPath ./publish/ghb_osx_x64_${{ needs.release.outputs.version }}.zip
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: ./publish/osx-x64/
+          dest: ./publish/ghb_osx_x64_${{ needs.release.outputs.version }}.zip
 
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
