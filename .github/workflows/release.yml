@@ -20,12 +20,16 @@ jobs:
         uses: FiorelaCiroku/XDTesting-Print-Directory-Structure@v1.0.2
       - name: Restore
         run: dotnet restore
+        working-directory: ./GithubBackup
       - name: Build
-        run: dotnet build GithubBackup --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ./GithubBackup
       - name: Test
         run: dotnet test --configuration Release --no-restore
+        working-directory: ./GithubBackup
       - name: Publish
         run: dotnet publish GithubBackup.Cli --configuration Release --output publish --no-restore
+        working-directory: ./GithubBackup
 
       - name: Create Release
         id: create_release
@@ -48,3 +52,4 @@ jobs:
           asset_path: ./publish/ghb.exe
           asset_name: ghb.exe
           asset_content_type: application/octet-stream
+        working-directory: ./GithubBackup
