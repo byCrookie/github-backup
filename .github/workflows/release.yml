@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.nerbank_gitversioning.outputs.Version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -66,6 +67,9 @@ jobs:
       - name: Publish
         run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x64 --runtime win-x64 --self-contained
         working-directory: ./GithubBackup
+        
+      - name: Zip
+        run: Compress-Archive -Path ./publish/win-x64/* -DestinationPath publish/ghb_win-x64_${{ needs.release.outputs.version }}.zip
 
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
@@ -73,9 +77,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./GithubBackup/publish/win-x64/ghb.exe
-          asset_name: win-x64/ghb.exe
-          asset_content_type: application/octet-stream
+          asset_path: ./GithubBackup/publish/ghb_win-x64_${{ needs.release.outputs.version }}.zip
+          asset_name: ghb_win-x64_${{ needs.release.outputs.version }}.zip
+          asset_content_type: application/zip
           
   linux:
     needs: release
@@ -103,8 +107,11 @@ jobs:
         working-directory: ./GithubBackup
 
       - name: Publish
-        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x64 --runtime linux-x64 --self-contained
+        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/linux-x64 --runtime linux-x64 --self-contained
         working-directory: ./GithubBackup
+        
+      - name: Zip
+        run: Compress-Archive -Path ./publish/linux-x64/* -DestinationPath publish/ghb_linux-x64_${{ needs.release.outputs.version }}.zip
 
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
@@ -112,9 +119,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./GithubBackup/publish/linux-x64/ghb.exe
-          asset_name: linux-x64/ghb.exe
-          asset_content_type: application/octet-stream
+          asset_path: ./GithubBackup/publish/ghb_linux-x64_${{ needs.release.outputs.version }}.zip
+          asset_name: ghb_linux-x64_${{ needs.release.outputs.version }}.zip
+          asset_content_type: application/zip
   
   macos:
     needs: release
@@ -142,15 +149,18 @@ jobs:
         working-directory: ./GithubBackup
 
       - name: Publish
-        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x64 --runtime osx-x64 --self-contained
+        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/osx-x64 --runtime osx-x64 --self-contained
         working-directory: ./GithubBackup
-        
+
+      - name: Zip
+        run: Compress-Archive -Path ./publish/osx-x64/* -DestinationPath publish/ghb_osx-x64_${{ needs.release.outputs.version }}.zip
+
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./GithubBackup/publish/osx-x64/ghb
-          asset_name: osx-x64/ghb
-          asset_content_type: application/octet-stream
+          asset_path: ./GithubBackup/publish/ghb_osx-x64_${{ needs.release.outputs.version }}.zip
+          asset_name: ghb_osx-x64_${{ needs.release.outputs.version }}.zip
+          asset_content_type: application/zip
