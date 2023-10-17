@@ -11,17 +11,20 @@ internal sealed class RepositoriesRunner : IRepositoriesRunner
     private readonly RepositoriesArgs _repositoriesArgs;
     private readonly IRepositoryService _repositoryService;
     private readonly ILoginService _loginService;
+    private readonly IAnsiConsole _ansiConsole;
 
     public RepositoriesRunner(
         GlobalArgs globalArgs,
         RepositoriesArgs repositoriesArgs,
         IRepositoryService repositoryService,
-        ILoginService loginService)
+        ILoginService loginService,
+        IAnsiConsole ansiConsole)
     {
         _globalArgs = globalArgs;
         _repositoriesArgs = repositoriesArgs;
         _repositoryService = repositoryService;
         _loginService = loginService;
+        _ansiConsole = ansiConsole;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -30,7 +33,7 @@ internal sealed class RepositoriesRunner : IRepositoriesRunner
 
         if (!_globalArgs.Quiet)
         {
-            AnsiConsole.WriteLine($"Logged in as {user.Name}");
+            _ansiConsole.WriteLine($"Logged in as {user.Name}");
         }
 
         var options = new RepositoryOptions(
@@ -45,7 +48,7 @@ internal sealed class RepositoriesRunner : IRepositoriesRunner
         {
             if (!_globalArgs.Quiet)
             {
-                AnsiConsole.WriteLine("No migrations found.");
+                _ansiConsole.WriteLine("No migrations found.");
             }
 
             return;
@@ -53,17 +56,17 @@ internal sealed class RepositoriesRunner : IRepositoriesRunner
 
         if (!_globalArgs.Interactive)
         {
-            AnsiConsole.WriteLine($"Found {repositories.Count} repositories:");
+            _ansiConsole.WriteLine($"Found {repositories.Count} repositories:");
             foreach (var repository in repositories)
             {
-                AnsiConsole.WriteLine($"- {repository.FullName}");
+                _ansiConsole.WriteLine($"- {repository.FullName}");
             }
             
-            AnsiConsole.WriteLine(string.Join(" ", repositories.Select(r => r.FullName)));
+            _ansiConsole.WriteLine(string.Join(" ", repositories.Select(r => r.FullName)));
         }
         else
         {
-            var selectedRepositories = AnsiConsole.Prompt(
+            var selectedRepositories = _ansiConsole.Prompt(
                 new MultiSelectionPrompt<Repository>()
                     .Title("Select [green]repositories[/] to print?")
                     .Required(false)
@@ -76,7 +79,7 @@ internal sealed class RepositoriesRunner : IRepositoriesRunner
                     .UseConverter(r => r.FullName)
             );
 
-            AnsiConsole.WriteLine(string.Join(" ", selectedRepositories.Select(r => r.FullName)));   
+            _ansiConsole.WriteLine(string.Join(" ", selectedRepositories.Select(r => r.FullName)));   
         }
     }
 }

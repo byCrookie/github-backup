@@ -17,6 +17,7 @@ internal sealed class CredentialStore : ICredentialStore
     private const string Key = "LBaZO3iFnF";
     private const string Salt = "fqCKmp5nwk";
     private const string TokenFileName = "token";
+    private const string AppDirectory = "github-backup";
 
     public CredentialStore(
         IFileSystem fileSystem,
@@ -32,6 +33,7 @@ internal sealed class CredentialStore : ICredentialStore
     {
         if (!TryRetrieveTokenStoreFilePath(out var file))
         {
+            _githubTokenStore.Set(null);
             return Task.CompletedTask;
         }
 
@@ -45,12 +47,20 @@ internal sealed class CredentialStore : ICredentialStore
     {
         if (!TryRetrieveTokenStoreFilePath(out var file))
         {
+            _githubTokenStore.Set(null);
             return null;
         }
 
         if (_fileSystem.File.Exists(file))
         {
             var encryptedToken = await _fileSystem.File.ReadAllTextAsync(file, ct);
+
+            if (string.IsNullOrWhiteSpace(encryptedToken))
+            {
+                _githubTokenStore.Set(null);
+                return null;
+            }
+            
             var decryptedToken = DecryptString(encryptedToken, Key, Salt);
             _githubTokenStore.Set(decryptedToken);
             return decryptedToken;
@@ -100,7 +110,7 @@ internal sealed class CredentialStore : ICredentialStore
 
         if (_fileSystem.Directory.Exists(appDataPath))
         {
-            var backupPath = _fileSystem.Path.Combine(appDataPath, "GithubBackup");
+            var backupPath = _fileSystem.Path.Combine(appDataPath, AppDirectory);
             var tokenPath = _fileSystem.Path.Combine(backupPath, TokenFileName);
 
             if (_fileSystem.Directory.Exists(backupPath))

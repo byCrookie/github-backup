@@ -12,17 +12,20 @@ internal sealed class MigrationsRunner : IMigrationsRunner
     private readonly MigrationsArgs _migrationsArgs;
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
+    private readonly IAnsiConsole _ansiConsole;
 
     public MigrationsRunner(
         GlobalArgs globalArgs,
         MigrationsArgs migrationsArgs,
         IMigrationService migrationService,
-        ILoginService loginService)
+        ILoginService loginService,
+        IAnsiConsole ansiConsole)
     {
         _globalArgs = globalArgs;
         _migrationsArgs = migrationsArgs;
         _migrationService = migrationService;
         _loginService = loginService;
+        _ansiConsole = ansiConsole;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -31,7 +34,7 @@ internal sealed class MigrationsRunner : IMigrationsRunner
 
         if (!_globalArgs.Quiet)
         {
-            AnsiConsole.WriteLine($"Logged in as {user.Name}");
+            _ansiConsole.WriteLine($"Logged in as {user.Name}");
         }
 
         var migrations = await _migrationService.GetMigrationsAsync(ct);
@@ -40,7 +43,7 @@ internal sealed class MigrationsRunner : IMigrationsRunner
         {
             if (!_globalArgs.Quiet)
             {
-                AnsiConsole.WriteLine("No migrations found.");
+                _ansiConsole.WriteLine("No migrations found.");
             }
 
             return;
@@ -52,13 +55,13 @@ internal sealed class MigrationsRunner : IMigrationsRunner
                 .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
                 .ToListAsync(cancellationToken: ct);
 
-            AnsiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
+            _ansiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
             foreach (var migration in migrationStatus)
             {
-                AnsiConsole.WriteLine($"- {migration.Id} ({migration.State})");
+                _ansiConsole.WriteLine($"- {migration.Id} ({migration.State})");
             }
 
-            var selectedMigrations = AnsiConsole.Prompt(
+            var selectedMigrations = _ansiConsole.Prompt(
                 new MultiSelectionPrompt<Migration>()
                     .Title("Select [green]migrations[/] to print?")
                     .Required()
@@ -71,13 +74,13 @@ internal sealed class MigrationsRunner : IMigrationsRunner
                     .UseConverter(m => $"{m.Id} ({m.State})")
             );
 
-            AnsiConsole.WriteLine(string.Join(" ", selectedMigrations.Select(m => m.Id)));
+            _ansiConsole.WriteLine(string.Join(" ", selectedMigrations.Select(m => m.Id)));
             return;
         }
 
         if (_migrationsArgs.Id)
         {
-            AnsiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
+            _ansiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
         }
         else
         {
@@ -85,13 +88,13 @@ internal sealed class MigrationsRunner : IMigrationsRunner
                 .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
                 .ToListAsync(cancellationToken: ct);
 
-            AnsiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
+            _ansiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
             foreach (var migration in migrationStatus)
             {
-                AnsiConsole.WriteLine($"- {migration.Id} ({migration.State})");
+                _ansiConsole.WriteLine($"- {migration.Id} ({migration.State})");
             }
             
-            AnsiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
+            _ansiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
         }
     }
 }

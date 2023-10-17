@@ -15,6 +15,7 @@ internal sealed class DownloadRunner : IDownloadRunner
     private readonly ILoginService _loginService;
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<DownloadRunner> _logger;
+    private readonly IAnsiConsole _ansiConsole;
 
     public DownloadRunner(
         GlobalArgs globalArgs,
@@ -22,7 +23,8 @@ internal sealed class DownloadRunner : IDownloadRunner
         IMigrationService migrationService,
         ILoginService loginService,
         IFileSystem fileSystem,
-        ILogger<DownloadRunner> logger)
+        ILogger<DownloadRunner> logger,
+        IAnsiConsole ansiConsole)
     {
         _globalArgs = globalArgs;
         _downloadArgs = downloadArgs;
@@ -30,6 +32,7 @@ internal sealed class DownloadRunner : IDownloadRunner
         _loginService = loginService;
         _fileSystem = fileSystem;
         _logger = logger;
+        _ansiConsole = ansiConsole;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -38,7 +41,7 @@ internal sealed class DownloadRunner : IDownloadRunner
 
         if (!_globalArgs.Quiet)
         {
-            AnsiConsole.WriteLine($"Logged in as {user.Name}");
+            _ansiConsole.WriteLine($"Logged in as {user.Name}");
         }
 
         if (_downloadArgs.Latest)
@@ -69,7 +72,7 @@ internal sealed class DownloadRunner : IDownloadRunner
             
             if (!_globalArgs.Quiet)
             {
-                AnsiConsole.WriteLine("No migrations found");
+                _ansiConsole.WriteLine("No migrations found");
             }
             
             return;
@@ -108,7 +111,7 @@ internal sealed class DownloadRunner : IDownloadRunner
 
         if (!_globalArgs.Quiet)
         {
-            AnsiConsole.WriteLine($"Downloading migration {migration.Id} to {_downloadArgs.Destination}...");
+            _ansiConsole.WriteLine($"Downloading migration {migration.Id} to {_downloadArgs.Destination}...");
         }
 
         var path = await _migrationService.DownloadMigrationAsync(options, ct);
@@ -116,7 +119,7 @@ internal sealed class DownloadRunner : IDownloadRunner
 
         if (!_globalArgs.Quiet)
         {
-            AnsiConsole.WriteLine($"Downloaded migration {migration.Id} to {path}");
+            _ansiConsole.WriteLine($"Downloaded migration {migration.Id} to {path}");
         }
     }
 }

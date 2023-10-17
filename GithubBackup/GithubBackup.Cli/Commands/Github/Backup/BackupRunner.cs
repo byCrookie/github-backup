@@ -14,19 +14,22 @@ internal sealed class BackupRunner : IBackupRunner
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
     private readonly IFileSystem _fileSystem;
+    private readonly IAnsiConsole _ansiConsole;
 
     public BackupRunner(
         GlobalArgs globalArgs,
         BackupArgs backupArgs,
         IMigrationService migrationService,
         ILoginService loginService,
-        IFileSystem fileSystem)
+        IFileSystem fileSystem,
+        IAnsiConsole ansiConsole)
     {
         _globalArgs = globalArgs;
         _backupArgs = backupArgs;
         _migrationService = migrationService;
         _loginService = loginService;
         _fileSystem = fileSystem;
+        _ansiConsole = ansiConsole;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -35,7 +38,7 @@ internal sealed class BackupRunner : IBackupRunner
 
         if (!_globalArgs.Quiet)
         {
-            AnsiConsole.WriteLine($"Logged in as {user.Name}");
+            _ansiConsole.WriteLine($"Logged in as {user.Name}");
         }
 
         var options = new StartMigrationOptions(
@@ -53,7 +56,7 @@ internal sealed class BackupRunner : IBackupRunner
 
         if (!_globalArgs.Quiet)
         {
-            AnsiConsole.WriteLine(
+            _ansiConsole.WriteLine(
                 $"Downloading migration {migration.Id} to {_backupArgs.DownloadArgs.Destination} when ready...");
         }
 
@@ -68,12 +71,12 @@ internal sealed class BackupRunner : IBackupRunner
             downloadOptions,
             update =>
             {
-                AnsiConsole.WriteLine($"Migration {update.Id} is {update.State}...");
+                _ansiConsole.WriteLine($"Migration {update.Id} is {update.State}...");
                 return Task.CompletedTask;
             },
             ct
         );
         
-        AnsiConsole.WriteLine(!_globalArgs.Quiet ? $"Downloaded migration {migration.Id} ({file})" : file);
+        _ansiConsole.WriteLine(!_globalArgs.Quiet ? $"Downloaded migration {migration.Id} ({file})" : file);
     }
 }

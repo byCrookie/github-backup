@@ -11,17 +11,20 @@ internal sealed class MigrateRunner : IMigrateRunner
     private readonly MigrateArgs _migrateArgs;
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
+    private readonly IAnsiConsole _ansiConsole;
 
     public MigrateRunner(
         GlobalArgs globalArgs,
         MigrateArgs migrateArgs,
         IMigrationService migrationService,
-        ILoginService loginService)
+        ILoginService loginService,
+        IAnsiConsole ansiConsole)
     {
         _globalArgs = globalArgs;
         _migrateArgs = migrateArgs;
         _migrationService = migrationService;
         _loginService = loginService;
+        _ansiConsole = ansiConsole;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -30,10 +33,10 @@ internal sealed class MigrateRunner : IMigrateRunner
         
         if (!_globalArgs.Quiet)
         {
-            AnsiConsole.WriteLine($"Logged in as {user.Name}");
+            _ansiConsole.WriteLine($"Logged in as {user.Name}");
         }
 
-        if (_globalArgs.Interactive && !AnsiConsole.Confirm("Do you want to start a migration?", false))
+        if (_globalArgs.Interactive && !_ansiConsole.Confirm("Do you want to start a migration?", false))
         {
             return;
         }
@@ -53,7 +56,7 @@ internal sealed class MigrateRunner : IMigrateRunner
 
         if (!_globalArgs.Quiet)
         {
-            AnsiConsole.WriteLine($"Migration started with id {migration.Id}");
+            _ansiConsole.WriteLine($"Migration started with id {migration.Id}");
         }
     }
 }

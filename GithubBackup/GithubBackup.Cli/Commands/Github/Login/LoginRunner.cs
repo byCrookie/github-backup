@@ -17,6 +17,7 @@ internal sealed class LoginRunner : ILoginRunner
     private readonly IUserService _userService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<LoginRunner> _logger;
+    private readonly IAnsiConsole _ansiConsole;
 
     public LoginRunner(
         GlobalArgs globalArgs,
@@ -25,7 +26,8 @@ internal sealed class LoginRunner : ILoginRunner
         ICredentialStore credentialStore,
         IUserService userService,
         IConfiguration configuration,
-        ILogger<LoginRunner> logger)
+        ILogger<LoginRunner> logger,
+        IAnsiConsole ansiConsole)
     {
         _globalArgs = globalArgs;
         _loginArgs = loginArgs;
@@ -34,6 +36,7 @@ internal sealed class LoginRunner : ILoginRunner
         _userService = userService;
         _configuration = configuration;
         _logger = logger;
+        _ansiConsole = ansiConsole;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -42,7 +45,7 @@ internal sealed class LoginRunner : ILoginRunner
 
         if (!_globalArgs.Quiet)
         {
-            AnsiConsole.WriteLine($"Logged in as {user.Name}");
+            _ansiConsole.WriteLine($"Logged in as {user.Name}");
         }
     }
 
@@ -76,9 +79,9 @@ internal sealed class LoginRunner : ILoginRunner
     private async Task<string> GetOAuthTokenAsync(CancellationToken ct)
     {
         var deviceAndUserCodes = await _authenticationService.RequestDeviceAndUserCodesAsync(ct);
-        AnsiConsole.WriteLine(
+        _ansiConsole.WriteLine(
             $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}");
-        AnsiConsole.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
+        _ansiConsole.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
         var accessToken = await _authenticationService.PollForAccessTokenAsync(
             deviceAndUserCodes.DeviceCode,
             deviceAndUserCodes.Interval,

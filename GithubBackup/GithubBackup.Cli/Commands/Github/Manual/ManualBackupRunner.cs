@@ -18,6 +18,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
     private readonly IRepositoryService _repositoryService;
     private readonly ICredentialStore _credentialStore;
     private readonly IFileSystem _fileSystem;
+    private readonly IAnsiConsole _ansiConsole;
 
     public ManualBackupRunner(
         // Needs to be passed in because of the way ICommand's are resolved in
@@ -29,7 +30,8 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
         IUserService userService,
         IRepositoryService repositoryService,
         ICredentialStore credentialStore,
-        IFileSystem fileSystem)
+        IFileSystem fileSystem,
+        IAnsiConsole ansiConsole)
     {
         _authenticationService = authenticationService;
         _migrationService = migrationService;
@@ -37,16 +39,17 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
         _repositoryService = repositoryService;
         _credentialStore = credentialStore;
         _fileSystem = fileSystem;
+        _ansiConsole = ansiConsole;
     }
 
     public async Task RunAsync(CancellationToken ct)
     {
         var user = await LoginAsync(ct);
-        AnsiConsole.WriteLine($"Logged in as {user.Name}");
+        _ansiConsole.WriteLine($"Logged in as {user.Name}");
 
-        if (AnsiConsole.Confirm("Do you want to start a migration?", false))
+        if (_ansiConsole.Confirm("Do you want to start a migration?", false))
         {
-            var byType = AnsiConsole.Confirm("Do you want to select repositories by type? If selected, no affiliation or visibility can be selected.", false);
+            var byType = _ansiConsole.Confirm("Do you want to select repositories by type? If selected, no affiliation or visibility can be selected.", false);
             var type = (RepositoryType?)null;
             var affiliation = (RepositoryAffiliation?)RepositoryAffiliation.Owner;
             var visibility = (RepositoryVisibility?)RepositoryVisibility.All;
@@ -54,18 +57,18 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
             switch (byType)
             {
                 case true:
-                    type = AnsiConsole.Prompt(new SelectionPrompt<RepositoryType>()
+                    type = _ansiConsole.Prompt(new SelectionPrompt<RepositoryType>()
                         .Title("What type of repositories do you want to backup?")
                         .PageSize(20)
                         .AddChoices(Enum.GetValues<RepositoryType>()));
                     break;
                 case false:
-                    affiliation = AnsiConsole.Prompt(new SelectionPrompt<RepositoryAffiliation>()
+                    affiliation = _ansiConsole.Prompt(new SelectionPrompt<RepositoryAffiliation>()
                         .Title("Which affiliation type do you want to backup?")
                         .PageSize(20)
                         .AddChoices(Enum.GetValues<RepositoryAffiliation>()));
                 
-                    visibility = AnsiConsole.Prompt(new SelectionPrompt<RepositoryVisibility>()
+                    visibility = _ansiConsole.Prompt(new SelectionPrompt<RepositoryVisibility>()
                         .Title("Which visibility type do you want to backup?")
                         .PageSize(20)
                         .AddChoices(Enum.GetValues<RepositoryVisibility>()));
@@ -78,11 +81,11 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
 
             if (!repositories.Any())
             {
-                AnsiConsole.WriteLine("No repositories found.");
+                _ansiConsole.WriteLine("No repositories found.");
                 return;
             }
 
-            var selectedRepositories = AnsiConsole.Prompt(
+            var selectedRepositories = _ansiConsole.Prompt(
                 new MultiSelectionPrompt<Repository>()
                     .Title("Select [green]repositories[/] to backup? If none is selected, all repositories will be backed up.")
                     .Required(false)
@@ -95,7 +98,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
                     .UseConverter(r => r.FullName)
             );
 
-            var selectedOptions = AnsiConsole.Prompt(
+            var selectedOptions = _ansiConsole.Prompt(
                 new MultiSelectionPrompt<Description>()
                     .Title("Select [green]options[/] to start migration?")
                     .PageSize(20)
@@ -136,7 +139,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
 
             if (!migrations.Any())
             {
-                AnsiConsole.WriteLine("No migrations found.");
+                _ansiConsole.WriteLine("No migrations found.");
                 return;
             }
 
@@ -144,13 +147,13 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
                 .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
                 .ToListAsync(cancellationToken: ct);
 
-            AnsiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
+            _ansiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
             foreach (var migration in migrationStatus)
             {
-                AnsiConsole.WriteLine($"- {migration.Id} ({migration.State})");
+                _ansiConsole.WriteLine($"- {migration.Id} ({migration.State})");
             }
 
-            var selectedMigrations = AnsiConsole.Prompt(
+            var selectedMigrations = _ansiConsole.Prompt(
                 new MultiSelectionPrompt<Migration>()
                     .Title("Select [green]migrations[/] to download?")
                     .Required()
@@ -163,20 +166,20 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
                     .UseConverter(m => $"{m.Id} ({m.State})")
             );
 
-            var destination = AnsiConsole.Ask<string>("Where do you want to save the migration files?");
+            var destination = _ansiConsole.Ask<string>("Where do you want to save the migration files?");
 
             while (!_fileSystem.Directory.Exists(destination))
             {
-                destination = AnsiConsole.Ask<string>("The destination directory does not exist. Please enter a valid directory.");
+                destination = _ansiConsole.Ask<string>("The destination directory does not exist. Please enter a valid directory.");
             }
 
             foreach (var migration in selectedMigrations)
             {
-                AnsiConsole.WriteLine($"Downloading migration {migration.Id} to {destination}...");
+                _ansiConsole.WriteLine($"Downloading migration {migration.Id} to {destination}...");
                 var file = await _migrationService.DownloadMigrationAsync(new DownloadMigrationOptions(migration.Id, _fileSystem.DirectoryInfo.New(destination)), ct);
-                AnsiConsole.WriteLine($"Downloaded migration {migration.Id} ({file})");
+                _ansiConsole.WriteLine($"Downloaded migration {migration.Id} ({file})");
             }
-        } while (AnsiConsole.Confirm("Fetch migration status again?"));
+        } while (_ansiConsole.Confirm("Fetch migration status again?"));
     }
 
     private static string[] GetRepositoryNames(IReadOnlyCollection<Repository> selectedRepositories, IEnumerable<Repository> repositories)
@@ -197,7 +200,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
             else
             {
                 var user = await _userService.WhoAmIAsync(ct);
-                if (AnsiConsole.Confirm($"Do you want to continue as {user.Name}?"))
+                if (_ansiConsole.Confirm($"Do you want to continue as {user.Name}?"))
                 {
                     return user;
                 }
@@ -222,9 +225,9 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
     private async Task<string> GetOAuthTokenAsync(CancellationToken ct)
     {
         var deviceAndUserCodes = await _authenticationService.RequestDeviceAndUserCodesAsync(ct);
-        AnsiConsole.WriteLine(
+        _ansiConsole.WriteLine(
             $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}");
-        AnsiConsole.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
+        _ansiConsole.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
         var accessToken = await _authenticationService.PollForAccessTokenAsync(
             deviceAndUserCodes.DeviceCode,
             deviceAndUserCodes.Interval,

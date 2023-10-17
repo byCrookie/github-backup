@@ -19,6 +19,10 @@
         <PackageReference Include="Serilog.Extensions.Hosting" />
         <PackageReference Include="Serilog.Sinks.File" />
         <PackageReference Include="Spectre.Console" />
+        <PackageReference Include="Spectre.Console.Analyzer">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="System.CommandLine" />
         <PackageReference Include="System.CommandLine.Hosting" />
         <PackageReference Include="System.Linq.Async" />

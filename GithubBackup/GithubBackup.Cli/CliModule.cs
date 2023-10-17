@@ -4,6 +4,7 @@ using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Spectre.Console;
 
 namespace GithubBackup.Cli;
 
@@ -29,6 +30,7 @@ internal static class CliModule
         services.AddCore();
         services.AddSerilog();
         services.AddTransient<IFileSystem, FileSystem>();
+        services.AddSingleton<IAnsiConsole>(_ => AnsiConsole.Console);
         
         services.AddCommands<TCliCommand, TCommandArgs>(globalArgs, commandArgs);
     }

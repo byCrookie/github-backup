@@ -14,7 +14,6 @@ using NSubstitute.ExceptionExtensions;
 
 namespace GithubBackup.Cli.Tests.Commands.Services;
 
-[DisableParallelization]
 public class CommandRunnerServiceTests
 {
     private readonly CommandRunnerService _sut;

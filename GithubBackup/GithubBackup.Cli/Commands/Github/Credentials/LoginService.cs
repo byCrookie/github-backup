@@ -11,17 +11,20 @@ internal sealed class LoginService : ILoginService
     private readonly ILogger<LoginService> _logger;
     private readonly ICredentialStore _credentialStore;
     private readonly IUserService _userService;
+    private readonly IAnsiConsole _ansiConsole;
 
     public LoginService(
         GlobalArgs globalArgs,
         ILogger<LoginService> logger,
         ICredentialStore credentialStore,
-        IUserService userService)
+        IUserService userService,
+        IAnsiConsole ansiConsole)
     {
         _globalArgs = globalArgs;
         _logger = logger;
         _credentialStore = credentialStore;
         _userService = userService;
+        _ansiConsole = ansiConsole;
     }
 
     public async Task<User> ValidateLoginAsync(CancellationToken ct)
@@ -34,30 +37,31 @@ internal sealed class LoginService : ILoginService
             throw new Exception("Login first using the 'login' command.");
         }
 
+        var user = await TryWhoAmIAsync(ct);
+
+        if (!_globalArgs.Interactive)
+        {
+            return user;
+        }
+
+        if (_ansiConsole.Confirm($"Do you want to continue as {user.Name}?"))
+        {
+            return user;
+        }
+
+        throw new Exception("Login with a different user using the 'login' command.");
+    }
+
+    private async Task<User> TryWhoAmIAsync(CancellationToken ct)
+    {
         try
         {
-            var user = await _userService.WhoAmIAsync(ct);
-
-            if (!_globalArgs.Interactive)
-            {
-                return user;
-            }
-
-            if (AnsiConsole.Confirm($"Do you want to continue as {user.Name}?"))
-            {
-                return user;
-            }
-
-            throw new Exception("Login with a different user using the 'login' command.");
+            return await _userService.WhoAmIAsync(ct);
         }
         catch (Exception)
         {
-            if (!_globalArgs.Quiet)
-            {
-                _logger.LogDebug("Token is invalid");
-            }
+            _logger.LogDebug("Token is invalid");
+            throw new Exception("Login first using the 'login' command.");
         }
-
-        throw new Exception("Login first using the 'login' command.");
     }
 }
