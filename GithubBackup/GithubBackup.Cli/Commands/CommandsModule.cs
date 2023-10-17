@@ -1,6 +1,6 @@
 using GithubBackup.Cli.Commands.Github;
+using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Services;
-using GithubBackup.Cli.Options;
 using GithubBackup.Core.DependencyInjection.Factory;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,4 +1,4 @@
-using GithubBackup.Cli.Options;
+using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
 using Serilog;
 

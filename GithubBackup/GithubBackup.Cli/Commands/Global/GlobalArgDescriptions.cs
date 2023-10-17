@@ -1,6 +1,4 @@
-﻿using GithubBackup.Cli.Commands;
-
-namespace GithubBackup.Cli.Options;
+﻿namespace GithubBackup.Cli.Commands.Global;
 
 internal static class GlobalArgDescriptions
 {

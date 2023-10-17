@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using GithubBackup.Cli.Options;
+using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Migrations;

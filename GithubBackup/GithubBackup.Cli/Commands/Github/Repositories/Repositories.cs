@@ -1,5 +1,5 @@
 using GithubBackup.Cli.Commands.Github.Credentials;
-using GithubBackup.Cli.Options;
+using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Core.Github.Repositories;
 using Spectre.Console;
 

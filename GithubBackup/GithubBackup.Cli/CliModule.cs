@@ -1,6 +1,6 @@
 using System.IO.Abstractions;
 using GithubBackup.Cli.Commands;
-using GithubBackup.Cli.Options;
+using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;

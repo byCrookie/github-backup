@@ -1,8 +1,7 @@
 ﻿using System.CommandLine;
 using Microsoft.Extensions.Logging;
-using Serilog;
 
-namespace GithubBackup.Cli.Options;
+namespace GithubBackup.Cli.Commands.Global;
 
 internal sealed class GlobalArgs
 {

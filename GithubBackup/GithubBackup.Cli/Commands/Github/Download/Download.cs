@@ -1,6 +1,6 @@
 using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Credentials;
-using GithubBackup.Cli.Options;
+using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Core.Github.Migrations;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
