@@ -17,9 +17,9 @@ public class LoggerExtensionsTests
         logger.LogError("3");
 
         logger.VerifyLogs(
-            (LogLevel.Debug, "1 (.*)"),
-            (LogLevel.Critical, "2 (.*)"),
-            (LogLevel.Error, "3")
+            new LogEntry(LogLevel.Debug, "1 (.*)"),
+            new LogEntry(LogLevel.Critical, "2 (.*)"),
+            new LogEntry(LogLevel.Error, "3")
         );
     }
 
@@ -33,10 +33,10 @@ public class LoggerExtensionsTests
         logger.LogError("3");
 
         var action = () => logger.VerifyLogs(
-            (LogLevel.Debug, "1 (.*)"),
-            (LogLevel.Critical, "2 (.*)"),
-            (LogLevel.Error, "3"),
-            (LogLevel.Information, "4")
+            new LogEntry(LogLevel.Debug, "1 (.*)"),
+            new LogEntry(LogLevel.Critical, "2 (.*)"),
+            new LogEntry(LogLevel.Error, "3"),
+            new LogEntry(LogLevel.Information, "4")
         );
 
         action.Should().Throw<Exception>().WithMessage(
@@ -64,8 +64,8 @@ public class LoggerExtensionsTests
         logger.LogError("3");
 
         var action = () => logger.VerifyLogs(
-            (LogLevel.Debug, "1 (.*)"),
-            (LogLevel.Critical, "2 (.*)")
+            new LogEntry(LogLevel.Debug, "1 (.*)"),
+            new LogEntry(LogLevel.Critical, "2 (.*)")
         );
 
         action.Should().Throw<Exception>().WithMessage(

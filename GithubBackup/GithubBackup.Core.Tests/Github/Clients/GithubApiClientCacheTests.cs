@@ -70,10 +70,10 @@ public class GithubApiClientCacheTests
         result2.Headers.GetRequired(TestId).Should().Be(nameof(cachedResponse));
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Requesting https://api.github.com/test"),
-            (LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
-            (LogLevel.Debug, "Requesting https://api.github.com/test"),
-            (LogLevel.Debug, "Cache - Returning cached response for GET - https://api.github.com/test")
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug, "Cache - Returning cached response for GET - https://api.github.com/test")
         );
     }
 
@@ -111,10 +111,10 @@ public class GithubApiClientCacheTests
         result2.Headers.GetRequired(TestId).Should().Be(nameof(newResponse));
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Requesting https://api.github.com/test"),
-            (LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
-            (LogLevel.Debug, "Requesting https://api.github.com/test"),
-            (LogLevel.Debug,
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug,
                 "Cache - Resource has changed, returning new response for GET - https://api.github.com/test")
         );
     }
@@ -144,11 +144,11 @@ public class GithubApiClientCacheTests
         result2.Headers.GetRequired(TestId).Should().Be(nameof(response2));
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Requesting https://api.github.com/test"),
-            (LogLevel.Debug, "Caching response for GET - https://api.github.com/test"),
-            (LogLevel.Debug, "Requesting https://api.github.com/test"),
-            (LogLevel.Debug, "Resource has changed, returning new response for GET - https://api.github.com/test"),
-            (LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test")
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug, "Caching response for GET - https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug, "Resource has changed, returning new response for GET - https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test")
         );
     }
 
@@ -173,8 +173,8 @@ public class GithubApiClientCacheTests
         result2.Headers.GetRequired(TestId).Should().Be(nameof(response2));
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Requesting https://api.github.com/test"),
-            (LogLevel.Debug, "Requesting https://api.github.com/test")
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test")
         );
     }
 

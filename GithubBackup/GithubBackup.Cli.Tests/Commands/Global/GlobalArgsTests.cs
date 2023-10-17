@@ -4,7 +4,7 @@ using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
 using Microsoft.Extensions.Logging;
 
-namespace GithubBackup.Cli.Tests.Commands;
+namespace GithubBackup.Cli.Tests.Commands.Global;
 
 public class GlobalArgsTests
 {

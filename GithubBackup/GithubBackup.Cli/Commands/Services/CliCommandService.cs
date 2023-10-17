@@ -30,8 +30,8 @@ internal sealed class CliCommandService : ICliCommandService
         catch (FlurlHttpException e)
         {
             var error = await e.GetResponseStringAsync();
-            _logger.LogCritical(e, "Unhandled exception (Command: {Type}):{NewLine}{Message}",
-                _commandRunner.GetType().Name, Environment.NewLine, error);
+            _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}",
+                _commandRunner.GetType().Name, error);
             await Console.Error.WriteLineAsync(e.Message);
             Environment.ExitCode = 1;
         }

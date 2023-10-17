@@ -56,7 +56,7 @@ public class AuthenticationServiceTests
         );
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Requesting device and user codes")
+            new LogEntry(LogLevel.Debug, "Requesting device and user codes")
         );
     }
 
@@ -106,9 +106,9 @@ public class AuthenticationServiceTests
         var result = await _sut.PollForAccessTokenAsync(deviceCode, interval, CancellationToken.None);
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Polling for access token"),
-            (LogLevel.Information, "Authorization pending. Retrying in 1 seconds"),
-            (LogLevel.Information, "Slow down. Retrying in 2 seconds")
+            new LogEntry(LogLevel.Debug, "Polling for access token"),
+            new LogEntry(LogLevel.Information, "Authorization pending. Retrying in 1 seconds"),
+            new LogEntry(LogLevel.Information, "Slow down. Retrying in 2 seconds")
         );
 
         result.Should().BeEquivalentTo(new AccessToken(accessToken, tokenType, scope));

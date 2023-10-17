@@ -161,13 +161,13 @@ public class MigrationServiceTests
         }, CancellationToken.None);
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Polling migration 1"),
-            (LogLevel.Debug, "Getting migration 1"),
-            (LogLevel.Information, $"Migration {id} is Pending"),
-            (LogLevel.Debug, "Getting migration 1"),
-            (LogLevel.Information, $"Migration {id} is Exporting"),
-            (LogLevel.Debug, "Getting migration 1"),
-            (LogLevel.Information, $"Migration {id} is Exported")
+            new LogEntry(LogLevel.Debug, "Polling migration 1"),
+            new LogEntry(LogLevel.Debug, "Getting migration 1"),
+            new LogEntry(LogLevel.Information, $"Migration {id} is Pending"),
+            new LogEntry(LogLevel.Debug, "Getting migration 1"),
+            new LogEntry(LogLevel.Information, $"Migration {id} is Exporting"),
+            new LogEntry(LogLevel.Debug, "Getting migration 1"),
+            new LogEntry(LogLevel.Information, $"Migration {id} is Exported")
         );
 
         result.Should().BeEquivalentTo(downloadFile);
@@ -282,9 +282,9 @@ public class MigrationServiceTests
         _mockFileSystem.File.Exists(backup3Path).Should().BeTrue();
 
         _logger.VerifyLogs(
-            (LogLevel.Information, "Overwriting backups"),
-            (LogLevel.Information, "Deleting identical backup 20001202000000_migration_1.tar.gz"),
-            (LogLevel.Information, "Deleting identical backup 20001207000000_migration_1.tar.gz")
+            new LogEntry(LogLevel.Information, "Overwriting backups"),
+            new LogEntry(LogLevel.Information, "Deleting identical backup 20001202000000_migration_1.tar.gz"),
+            new LogEntry(LogLevel.Information, "Deleting identical backup 20001207000000_migration_1.tar.gz")
         );
 
         result.Should().BeEquivalentTo(downloadFile);
@@ -334,12 +334,12 @@ public class MigrationServiceTests
         var result = await _sut.DownloadMigrationAsync(options, CancellationToken.None);
 
         _logger.VerifyLogs(
-            (LogLevel.Information, "Applying retention rules"),
-            (LogLevel.Information,
+            new LogEntry(LogLevel.Information, "Applying retention rules"),
+            new LogEntry(LogLevel.Information,
                 "Deleting backup 20001207000000_migration_1.tar.gz because to many backups are present"),
-            (LogLevel.Information,
+            new LogEntry(LogLevel.Information,
                 "Deleting backup 20001202000000_migration_1.tar.gz because to many backups are present"),
-            (LogLevel.Information,
+            new LogEntry(LogLevel.Information,
                 "Deleting backup 20001201000000_migration_3.tar.gz because to many backups are present")
         );
         

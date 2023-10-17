@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ namespace GithubBackup.TestUtils.Logging;
 
 public static class LoggerExtensions
 {
-    public static void VerifyLogs<T>(this ILogger<T> logger, params (LogLevel Level, string? Pattern)[] expectedLogs)
+    public static void VerifyLogs<T>(this ILogger<T> logger, params LogEntry[] expectedLogs)
     {
         logger.Should().NotBeNull();
         var logs = logger
@@ -19,15 +20,12 @@ public static class LoggerExtensions
                     call.GetArguments()[2]?.ToString()
                 )
             ).ToList();
-        var expectedLogEntries = expectedLogs
-            .Select(expectedLog => new LogEntry(expectedLog.Level, expectedLog.Pattern))
-            .ToList();
 
         var logVerifications = new List<LogVerification>();
 
-        for (var i = 0; i < Math.Max(logs.Count, expectedLogEntries.Count); i++)
+        for (var i = 0; i < Math.Max(logs.Count, expectedLogs.Length); i++)
         {
-            var expectedLog = expectedLogEntries.Count > i ? expectedLogEntries[i] : null;
+            var expectedLog = expectedLogs.Length > i ? expectedLogs[i] : null;
             var log = logs.Count > i ? logs[i] : null;
 
             if (expectedLog is null && log is not null)

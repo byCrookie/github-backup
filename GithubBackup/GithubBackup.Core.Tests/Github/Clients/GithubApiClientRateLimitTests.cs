@@ -56,8 +56,8 @@ public class GithubApiClientRateLimitTests
         result.Should().BeEquivalentTo(response);
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Requesting https://api.github.com/test"),
-            (LogLevel.Debug,
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug,
                 "RetryAfter - Delaying for (.*) before retrying request to GET - https://api.github.com/test")
         );
     }
@@ -81,8 +81,8 @@ public class GithubApiClientRateLimitTests
         result.Should().BeEquivalentTo(response);
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Requesting https://api.github.com/test"),
-            (LogLevel.Debug,
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug,
                 "RateLimit - Delaying for (.*) before retrying request to GET - https://api.github.com/test")
         );
     }
@@ -108,12 +108,12 @@ public class GithubApiClientRateLimitTests
         result.Should().BeEquivalentTo(response);
 
         _logger.VerifyLogs(
-            (LogLevel.Debug, "Requesting https://api.github.com/test"),
-            (LogLevel.Debug,
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug,
                 "Retry Attempt 0 - Delaying for (.*) before retrying request to GET - https://api.github.com/test"),
-            (LogLevel.Debug,
+            new LogEntry(LogLevel.Debug,
                 "Retry Attempt 1 - Delaying for (.*) before retrying request to GET - https://api.github.com/test"),
-            (LogLevel.Debug,
+            new LogEntry(LogLevel.Debug,
                 "Retry Attempt 2 - Delaying for (.*) before retrying request to GET - https://api.github.com/test")
         );
     }
