@@ -13,18 +13,7 @@ internal static class MigrateCommand
     public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
-        
-        command.AddOptions(new List<Option>
-        {
-            MigrateArgs.RepositoriesOption,
-            MigrateArgs.LockRepositoriesOption,
-            MigrateArgs.ExcludeMetadataOption,
-            MigrateArgs.ExcludeGitDataOption,
-            MigrateArgs.ExcludeAttachementsOption,
-            MigrateArgs.ExcludeReleasesOption,
-            MigrateArgs.ExcludeOwnerProjectsOption,
-            MigrateArgs.OrgMetadataOnlyOption
-        });
+        command.AddOptions(MigrateArgs.Options());
         
         command.SetHandler(
             (globalArgs, migrateArgs) => GithubBackup.Cli.Cli.RunAsync<MigrationsRunner, MigrateArgs>(args, globalArgs, migrateArgs),

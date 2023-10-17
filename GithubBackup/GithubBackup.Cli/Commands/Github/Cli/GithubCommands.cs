@@ -11,20 +11,10 @@ using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Cli;
 
-internal static class GithubRootCommand
+internal static class GithubCommands
 {
-    public static RootCommand Build(string[] args)
+    public static void AddCommands(string[] args, Command command)
     {
-        var rootCommand = new RootCommand("Github Backup");
-
-        rootCommand.AddGlobalOptions(new List<Option>
-        {
-            GlobalArgs.VerbosityOption,
-            GlobalArgs.QuietOption,
-            GlobalArgs.LogFileOption,
-            GlobalArgs.InteractiveOption
-        });
-
         var manualBackupCommand = ManualBackupCommand.Create(args);
         var migrateCommand = MigrateCommand.Create(args);
         var loginCommand = LoginCommand.Create(args);
@@ -33,13 +23,15 @@ internal static class GithubRootCommand
         var downloadCommand = DownloadCommand.Create(args);
         var backupCommand = BackupCommand.Create(args);
 
-        rootCommand.AddCommand(loginCommand);
-        rootCommand.AddCommand(backupCommand);
-        rootCommand.AddCommand(manualBackupCommand);
-        rootCommand.AddCommand(migrateCommand);
-        rootCommand.AddCommand(migrationsCommand);
-        rootCommand.AddCommand(repositoriesCommand);
-        rootCommand.AddCommand(downloadCommand);
-        return rootCommand;
+        command.AddCommands(new List<Command>
+        {
+            manualBackupCommand,
+            migrateCommand,
+            loginCommand,
+            migrationsCommand,
+            repositoriesCommand,
+            downloadCommand,
+            backupCommand
+        });
     }
 }

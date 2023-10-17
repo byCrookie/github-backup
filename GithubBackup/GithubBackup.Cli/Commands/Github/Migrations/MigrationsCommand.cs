@@ -12,11 +12,7 @@ internal static class MigrationsCommand
     public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
-        
-        command.AddOptions(new List<Option>
-        {
-            MigrationsArgs.IdOption
-        });
+        command.AddOptions(MigrationsArgs.Options());
         
         command.SetHandler(
             (globalArgs, migrationsArgs) => GithubBackup.Cli.Cli.RunAsync<MigrationsRunner, MigrationsArgs>(args, globalArgs, migrationsArgs),

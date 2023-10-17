@@ -62,4 +62,15 @@ internal sealed class GlobalArgs
             }
         });
     }
+
+    public static Option[] Options()
+    {
+        return new Option[]
+        {
+            QuietOption,
+            LogFileOption,
+            VerbosityOption,
+            InteractiveOption
+        };
+    }
 }

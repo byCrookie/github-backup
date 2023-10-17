@@ -1,9 +1,11 @@
-﻿using System.CommandLine.Builder;
+﻿using System.CommandLine;
+using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
 using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Commands.Github.Cli;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Logging;
+using GithubBackup.Cli.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -14,7 +16,10 @@ internal static class Cli
 {
     public static async Task<int> RunAsync(string[] args)
     {
-        var rootCommand = GithubRootCommand.Build(args);
+        var rootCommand = new RootCommand("Github Backup");
+        rootCommand.AddGlobalOptions(GlobalArgs.Options());
+        GithubCommands.AddCommands(args, rootCommand);
+
         var commandLineBuilder = new CommandLineBuilder(rootCommand);
         commandLineBuilder.UseDefaults();
         commandLineBuilder.UseExceptionHandler((exception, _) =>

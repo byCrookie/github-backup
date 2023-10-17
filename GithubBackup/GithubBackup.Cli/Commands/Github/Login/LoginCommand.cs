@@ -12,12 +12,7 @@ internal static class LoginCommand
     public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
-        
-        command.AddOptions(new List<Option>
-        {
-            LoginArgs.TokenOption,
-            LoginArgs.DeviceFlowAuthOption
-        });
+        command.AddOptions(LoginArgs.Options());
         
         command.SetHandler(
             (globalArgs, loginArgs) => GithubBackup.Cli.Cli.RunAsync<LoginRunner, LoginArgs>(args, globalArgs, loginArgs),

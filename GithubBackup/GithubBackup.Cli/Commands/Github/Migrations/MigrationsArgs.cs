@@ -32,4 +32,12 @@ internal sealed class MigrationsArgs
             }
         });
     }
+    
+    public static Option[] Options()
+    {
+        return new Option[]
+        {
+            IdOption
+        };
+    }
 }

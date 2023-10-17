@@ -66,4 +66,16 @@ internal sealed class DownloadArgs
             description: DownloadArgDescriptions.Overwrite.Long
         ) { IsRequired = false };
     }
+    
+    public static Option[] Options()
+    {
+        return new Option[]
+        {
+            MigrationsOption,
+            LatestOption,
+            DestinationOption,
+            NumberOfBackupsOption,
+            OverwriteOption
+        };
+    }
 }

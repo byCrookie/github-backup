@@ -108,4 +108,19 @@ internal sealed class MigrateArgs
             }
         });
     }
+    
+    public static Option[] Options()
+    {
+        return new Option[]
+        {
+            RepositoriesOption,
+            LockRepositoriesOption,
+            ExcludeMetadataOption,
+            ExcludeGitDataOption,
+            ExcludeAttachementsOption,
+            ExcludeReleasesOption,
+            ExcludeOwnerProjectsOption,
+            OrgMetadataOnlyOption
+        };
+    }
 }

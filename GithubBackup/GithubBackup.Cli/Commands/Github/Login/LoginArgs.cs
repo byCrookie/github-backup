@@ -30,4 +30,13 @@ internal sealed class LoginArgs
             description: LoginArgDescriptions.DeviceFlowAuth.Long
         ) { IsRequired = false };
     }
+    
+    public static Option[] Options()
+    {
+        return new Option[]
+        {
+            TokenOption,
+            DeviceFlowAuthOption
+        };
+    }
 }

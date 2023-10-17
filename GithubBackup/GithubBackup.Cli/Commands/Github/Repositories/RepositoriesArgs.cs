@@ -55,4 +55,14 @@ internal sealed class RepositoriesArgs
             }
         });
     }
+    
+    public static Option[] Options()
+    {
+        return new Option[]
+        {
+            TypeOption,
+            AffiliationOption,
+            VisibilityOption
+        };
+    }
 }

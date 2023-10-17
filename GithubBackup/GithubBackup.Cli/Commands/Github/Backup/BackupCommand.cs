@@ -14,25 +14,8 @@ internal static class BackupCommand
     public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
-        
-        command.AddOptions(new List<Option>
-        {
-            MigrateArgs.RepositoriesOption,
-            MigrateArgs.LockRepositoriesOption,
-            MigrateArgs.ExcludeMetadataOption,
-            MigrateArgs.ExcludeGitDataOption,
-            MigrateArgs.ExcludeAttachementsOption,
-            MigrateArgs.ExcludeReleasesOption,
-            MigrateArgs.ExcludeOwnerProjectsOption,
-            MigrateArgs.OrgMetadataOnlyOption
-        });
-        
-        command.AddOptions(new List<Option>
-        {
-            DownloadArgs.LatestOption,
-            DownloadArgs.DestinationOption,
-            DownloadArgs.OverwriteOption
-        });
+        command.AddOptions(MigrateArgs.Options());
+        command.AddOptions(DownloadArgs.Options());
 
         command.SetHandler(
             (globalArgs, manualBackupArgs) => GithubBackup.Cli.Cli.RunAsync<BackupRunner, BackupArgs>(args, globalArgs, manualBackupArgs),
