@@ -22,6 +22,7 @@ public class MigrationServiceTests
     private readonly IFileSystem _mockFileSystem;
     private readonly ILogger<MigrationService> _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly Environment.Environment _environment;
 
     public MigrationServiceTests()
     {
@@ -29,6 +30,7 @@ public class MigrationServiceTests
         _logger = Substitute.For<ILogger<MigrationService>>();
         _mockFileSystem = new MockFileSystem();
         _dateTimeProvider = Substitute.For<IDateTimeProvider>();
+        _environment = new Environment.Environment(_mockFileSystem);
 
         _sut = new MigrationService(_mockFileSystem, _githubApiClient, _dateTimeProvider, _logger);
     }
@@ -133,13 +135,13 @@ public class MigrationServiceTests
         var reponse2 = new MigrationReponse(id, MigrationState.Exporting, createdAt).ToFlurlJsonResponse();
         var reponse3 = new MigrationReponse(id, MigrationState.Exported, createdAt).ToFlurlJsonResponse();
 
-        var downloadPath = Root("Test");
+        var downloadPath = _environment.Root("Test");
 
         _githubApiClient
             .GetAsync($"/user/migrations/{id}", null, Arg.Any<CancellationToken>())
             .Returns(reponse1, reponse2, reponse3);
 
-        var downloadFile = Root(downloadPath.FullName, "Test.zip").FullName;
+        var downloadFile = _environment.Root(downloadPath.FullName, "Test.zip").FullName;
 
         _githubApiClient
             .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
@@ -186,9 +188,9 @@ public class MigrationServiceTests
     {
         const long id = 1;
 
-        var downloadPath = Root("Test");
+        var downloadPath = _environment.Root("Test");
 
-        var downloadFile = Root(downloadPath.FullName, "Test.zip").FullName;
+        var downloadFile = _environment.Root(downloadPath.FullName, "Test.zip").FullName;
 
         _githubApiClient
             .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
@@ -214,13 +216,13 @@ public class MigrationServiceTests
     {
         const long id = 1;
 
-        var downloadPath = Root("Test");
-        
+        var downloadPath = _environment.Root("Test");
+
         _mockFileSystem.Directory.CreateDirectory(downloadPath.FullName);
 
         _dateTimeProvider.Now.Returns(new DateTime(2000, 1, 1));
         var downloadFile = $"{_dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{id}.tar.gz";
-        _mockFileSystem.File.Create(Root(downloadPath.FullName, downloadFile).FullName);
+        _mockFileSystem.File.Create(_environment.Root(downloadPath.FullName, downloadFile).FullName);
 
         _githubApiClient
             .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
@@ -245,7 +247,7 @@ public class MigrationServiceTests
     {
         const long id = 1;
 
-        var downloadPath = Root("Test");
+        var downloadPath = _environment.Root("Test");
 
         _mockFileSystem.Directory.CreateDirectory(downloadPath.FullName);
 
@@ -256,14 +258,14 @@ public class MigrationServiceTests
         var backup1 = $"{date10DaysAgo:yyyyMMddHHmmss}_migration_{id}.tar.gz";
         var backup2 = $"{date5DaysAgo:yyyyMMddHHmmss}_migration_{id}.tar.gz";
         var backup3 = $"{dateNow:yyyyMMddHHmmss}_migration_{id + 1}.tar.gz";
-        var backup1Path = Root(downloadPath.FullName, backup1).FullName;
-        var backup2Path = Root(downloadPath.FullName, backup2).FullName;
-        var backup3Path = Root(downloadPath.FullName, backup3).FullName;
+        var backup1Path = _environment.Root(downloadPath.FullName, backup1).FullName;
+        var backup2Path = _environment.Root(downloadPath.FullName, backup2).FullName;
+        var backup3Path = _environment.Root(downloadPath.FullName, backup3).FullName;
         _mockFileSystem.File.Create(backup1Path);
         _mockFileSystem.File.Create(backup2Path);
         _mockFileSystem.File.Create(backup3Path);
 
-        var downloadFile = Root(downloadPath.FullName, "Test.zip").FullName;
+        var downloadFile = _environment.Root(downloadPath.FullName, "Test.zip").FullName;
 
         _githubApiClient
             .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
@@ -295,7 +297,7 @@ public class MigrationServiceTests
     {
         const long id = 1;
 
-        var downloadPath = Root("Test");
+        var downloadPath = _environment.Root("Test");
 
         _mockFileSystem.Directory.CreateDirectory(downloadPath.FullName);
 
@@ -308,16 +310,16 @@ public class MigrationServiceTests
         var backup1 = $"{date10DaysAgo:yyyyMMddHHmmss}_migration_{id}.tar.gz";
         var backup2 = $"{date5DaysAgo:yyyyMMddHHmmss}_migration_{id}.tar.gz";
         var backup3 = $"{dateNow:yyyyMMddHHmmss}_migration_{id + 1}.tar.gz";
-        var backup0Path = Root(downloadPath.FullName, backup0).FullName;
-        var backup1Path = Root(downloadPath.FullName, backup1).FullName;
-        var backup2Path = Root(downloadPath.FullName, backup2).FullName;
-        var backup3Path = Root(downloadPath.FullName, backup3).FullName;
+        var backup0Path = _environment.Root(downloadPath.FullName, backup0).FullName;
+        var backup1Path = _environment.Root(downloadPath.FullName, backup1).FullName;
+        var backup2Path = _environment.Root(downloadPath.FullName, backup2).FullName;
+        var backup3Path = _environment.Root(downloadPath.FullName, backup3).FullName;
         _mockFileSystem.File.Create(backup0Path);
         _mockFileSystem.File.Create(backup1Path);
         _mockFileSystem.File.Create(backup2Path);
         _mockFileSystem.File.Create(backup3Path);
 
-        var downloadFile = Root(downloadPath.FullName, "Test.zip").FullName;
+        var downloadFile = _environment.Root(downloadPath.FullName, "Test.zip").FullName;
 
         _githubApiClient
             .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
@@ -342,22 +344,12 @@ public class MigrationServiceTests
             new LogEntry(LogLevel.Information,
                 "Deleting backup 20001201000000_migration_3.tar.gz because to many backups are present")
         );
-        
+
         _mockFileSystem.File.Exists(backup0Path).Should().BeFalse();
         _mockFileSystem.File.Exists(backup1Path).Should().BeFalse();
         _mockFileSystem.File.Exists(backup2Path).Should().BeFalse();
         _mockFileSystem.File.Exists(backup3Path).Should().BeTrue();
 
         result.Should().BeEquivalentTo(downloadFile);
-    }
-
-    private IDirectoryInfo Root(params string[] path)
-    {
-        if (OperatingSystem.IsWindows())
-            return _mockFileSystem.DirectoryInfo.New(Path.Combine(new []{@"C:\"}.Concat(path).ToArray()));
-        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
-            return _mockFileSystem.DirectoryInfo.New(Path.Combine(new [] { "/" }.Concat(path).ToArray()));
-        
-        throw new NotSupportedException("Operating system not supported");
     }
 }

@@ -6,7 +6,6 @@ using GithubBackup.Cli.Commands.Github.Manual;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Github.Migrations;
 using GithubBackup.Cli.Commands.Github.Repositories;
-using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Cli;

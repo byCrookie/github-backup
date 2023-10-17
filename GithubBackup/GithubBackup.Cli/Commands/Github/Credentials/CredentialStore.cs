@@ -1,8 +1,10 @@
 ﻿using System.IO.Abstractions;
 using System.Security.Cryptography;
+using GithubBackup.Core.Environment;
 using GithubBackup.Core.Github.Credentials;
 using static System.Text.Encoding;
 using Convert = System.Convert;
+using Environment = System.Environment;
 
 namespace GithubBackup.Cli.Commands.Github.Credentials;
 
@@ -10,34 +12,45 @@ internal sealed class CredentialStore : ICredentialStore
 {
     private readonly IFileSystem _fileSystem;
     private readonly IGithubTokenStore _githubTokenStore;
+    private readonly IEnvironment _environment;
 
     private const string Key = "LBaZO3iFnF";
     private const string Salt = "fqCKmp5nwk";
-    private const string TokenFileName = ".token";
+    private const string TokenFileName = "token";
 
-    public CredentialStore(IFileSystem fileSystem, IGithubTokenStore githubTokenStore)
+    public CredentialStore(
+        IFileSystem fileSystem,
+        IGithubTokenStore githubTokenStore,
+        IEnvironment environment)
     {
         _fileSystem = fileSystem;
         _githubTokenStore = githubTokenStore;
+        _environment = environment;
     }
 
     public Task StoreTokenAsync(string accessToken, CancellationToken ct)
     {
+        if (!TryRetrieveTokenStoreFilePath(out var file))
+        {
+            return Task.CompletedTask;
+        }
+
         _githubTokenStore.Set(accessToken);
-        var path = GetBackupPath();
-        _fileSystem.Directory.CreateDirectory(path);
+
         var encryptedToken = EncryptString(accessToken, Key, Salt);
-        return _fileSystem.File.WriteAllTextAsync(_fileSystem.Path.Combine(path, TokenFileName), encryptedToken, ct);
+        return _fileSystem.File.WriteAllTextAsync(file!, encryptedToken, ct);
     }
 
     public async Task<string?> LoadTokenAsync(CancellationToken ct)
     {
-        var path = GetBackupPath();
-        var filePath = _fileSystem.Path.Combine(path, TokenFileName);
-
-        if (_fileSystem.File.Exists(filePath))
+        if (!TryRetrieveTokenStoreFilePath(out var file))
         {
-            var encryptedToken = await _fileSystem.File.ReadAllTextAsync(filePath, ct);
+            return null;
+        }
+
+        if (_fileSystem.File.Exists(file))
+        {
+            var encryptedToken = await _fileSystem.File.ReadAllTextAsync(file, ct);
             var decryptedToken = DecryptString(encryptedToken, Key, Salt);
             _githubTokenStore.Set(decryptedToken);
             return decryptedToken;
@@ -60,9 +73,10 @@ internal sealed class CredentialStore : ICredentialStore
         {
             cs.Write(plaintextBytes, 0, plaintextBytes.Length);
         }
+
         return Convert.ToBase64String(ms.ToArray());
     }
- 
+
     private static string DecryptString(string encrypted, string key, string salt)
     {
         var encryptedBytes = Convert.FromBase64String(encrypted);
@@ -76,11 +90,39 @@ internal sealed class CredentialStore : ICredentialStore
         {
             cs.Write(encryptedBytes, 0, encryptedBytes.Length);
         }
+
         return UTF8.GetString(ms.ToArray());
     }
 
-    private string GetBackupPath()
+    private bool TryRetrieveTokenStoreFilePath(out string? path)
     {
-        return _fileSystem.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "GithubBackup");
+        var appDataPath = _environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).FullName;
+
+        if (_fileSystem.Directory.Exists(appDataPath))
+        {
+            var backupPath = _fileSystem.Path.Combine(appDataPath, "GithubBackup");
+            var tokenPath = _fileSystem.Path.Combine(backupPath, TokenFileName);
+
+            if (_fileSystem.Directory.Exists(backupPath))
+            {
+                path = tokenPath;
+                return true;
+            }
+
+            try
+            {
+                _fileSystem.Directory.CreateDirectory(backupPath);
+                path = tokenPath;
+                return true;
+            }
+            catch (Exception)
+            {
+                path = null;
+                return false;
+            }
+        }
+
+        path = null;
+        return false;
     }
 }

@@ -12,6 +12,7 @@ internal static class LoginArgDescriptions
     public static readonly Description DeviceFlowAuth = new("DeviceFlowAuth", "Device Flow Auth",
         """
         Interactive authentication using the device flow.
+        If a home directory is configured, the token will be stored in the file {home}/github-backup/token.
         Requires a browser. Recommended for use on clients.
         """
     );

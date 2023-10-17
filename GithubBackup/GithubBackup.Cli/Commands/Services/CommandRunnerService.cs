@@ -1,6 +1,8 @@
 using Flurl.Http;
+using GithubBackup.Core.Environment;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Environment = System.Environment;
 
 namespace GithubBackup.Cli.Commands.Services;
 
@@ -9,15 +11,18 @@ internal sealed class CommandRunnerService : ICommandRunnerService
     private readonly ILogger<CommandRunnerService> _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly ICommandRunner _commandRunner;
+    private readonly IEnvironment _environment;
 
     public CommandRunnerService(
         ILogger<CommandRunnerService> logger,
         IHostApplicationLifetime hostApplicationLifetime,
-        ICommandRunner commandRunner)
+        ICommandRunner commandRunner,
+        IEnvironment environment)
     {
         _logger = logger;
         _hostApplicationLifetime = hostApplicationLifetime;
         _commandRunner = commandRunner;
+        _environment = environment;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -33,14 +38,14 @@ internal sealed class CommandRunnerService : ICommandRunnerService
             _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}",
                 _commandRunner.GetType().Name, error);
             await Console.Error.WriteLineAsync(e.Message);
-            Environment.ExitCode = 1;
+            _environment.ExitCode = 1;
         }
         catch (Exception e)
         {
             _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}",
                 _commandRunner.GetType().Name, e.Message);
             await Console.Error.WriteLineAsync(e.Message);
-            Environment.ExitCode = 1;
+            _environment.ExitCode = 1;
         }
 
         _hostApplicationLifetime.StopApplication();

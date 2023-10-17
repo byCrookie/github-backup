@@ -51,7 +51,6 @@ internal sealed class LoginRunner : ILoginRunner
         if (!string.IsNullOrWhiteSpace(_loginArgs.Token))
         {
             _logger.LogInformation("Using token from command line");
-            await _credentialStore.StoreTokenAsync(_loginArgs.Token, ct);
             return await _userService.WhoAmIAsync(ct);
         }
 
@@ -71,7 +70,6 @@ internal sealed class LoginRunner : ILoginRunner
             throw new Exception("No token found. Please provide a token via the --token argument or the GITHUB_BACKUP_TOKEN environment variable.");
         }
 
-        await _credentialStore.StoreTokenAsync(token, ct);
         return await _userService.WhoAmIAsync(ct);
     }
 
@@ -86,7 +84,6 @@ internal sealed class LoginRunner : ILoginRunner
             deviceAndUserCodes.Interval,
             ct
         );
-        await _credentialStore.StoreTokenAsync(accessToken.Token, ct);
         return accessToken.Token;
     }
 }

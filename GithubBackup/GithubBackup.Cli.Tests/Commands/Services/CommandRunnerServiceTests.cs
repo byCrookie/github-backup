@@ -4,6 +4,7 @@ using Flurl;
 using Flurl.Http;
 using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Commands.Services;
+using GithubBackup.Core.Environment;
 using GithubBackup.TestUtils.Logging;
 using Meziantou.Xunit;
 using Microsoft.Extensions.Hosting;
@@ -20,14 +21,16 @@ public class CommandRunnerServiceTests
     private readonly ILogger<CommandRunnerService> _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifeTime;
     private readonly ICommandRunner _commandRunner;
+    private readonly IEnvironment _environment;
 
     public CommandRunnerServiceTests()
     {
         _logger = Substitute.For<ILogger<CommandRunnerService>>();
         _hostApplicationLifeTime = Substitute.For<IHostApplicationLifetime>();
         _commandRunner = Substitute.For<ICommandRunner>();
+        _environment = Substitute.For<IEnvironment>();
 
-        _sut = new CommandRunnerService(_logger, _hostApplicationLifeTime, _commandRunner);
+        _sut = new CommandRunnerService(_logger, _hostApplicationLifeTime, _commandRunner, _environment);
     }
 
     [Fact]
@@ -42,7 +45,7 @@ public class CommandRunnerServiceTests
             new LogEntry(LogLevel.Information, "Starting command: (.*)")
         );
 
-        Environment.ExitCode.Should().Be(0);
+        _environment.ExitCode.Should().Be(0);
     }
 
     [Fact]
@@ -61,7 +64,7 @@ public class CommandRunnerServiceTests
             new LogEntry(LogLevel.Critical, "Unhandled exception [(]Command: (.*)[)]: Test")
         );
 
-        Environment.ExitCode.Should().Be(1);
+        _environment.ExitCode.Should().Be(1);
     }
 
     [Fact]
@@ -80,7 +83,7 @@ public class CommandRunnerServiceTests
             new LogEntry(LogLevel.Critical, "Unhandled exception [(]Command: (.*)[)]: Test")
         );
 
-        Environment.ExitCode.Should().Be(1);
+        _environment.ExitCode.Should().Be(1);
     }
 
     private static FlurlHttpException CreateFlurlHttpException(string errorMessage)
