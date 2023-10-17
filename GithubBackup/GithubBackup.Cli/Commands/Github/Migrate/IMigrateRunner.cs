@@ -1,5 +1,5 @@
 namespace GithubBackup.Cli.Commands.Github.Migrate;
 
-internal interface IMigrate : ICliCommand
+internal interface IMigrateRunner : ICommandRunner
 {
 }

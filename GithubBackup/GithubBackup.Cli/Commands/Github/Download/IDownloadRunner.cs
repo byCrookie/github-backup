@@ -1,5 +1,5 @@
 namespace GithubBackup.Cli.Commands.Github.Download;
 
-internal interface IDownload : ICliCommand
+internal interface IDownloadRunner : ICommandRunner
 {
 }

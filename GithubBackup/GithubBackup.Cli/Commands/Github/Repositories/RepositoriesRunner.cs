@@ -5,14 +5,14 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Repositories;
 
-internal sealed class Repositories : IRepositories
+internal sealed class RepositoriesRunner : IRepositoriesRunner
 {
     private readonly GlobalArgs _globalArgs;
     private readonly RepositoriesArgs _repositoriesArgs;
     private readonly IRepositoryService _repositoryService;
     private readonly ILoginService _loginService;
 
-    public Repositories(
+    public RepositoriesRunner(
         GlobalArgs globalArgs,
         RepositoriesArgs repositoriesArgs,
         IRepositoryService repositoryService,

@@ -9,7 +9,7 @@ internal static class MigrationsCommand
     private const string CommandName = "migrations";
     private const string CommandDescription = "List migrations.";
     
-    public static Command Create(Func<string[], GlobalArgs, MigrationsArgs, Task> runAsync, string[] args)
+    public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
         
@@ -19,7 +19,7 @@ internal static class MigrationsCommand
         });
         
         command.SetHandler(
-            (globalArgs, migrationsArgs) => runAsync(args, globalArgs, migrationsArgs),
+            (globalArgs, migrationsArgs) => GithubBackup.Cli.Cli.RunAsync<MigrationsRunner, MigrationsArgs>(args, globalArgs, migrationsArgs),
             new GlobalArgsBinder(),
             new MigrationsArgsBinder()
         );

@@ -5,14 +5,14 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Migrate;
 
-internal sealed class Migrate : IMigrate
+internal sealed class MigrateRunner : IMigrateRunner
 {
     private readonly GlobalArgs _globalArgs;
     private readonly MigrateArgs _migrateArgs;
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
 
-    public Migrate(
+    public MigrateRunner(
         GlobalArgs globalArgs,
         MigrateArgs migrateArgs,
         IMigrationService migrationService,

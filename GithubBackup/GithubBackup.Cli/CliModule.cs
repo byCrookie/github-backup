@@ -24,7 +24,7 @@ internal static class CliModule
         TCommandArgs commandArgs
     )
         where TCommandArgs : class
-        where TCliCommand : class, ICliCommand
+        where TCliCommand : class, ICommandRunner
     {
         services.AddCore();
         services.AddSerilog();

@@ -10,7 +10,7 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Manual;
 
-internal sealed class ManualBackup : IManualBackup
+internal sealed class ManualBackupRunner : IManualBackupRunner
 {
     private readonly IAuthenticationService _authenticationService;
     private readonly IMigrationService _migrationService;
@@ -19,7 +19,7 @@ internal sealed class ManualBackup : IManualBackup
     private readonly ICredentialStore _credentialStore;
     private readonly IFileSystem _fileSystem;
 
-    public ManualBackup(
+    public ManualBackupRunner(
         // Needs to be passed in because of the way ICommand's are resolved in
         // the cli service.
         // ReSharper disable once UnusedParameter.Local

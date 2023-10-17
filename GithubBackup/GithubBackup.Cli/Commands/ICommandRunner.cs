@@ -1,6 +1,6 @@
 ﻿namespace GithubBackup.Cli.Commands;
 
-internal interface ICliCommand
+internal interface ICommandRunner
 {
     Task RunAsync(CancellationToken ct);
 }

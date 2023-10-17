@@ -11,7 +11,7 @@ internal static class BackupCommand
     private const string CommandName = "backup";
     private const string CommandDescription = "Backup a Github user. This command is not interactive.";
     
-    public static Command Create(Func<string[], GlobalArgs, BackupArgs, Task> runAsync, string[] args)
+    public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
         
@@ -35,7 +35,7 @@ internal static class BackupCommand
         });
 
         command.SetHandler(
-            (globalArgs, manualBackupArgs) => runAsync(args, globalArgs, manualBackupArgs),
+            (globalArgs, manualBackupArgs) => GithubBackup.Cli.Cli.RunAsync<BackupRunner, BackupArgs>(args, globalArgs, manualBackupArgs),
             new GlobalArgsBinder(),
             new BackupArgsBinder()
         );

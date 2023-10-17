@@ -9,7 +9,7 @@ internal static class RepositoriesCommand
     private const string CommandName = "repositories";
     private const string CommandDescription = "List repositories.";
     
-    public static Command Create(Func<string[], GlobalArgs, RepositoriesArgs, Task> runAsync, string[] args)
+    public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
         
@@ -19,7 +19,7 @@ internal static class RepositoriesCommand
         });
         
         command.SetHandler(
-            (globalArgs, migrationsArgs) => runAsync(args, globalArgs, migrationsArgs),
+            (globalArgs, migrationsArgs) => GithubBackup.Cli.Cli.RunAsync<RepositoriesRunner, RepositoriesArgs>(args, globalArgs, migrationsArgs),
             new GlobalArgsBinder(),
             new RepositoriesArgsBinder()
         );

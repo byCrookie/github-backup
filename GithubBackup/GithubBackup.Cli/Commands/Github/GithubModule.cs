@@ -14,13 +14,13 @@ internal static class GithubModule
 {
     public static void AddGithub(this IServiceCollection services)
     {
-        services.AddTransient<IManualBackup, ManualBackup>();
-        services.AddTransient<IMigrate, Migrate.Migrate>();
-        services.AddTransient<IMigrations, Migrations.Migrations>();
-        services.AddTransient<IRepositories, Repositories.Repositories>();
-        services.AddTransient<IBackup, Backup.Backup>();
-        services.AddTransient<ILogin, Login.Login>();
-        services.AddTransient<IDownload, Download.Download>();
+        services.AddTransient<IManualBackupRunner, ManualBackupRunner>();
+        services.AddTransient<IMigrateRunner, Migrate.MigrateRunner>();
+        services.AddTransient<IMigrationsRunner, Migrations.MigrationsRunner>();
+        services.AddTransient<IRepositoriesRunner, Repositories.RepositoriesRunner>();
+        services.AddTransient<IBackupRunner, Backup.BackupRunner>();
+        services.AddTransient<ILoginRunner, Login.LoginRunner>();
+        services.AddTransient<IDownloadRunner, Download.DownloadRunner>();
         
         services.AddCredentials();
     }

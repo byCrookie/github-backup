@@ -7,22 +7,22 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Download;
 
-internal sealed class Download : IDownload
+internal sealed class DownloadRunner : IDownloadRunner
 {
     private readonly GlobalArgs _globalArgs;
     private readonly DownloadArgs _downloadArgs;
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
     private readonly IFileSystem _fileSystem;
-    private readonly ILogger<Download> _logger;
+    private readonly ILogger<DownloadRunner> _logger;
 
-    public Download(
+    public DownloadRunner(
         GlobalArgs globalArgs,
         DownloadArgs downloadArgs,
         IMigrationService migrationService,
         ILoginService loginService,
         IFileSystem fileSystem,
-        ILogger<Download> logger)
+        ILogger<DownloadRunner> logger)
     {
         _globalArgs = globalArgs;
         _downloadArgs = downloadArgs;

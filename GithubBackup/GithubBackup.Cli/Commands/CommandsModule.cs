@@ -24,13 +24,13 @@ internal static class CommandsModule
         TCommandArgs commandArgs
     )
         where TCommandArgs : class
-        where TCliCommand : class, ICliCommand
+        where TCliCommand : class, ICommandRunner
     {
         services.AddGithub();
         
         services.AddSingleton(globalArgs);
 
-        services.AddTransient<ICliCommand>(s => s
+        services.AddTransient<ICommandRunner>(s => s
             .GetRequiredService<IFactory<TCommandArgs, TCliCommand>>()
             .Create(commandArgs));
 

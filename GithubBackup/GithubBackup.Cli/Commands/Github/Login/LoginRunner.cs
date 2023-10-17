@@ -8,7 +8,7 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Login;
 
-internal sealed class Login : ILogin
+internal sealed class LoginRunner : ILoginRunner
 {
     private readonly GlobalArgs _globalArgs;
     private readonly LoginArgs _loginArgs;
@@ -16,16 +16,16 @@ internal sealed class Login : ILogin
     private readonly ICredentialStore _credentialStore;
     private readonly IUserService _userService;
     private readonly IConfiguration _configuration;
-    private readonly ILogger<Login> _logger;
+    private readonly ILogger<LoginRunner> _logger;
 
-    public Login(
+    public LoginRunner(
         GlobalArgs globalArgs,
         LoginArgs loginArgs,
         IAuthenticationService authenticationService,
         ICredentialStore credentialStore,
         IUserService userService,
         IConfiguration configuration,
-        ILogger<Login> logger)
+        ILogger<LoginRunner> logger)
     {
         _globalArgs = globalArgs;
         _loginArgs = loginArgs;

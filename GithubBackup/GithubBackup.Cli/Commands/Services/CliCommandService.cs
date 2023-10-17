@@ -8,37 +8,37 @@ internal sealed class CliCommandService : ICliCommandService
 {
     private readonly ILogger<CliCommandService> _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
-    private readonly ICliCommand _cliCommand;
+    private readonly ICommandRunner _commandRunner;
 
     public CliCommandService(
         ILogger<CliCommandService> logger,
         IHostApplicationLifetime hostApplicationLifetime,
-        ICliCommand cliCommand)
+        ICommandRunner commandRunner)
     {
         _logger = logger;
         _hostApplicationLifetime = hostApplicationLifetime;
-        _cliCommand = cliCommand;
+        _commandRunner = commandRunner;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         try
         {
-            _logger.LogInformation("Starting command: {Type}", _cliCommand.GetType().Name);
-            await _cliCommand.RunAsync(cancellationToken);
+            _logger.LogInformation("Starting command: {Type}", _commandRunner.GetType().Name);
+            await _commandRunner.RunAsync(cancellationToken);
         }
         catch (FlurlHttpException e)
         {
             var error = await e.GetResponseStringAsync();
             _logger.LogCritical(e, "Unhandled exception (Command: {Type}):{NewLine}{Message}",
-                _cliCommand.GetType().Name, Environment.NewLine, error);
+                _commandRunner.GetType().Name, Environment.NewLine, error);
             await Console.Error.WriteLineAsync(e.Message);
             Environment.ExitCode = 1;
         }
         catch (Exception e)
         {
             _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}",
-                _cliCommand.GetType().Name, e.Message);
+                _commandRunner.GetType().Name, e.Message);
             await Console.Error.WriteLineAsync(e.Message);
             Environment.ExitCode = 1;
         }

@@ -6,14 +6,14 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Migrations;
 
-internal sealed class Migrations : IMigrations
+internal sealed class MigrationsRunner : IMigrationsRunner
 {
     private readonly GlobalArgs _globalArgs;
     private readonly MigrationsArgs _migrationsArgs;
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
 
-    public Migrations(
+    public MigrationsRunner(
         GlobalArgs globalArgs,
         MigrationsArgs migrationsArgs,
         IMigrationService migrationService,

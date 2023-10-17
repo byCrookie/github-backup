@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using GithubBackup.Cli.Commands.Github.Migrations;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
 
@@ -9,7 +10,7 @@ internal static class MigrateCommand
     private const string CommandName = "migrate";
     private const string CommandDescription = "Migrate a Github user.";
     
-    public static Command Create(Func<string[], GlobalArgs, MigrateArgs, Task> runAsync, string[] args)
+    public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
         
@@ -26,7 +27,7 @@ internal static class MigrateCommand
         });
         
         command.SetHandler(
-            (globalArgs, migrateArgs) => runAsync(args, globalArgs, migrateArgs),
+            (globalArgs, migrateArgs) => GithubBackup.Cli.Cli.RunAsync<MigrationsRunner, MigrateArgs>(args, globalArgs, migrateArgs),
             new GlobalArgsBinder(),
             new MigrateArgsBinder()
         );
