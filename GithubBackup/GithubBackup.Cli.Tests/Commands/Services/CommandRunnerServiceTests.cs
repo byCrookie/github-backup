@@ -14,20 +14,20 @@ using NSubstitute.ExceptionExtensions;
 namespace GithubBackup.Cli.Tests.Commands.Services;
 
 [DisableParallelization]
-public class CliCommandServiceTests
+public class CommandRunnerServiceTests
 {
-    private readonly CliCommandService _sut;
-    private readonly ILogger<CliCommandService> _logger;
+    private readonly CommandRunnerService _sut;
+    private readonly ILogger<CommandRunnerService> _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifeTime;
     private readonly ICommandRunner _commandRunner;
 
-    public CliCommandServiceTests()
+    public CommandRunnerServiceTests()
     {
-        _logger = Substitute.For<ILogger<CliCommandService>>();
+        _logger = Substitute.For<ILogger<CommandRunnerService>>();
         _hostApplicationLifeTime = Substitute.For<IHostApplicationLifetime>();
         _commandRunner = Substitute.For<ICommandRunner>();
 
-        _sut = new CliCommandService(_logger, _hostApplicationLifeTime, _commandRunner);
+        _sut = new CommandRunnerService(_logger, _hostApplicationLifeTime, _commandRunner);
     }
 
     [Fact]

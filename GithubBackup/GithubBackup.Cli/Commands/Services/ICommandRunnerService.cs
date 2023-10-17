@@ -2,6 +2,6 @@
 
 namespace GithubBackup.Cli.Commands.Services;
 
-internal interface ICliCommandService : IHostedService
+internal interface ICommandRunnerService : IHostedService
 {
 }

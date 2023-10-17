@@ -4,14 +4,14 @@ using Microsoft.Extensions.Logging;
 
 namespace GithubBackup.Cli.Commands.Services;
 
-internal sealed class CliCommandService : ICliCommandService
+internal sealed class CommandRunnerService : ICommandRunnerService
 {
-    private readonly ILogger<CliCommandService> _logger;
+    private readonly ILogger<CommandRunnerService> _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly ICommandRunner _commandRunner;
 
-    public CliCommandService(
-        ILogger<CliCommandService> logger,
+    public CommandRunnerService(
+        ILogger<CommandRunnerService> logger,
         IHostApplicationLifetime hostApplicationLifetime,
         ICommandRunner commandRunner)
     {

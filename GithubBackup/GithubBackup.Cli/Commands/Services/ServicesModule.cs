@@ -12,8 +12,8 @@ internal static class ServicesModule
     /// <param name="services">Dependencies are registered on this service collection</param>
     public static void AddServices(this IServiceCollection services)
     {
-        services.AddTransient<ICliCommandService, CliCommandService>();
+        services.AddTransient<ICommandRunnerService, CommandRunnerService>();
         
-        services.AddHostedService(sp => sp.GetRequiredService<IFactory<ICliCommandService>>().Create());
+        services.AddHostedService(sp => sp.GetRequiredService<IFactory<ICommandRunnerService>>().Create());
     }
 }
