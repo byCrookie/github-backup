@@ -74,14 +74,16 @@ internal class GithubApiClient : IGithubApiClient
             );
     }
 
-    public Task<string> DownloadFileAsync(Url url, string path, string? fileName = null, 
+    public async Task<string> DownloadFileAsync(Url url, string path, string? fileName = null, 
         Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
     {
         var request = _client.Value.Request(url)
             .WithOAuthBearerToken(_githubTokenStore.Get());
         configure?.Invoke(request);
         _logger.LogDebug("Downloading {Url}", request.Url);
-        return request.DownloadFileAsync(path, fileName, 4096, ct ?? CancellationToken.None);
+        var file = await request.DownloadFileAsync(path, fileName, 4096, ct ?? CancellationToken.None);
+        _logger.LogInformation("Downloaded {Url} to {Path}", request.Url, file);
+        return file;
     }
 
     public Task<IFlurlResponse> GetAsync(Url url, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)

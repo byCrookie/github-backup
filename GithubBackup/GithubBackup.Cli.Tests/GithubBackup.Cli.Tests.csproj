@@ -10,11 +10,11 @@
         <PackageReference Include="Bogus"/>
         <PackageReference Include="FluentAssertions"/>
         <PackageReference Include="Flurl.Http"/>
-        <PackageReference Include="Meziantou.Xunit.ParallelTestFramework" />
+        <PackageReference Include="Meziantou.Xunit.ParallelTestFramework"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
         <PackageReference Include="NSubstitute"/>
         <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
-        <PackageReference Include="Spectre.Console.Testing" />
+        <PackageReference Include="Spectre.Console.Testing"/>
         <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers"/>
         <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers"/>
         <PackageReference Include="Verify.Xunit"/>
@@ -26,10 +26,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\GithubBackup.Cli\GithubBackup.Cli.csproj"/>
-        <ProjectReference Include="..\GithubBackup.TestUtils.Tests\GithubBackup.TestUtils.Tests.csproj" />
+        <ProjectReference Include="..\GithubBackup.TestUtils.Tests\GithubBackup.TestUtils.Tests.csproj"/>
         <ProjectReference Include="..\GithubBackup.TestUtils\GithubBackup.TestUtils.csproj"/>
     </ItemGroup>
-
-
 
 </Project>

@@ -2,7 +2,6 @@ using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Core.Github.Migrations;
-using Microsoft.Extensions.Logging;
 using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Backup;
@@ -76,7 +75,14 @@ internal sealed class BackupRunner : IBackupRunner
             },
             ct
         );
-        
-        _ansiConsole.WriteLine(!_globalArgs.Quiet ? $"Downloaded migration {migration.Id} ({file})" : file);
+
+        if (!_globalArgs.Quiet)
+        {
+            _ansiConsole.WriteLine(!_globalArgs.Quiet ? $"Downloaded migration {migration.Id} ({file})" : file);
+        }
+        else
+        {
+            _ansiConsole.WriteLine(file);
+        }
     }
 }
