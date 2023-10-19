@@ -35,7 +35,7 @@ internal sealed class DownloadArgs
     {
         MigrationsOption = new Option<long[]>(
             aliases: new[] { "-m", "--migrations" },
-            getDefaultValue: StandardInput.ReadLongs,
+            getDefaultValue: Piping.ReadLongs,
             description: DownloadArgDescriptions.Migrations.Long)
         {
             IsRequired = false,

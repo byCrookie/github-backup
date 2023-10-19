@@ -1,7 +1,8 @@
 ﻿namespace GithubBackup.Cli.Utils;
 
-public static class StandardInput
+public static class Piping
 {
+    public static bool IsEnabled { get; set; } = true;
     public static Seperators Separators { get; } = new(new[]{ ",", ":", ";", "|", "-" });
     
     public static long[] ReadLongs()

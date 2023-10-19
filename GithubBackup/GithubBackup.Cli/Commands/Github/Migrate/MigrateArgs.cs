@@ -51,7 +51,7 @@ internal sealed class MigrateArgs
     {
         RepositoriesOption = new Option<string[]>(
             aliases: new[] { "-r", "--repositories" },
-            getDefaultValue: StandardInput.ReadStrings,
+            getDefaultValue: Piping.ReadStrings,
             description: MigrateArgDescriptions.Repositories.Long
         ) { IsRequired = false, Arity = ArgumentArity.ZeroOrMore, AllowMultipleArgumentsPerToken = true };
 

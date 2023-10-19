@@ -7,7 +7,7 @@ internal static class MigrateArgDescriptions
     public static readonly Description Repositories = new("Repositories", "Repositories",
         $"""
          The repositories to backup e.g. 'owner/repo'.
-         Instead piping can be used to provide the repositories. Supported separators: {StandardInput.Separators.Values}.
+         Instead piping can be used to provide the repositories. Supported separators: {Piping.Separators.Values}.
          """
     );
 
