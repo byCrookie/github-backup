@@ -32,6 +32,29 @@ public class GlobalArgsTests
     }
     
     [Fact]
+    public async Task InvokeAsync_ShortFlagsArePassed_FlagsGetParsed()
+    {
+        var rootCommand = new RootCommand();
+        rootCommand.AddGlobalOptions(GlobalArgs.Options());
+        var subCommand = new Command("sub");
+        
+        subCommand.SetHandler(
+            globalArgs =>
+            {
+                globalArgs.Should().NotBeNull();
+                globalArgs.Interactive.Should().BeTrue();
+                globalArgs.LogFile.Should().Be("./log.txt");
+                globalArgs.Quiet.Should().BeTrue();
+                globalArgs.Verbosity.Should().Be(LogLevel.Debug);
+            },
+            new GlobalArgsBinder()
+        );
+        
+        rootCommand.AddCommand(subCommand);
+        await rootCommand.InvokeAsync("sub -q -v debug -l ./log.txt -i");
+    }
+    
+    [Fact]
     public async Task InvokeAsync_NoFlagsArePassed_DefaultsAreUsed()
     {
         var rootCommand = new RootCommand();
