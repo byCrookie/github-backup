@@ -2,6 +2,7 @@ using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
 using GithubBackup.Core.Github.Migrations;
+using GithubBackup.Core.Utils;
 using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Migrations;
@@ -13,19 +14,22 @@ internal sealed class MigrationsRunner : IMigrationsRunner
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
     private readonly IAnsiConsole _ansiConsole;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public MigrationsRunner(
         GlobalArgs globalArgs,
         MigrationsArgs migrationsArgs,
         IMigrationService migrationService,
         ILoginService loginService,
-        IAnsiConsole ansiConsole)
+        IAnsiConsole ansiConsole,
+        IDateTimeProvider dateTimeProvider)
     {
         _globalArgs = globalArgs;
         _migrationsArgs = migrationsArgs;
         _migrationService = migrationService;
         _loginService = loginService;
         _ansiConsole = ansiConsole;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -58,7 +62,7 @@ internal sealed class MigrationsRunner : IMigrationsRunner
             _ansiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
             foreach (var migration in migrationStatus)
             {
-                _ansiConsole.WriteLine($"- {migration.Id} ({migration.State})");
+                _ansiConsole.WriteLine($"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)");
             }
 
             var selectedMigrations = _ansiConsole.Prompt(
@@ -70,8 +74,8 @@ internal sealed class MigrationsRunner : IMigrationsRunner
                     .InstructionsText(
                         "(Press [blue]<space>[/] to toggle a migration, " +
                         "[green]<enter>[/] to accept)")
-                    .AddChoices(migrationStatus.Where(m => m.State == MigrationState.Exported))
-                    .UseConverter(m => $"{m.Id} ({m.State})")
+                    .AddChoices(migrationStatus.Where(m => m.State == MigrationState.Exported && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
+                    .UseConverter(m => $"{m.Id} {m.State} {m.CreatedAt} ({(_dateTimeProvider.Now - m.CreatedAt).Days}d)")
             );
 
             _ansiConsole.WriteLine(string.Join(" ", selectedMigrations.Select(m => m.Id)));
@@ -91,9 +95,9 @@ internal sealed class MigrationsRunner : IMigrationsRunner
             _ansiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
             foreach (var migration in migrationStatus)
             {
-                _ansiConsole.WriteLine($"- {migration.Id} ({migration.State})");
+                _ansiConsole.WriteLine($"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)");
             }
-            
+
             _ansiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
         }
     }

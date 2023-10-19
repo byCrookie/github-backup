@@ -12,7 +12,7 @@ internal static class DownloadCommand
     public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
-        command.AddOptions(GlobalArgs.Options());
+        command.AddOptions(DownloadArgs.Options());
         
         command.SetHandler(
             (globalArgs, migrateArgs) => GithubBackup.Cli.Cli.RunAsync<DownloadRunner, DownloadArgs>(args, globalArgs, migrateArgs),

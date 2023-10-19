@@ -48,12 +48,17 @@
     },
     "GithubBackup.Cli Download": {
       "commandName": "Project",
-      "commandLineArgs": "download --migrations 1 --destination M:\\Development\\Temp\\github-backup --latest",
+      "commandLineArgs": "download --destination M:\\Development\\Temp\\github-backup --latest",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Manual Backup": {
       "commandName": "Project",
       "commandLineArgs": "manual",
+      "environmentVariables": {}
+    },
+    "GithubBackup.Cli Login": {
+      "commandName": "Project",
+      "commandLineArgs": "login --device-flow-auth",
       "environmentVariables": {}
     }
   }

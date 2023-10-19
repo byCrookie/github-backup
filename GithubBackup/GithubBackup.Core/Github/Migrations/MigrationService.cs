@@ -105,8 +105,28 @@ internal sealed partial class MigrationService : IMigrationService
         return await DownloadMigrationAsync(options, ct);
     }
 
-    public Task<string> DownloadMigrationAsync(DownloadMigrationOptions options, CancellationToken ct)
+    public async Task<string> DownloadMigrationAsync(DownloadMigrationOptions options, CancellationToken ct)
     {
+        var migration = await GetMigrationAsync(options.Id, ct);
+        
+        if (migration.State != MigrationState.Exported)
+        {
+            throw new Exception($"The migration is not {MigrationState.Exported.GetEnumMemberValue()} and cannot be downloaded.");
+        }
+
+        if (migration.CreatedAt < _dateTimeProvider.Now.AddDays(-7))
+        {
+            throw new Exception("The migration is older than 7 days and cannot be downloaded anymore.");
+        }
+        
+        var fileName = $"{_dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{options.Id}.tar.gz";
+        var tempFile = _fileSystem.Path.GetTempFileName();
+        var tempDirectoryName = _fileSystem.Path.GetDirectoryName(tempFile)!;
+        var tempFileName = _fileSystem.Path.GetFileName(tempFile);
+        
+        await _githubApiClient
+            .DownloadFileAsync($"/user/migrations/{options.Id}/archive", tempDirectoryName, tempFileName, ct: ct);
+        
         if (options.Overwrite)
         {
             _logger.LogInformation("Overwriting backups");
@@ -119,15 +139,14 @@ internal sealed partial class MigrationService : IMigrationService
             ApplyRetentionRules(options);
         }
 
-        var fileName = $"{_dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{options.Id}.tar.gz";
-
-        if (_fileSystem.File.Exists(_fileSystem.Path.Combine(options.Destination.FullName, fileName)))
+        var migrationPath = _fileSystem.Path.Combine(options.Destination.FullName, fileName);
+        if (_fileSystem.File.Exists(migrationPath))
         {
             throw new Exception($"A backup with the id {options.Id} already exists.");
         }
-
-        return _githubApiClient
-            .DownloadFileAsync($"/user/migrations/{options.Id}/archive", options.Destination.FullName, fileName, ct: ct);
+        
+        _fileSystem.File.Move(tempFile, migrationPath);
+        return migrationPath;
     }
 
     private void ApplyRetentionRules(DownloadMigrationOptions options)

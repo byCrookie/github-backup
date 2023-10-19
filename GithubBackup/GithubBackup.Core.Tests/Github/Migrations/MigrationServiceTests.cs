@@ -129,24 +129,31 @@ public class MigrationServiceTests
         var onPollOutput = new StringBuilder();
 
         const long id = 1;
-        var createdAt = DateTime.Now;
 
-        var reponse1 = new MigrationReponse(id, MigrationState.Pending, createdAt).ToFlurlJsonResponse();
-        var reponse2 = new MigrationReponse(id, MigrationState.Exporting, createdAt).ToFlurlJsonResponse();
-        var reponse3 = new MigrationReponse(id, MigrationState.Exported, createdAt).ToFlurlJsonResponse();
+        var today = new DateTime(2000, 1, 1);
+
+        _dateTimeProvider.Now.Returns(today);
+
+        _githubApiClient
+            .GetAsync($"/user/migrations/{id}", ct: Arg.Any<CancellationToken>())
+            .Returns(new MigrationReponse(id, MigrationState.Exported, today).ToFlurlJsonResponse());
 
         var downloadPath = _environment.Root("Test");
+        _mockFileSystem.Directory.CreateDirectory(downloadPath.FullName);
+
+        var reponse1 = new MigrationReponse(id, MigrationState.Pending, _dateTimeProvider.Now).ToFlurlJsonResponse();
+        var reponse2 = new MigrationReponse(id, MigrationState.Exporting, _dateTimeProvider.Now).ToFlurlJsonResponse();
+        var reponse3 = new MigrationReponse(id, MigrationState.Exported, _dateTimeProvider.Now).ToFlurlJsonResponse();
 
         _githubApiClient
             .GetAsync($"/user/migrations/{id}", null, Arg.Any<CancellationToken>())
             .Returns(reponse1, reponse2, reponse3);
 
-        var downloadFile = _environment.Root(downloadPath.FullName, "Test.zip").FullName;
-
         _githubApiClient
-            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
+            .DownloadFileAsync($"/user/migrations/{id}/archive", Arg.Any<string>(), Arg.Any<string>(), null,
                 Arg.Any<CancellationToken>())
-            .Returns(downloadFile);
+            .Returns(call => _mockFileSystem.Path.Combine(call.ArgAt<string>(1), call.ArgAt<string>(2)))
+            .AndDoes(call => _mockFileSystem.File.Create(_mockFileSystem.Path.Combine(call.ArgAt<string>(1), call.ArgAt<string>(2))));
 
         var options = new DownloadMigrationOptions(
             id,
@@ -169,10 +176,11 @@ public class MigrationServiceTests
             new LogEntry(LogLevel.Debug, "Getting migration 1"),
             new LogEntry(LogLevel.Information, $"Migration {id} is Exporting"),
             new LogEntry(LogLevel.Debug, "Getting migration 1"),
-            new LogEntry(LogLevel.Information, $"Migration {id} is Exported")
+            new LogEntry(LogLevel.Information, $"Migration {id} is Exported"),
+            new LogEntry(LogLevel.Debug, "Getting migration 1")
         );
 
-        result.Should().BeEquivalentTo(downloadFile);
+        result.Should().BeEquivalentTo(_mockFileSystem.Path.Combine(downloadPath.FullName, $"{_dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{id}.tar.gz"));
 
         onPollOutput.ToString().Trim().Should().Be(
             $"""
@@ -188,14 +196,22 @@ public class MigrationServiceTests
     {
         const long id = 1;
 
-        var downloadPath = _environment.Root("Test");
+        var today = new DateTime(2000, 1, 1);
 
-        var downloadFile = _environment.Root(downloadPath.FullName, "Test.zip").FullName;
+        _dateTimeProvider.Now.Returns(today);
 
         _githubApiClient
-            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
+            .GetAsync($"/user/migrations/{id}", ct: Arg.Any<CancellationToken>())
+            .Returns(new MigrationReponse(id, MigrationState.Exported, today).ToFlurlJsonResponse());
+
+        var downloadPath = _environment.Root("Test");
+        _mockFileSystem.Directory.CreateDirectory(downloadPath.FullName);
+
+        _githubApiClient
+            .DownloadFileAsync($"/user/migrations/{id}/archive", Arg.Any<string>(), Arg.Any<string>(), null,
                 Arg.Any<CancellationToken>())
-            .Returns(downloadFile);
+            .Returns(call => _mockFileSystem.Path.Combine(call.ArgAt<string>(1), call.ArgAt<string>(2)))
+            .AndDoes(call => _mockFileSystem.File.Create(_mockFileSystem.Path.Combine(call.ArgAt<string>(1), call.ArgAt<string>(2))));
 
         var options = new DownloadMigrationOptions(
             id,
@@ -206,9 +222,11 @@ public class MigrationServiceTests
 
         var result = await _sut.DownloadMigrationAsync(options, CancellationToken.None);
 
-        _logger.VerifyLogs();
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Debug, "Getting migration 1")
+        );
 
-        result.Should().BeEquivalentTo(downloadFile);
+        result.Should().BeEquivalentTo(_mockFileSystem.Path.Combine(downloadPath.FullName, $"{_dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{id}.tar.gz"));
     }
 
     [Fact]
@@ -216,18 +234,25 @@ public class MigrationServiceTests
     {
         const long id = 1;
 
-        var downloadPath = _environment.Root("Test");
+        var today = new DateTime(2000, 1, 1);
 
+        _dateTimeProvider.Now.Returns(today);
+
+        _githubApiClient
+            .GetAsync($"/user/migrations/{id}", ct: Arg.Any<CancellationToken>())
+            .Returns(new MigrationReponse(id, MigrationState.Exported, today).ToFlurlJsonResponse());
+
+        var downloadPath = _environment.Root("Test");
         _mockFileSystem.Directory.CreateDirectory(downloadPath.FullName);
 
-        _dateTimeProvider.Now.Returns(new DateTime(2000, 1, 1));
         var downloadFile = $"{_dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{id}.tar.gz";
         _mockFileSystem.File.Create(_environment.Root(downloadPath.FullName, downloadFile).FullName);
 
         _githubApiClient
-            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
+            .DownloadFileAsync($"/user/migrations/{id}/archive", Arg.Any<string>(), Arg.Any<string>(), null,
                 Arg.Any<CancellationToken>())
-            .Returns(downloadFile);
+            .Returns(call => _mockFileSystem.Path.Combine(call.ArgAt<string>(1), call.ArgAt<string>(2)))
+            .AndDoes(call => _mockFileSystem.File.Create(_mockFileSystem.Path.Combine(call.ArgAt<string>(1), call.ArgAt<string>(2))));
 
         var options = new DownloadMigrationOptions(
             id,
@@ -239,7 +264,10 @@ public class MigrationServiceTests
         var action = () => _sut.DownloadMigrationAsync(options, CancellationToken.None);
 
         await action.Should().ThrowAsync<Exception>();
-        _logger.VerifyLogs();
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Debug, "Getting migration 1")
+        );
     }
 
     [Fact]
@@ -247,8 +275,15 @@ public class MigrationServiceTests
     {
         const long id = 1;
 
-        var downloadPath = _environment.Root("Test");
+        var today = new DateTime(2000, 1, 1);
 
+        _dateTimeProvider.Now.Returns(today);
+
+        _githubApiClient
+            .GetAsync($"/user/migrations/{id}", ct: Arg.Any<CancellationToken>())
+            .Returns(new MigrationReponse(id, MigrationState.Exported, today).ToFlurlJsonResponse());
+
+        var downloadPath = _environment.Root("Test");
         _mockFileSystem.Directory.CreateDirectory(downloadPath.FullName);
 
         var date10DaysAgo = new DateTime(2000, 12, 2);
@@ -265,12 +300,11 @@ public class MigrationServiceTests
         _mockFileSystem.File.Create(backup2Path);
         _mockFileSystem.File.Create(backup3Path);
 
-        var downloadFile = _environment.Root(downloadPath.FullName, "Test.zip").FullName;
-
         _githubApiClient
-            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
+            .DownloadFileAsync($"/user/migrations/{id}/archive", Arg.Any<string>(), Arg.Any<string>(), null,
                 Arg.Any<CancellationToken>())
-            .Returns(downloadFile);
+            .Returns(call => _mockFileSystem.Path.Combine(call.ArgAt<string>(1), call.ArgAt<string>(2)))
+            .AndDoes(call => _mockFileSystem.File.Create(_mockFileSystem.Path.Combine(call.ArgAt<string>(1), call.ArgAt<string>(2))));
 
         var options = new DownloadMigrationOptions(
             id,
@@ -284,12 +318,13 @@ public class MigrationServiceTests
         _mockFileSystem.File.Exists(backup3Path).Should().BeTrue();
 
         _logger.VerifyLogs(
+            new LogEntry(LogLevel.Debug, "Getting migration 1"),
             new LogEntry(LogLevel.Information, "Overwriting backups"),
             new LogEntry(LogLevel.Information, "Deleting identical backup 20001202000000_migration_1.tar.gz"),
             new LogEntry(LogLevel.Information, "Deleting identical backup 20001207000000_migration_1.tar.gz")
         );
 
-        result.Should().BeEquivalentTo(downloadFile);
+        result.Should().BeEquivalentTo(_mockFileSystem.Path.Combine(downloadPath.FullName, $"{_dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{id}.tar.gz"));
     }
 
     [Fact]
@@ -297,8 +332,15 @@ public class MigrationServiceTests
     {
         const long id = 1;
 
-        var downloadPath = _environment.Root("Test");
+        var today = new DateTime(2000, 1, 1);
 
+        _dateTimeProvider.Now.Returns(today);
+
+        _githubApiClient
+            .GetAsync($"/user/migrations/{id}", ct: Arg.Any<CancellationToken>())
+            .Returns(new MigrationReponse(id, MigrationState.Exported, today).ToFlurlJsonResponse());
+
+        var downloadPath = _environment.Root("Test");
         _mockFileSystem.Directory.CreateDirectory(downloadPath.FullName);
 
         var date11DaysAgo = new DateTime(2000, 12, 1);
@@ -319,12 +361,11 @@ public class MigrationServiceTests
         _mockFileSystem.File.Create(backup2Path);
         _mockFileSystem.File.Create(backup3Path);
 
-        var downloadFile = _environment.Root(downloadPath.FullName, "Test.zip").FullName;
-
         _githubApiClient
-            .DownloadFileAsync($"/user/migrations/{id}/archive", downloadPath.FullName, Arg.Any<string>(), null,
+            .DownloadFileAsync($"/user/migrations/{id}/archive", Arg.Any<string>(), Arg.Any<string>(), null,
                 Arg.Any<CancellationToken>())
-            .Returns(downloadFile);
+            .Returns(call => _mockFileSystem.Path.Combine(call.ArgAt<string>(1), call.ArgAt<string>(2)))
+            .AndDoes(call => _mockFileSystem.File.Create(_mockFileSystem.Path.Combine(call.ArgAt<string>(1), call.ArgAt<string>(2))));
 
         var options = new DownloadMigrationOptions(
             id,
@@ -336,6 +377,7 @@ public class MigrationServiceTests
         var result = await _sut.DownloadMigrationAsync(options, CancellationToken.None);
 
         _logger.VerifyLogs(
+            new LogEntry(LogLevel.Debug, "Getting migration 1"),
             new LogEntry(LogLevel.Information, "Applying retention rules"),
             new LogEntry(LogLevel.Information,
                 "Deleting backup 20001207000000_migration_1.tar.gz because to many backups are present"),
@@ -350,6 +392,6 @@ public class MigrationServiceTests
         _mockFileSystem.File.Exists(backup2Path).Should().BeFalse();
         _mockFileSystem.File.Exists(backup3Path).Should().BeTrue();
 
-        result.Should().BeEquivalentTo(downloadFile);
+        result.Should().BeEquivalentTo(_mockFileSystem.Path.Combine(downloadPath.FullName, $"{_dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{id}.tar.gz"));
     }
 }

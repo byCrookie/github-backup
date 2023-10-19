@@ -6,6 +6,7 @@ using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
+using GithubBackup.Core.Utils;
 using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Manual;
@@ -19,6 +20,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
     private readonly ICredentialStore _credentialStore;
     private readonly IFileSystem _fileSystem;
     private readonly IAnsiConsole _ansiConsole;
+    private readonly IDateTimeProvider _dateTimeProvider;
 
     public ManualBackupRunner(
         // Needs to be passed in because of the way ICommand's are resolved in
@@ -31,7 +33,8 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
         IRepositoryService repositoryService,
         ICredentialStore credentialStore,
         IFileSystem fileSystem,
-        IAnsiConsole ansiConsole)
+        IAnsiConsole ansiConsole,
+        IDateTimeProvider dateTimeProvider)
     {
         _authenticationService = authenticationService;
         _migrationService = migrationService;
@@ -40,6 +43,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
         _credentialStore = credentialStore;
         _fileSystem = fileSystem;
         _ansiConsole = ansiConsole;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -150,7 +154,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
             _ansiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
             foreach (var migration in migrationStatus)
             {
-                _ansiConsole.WriteLine($"- {migration.Id} ({migration.State})");
+                _ansiConsole.WriteLine($"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)");
             }
 
             var selectedMigrations = _ansiConsole.Prompt(
@@ -162,8 +166,8 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
                     .InstructionsText(
                         "(Press [blue]<space>[/] to toggle a migration, " +
                         "[green]<enter>[/] to accept)")
-                    .AddChoices(migrationStatus.Where(m => m.State == MigrationState.Exported))
-                    .UseConverter(m => $"{m.Id} ({m.State})")
+                    .AddChoices(migrationStatus.Where(m => m.State == MigrationState.Exported && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
+                    .UseConverter(m => $"{m.Id} {m.State} {m.CreatedAt} ({(_dateTimeProvider.Now - m.CreatedAt).Days}d)")
             );
 
             var destination = _ansiConsole.Ask<string>("Where do you want to save the migration files?");
