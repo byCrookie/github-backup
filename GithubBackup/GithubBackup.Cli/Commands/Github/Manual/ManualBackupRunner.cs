@@ -157,6 +157,12 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
                 _ansiConsole.WriteLine($"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)");
             }
 
+            if (!migrationStatus.Any(m => m.State == MigrationState.Exported && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
+            {
+                _ansiConsole.WriteLine("No exported migrations found in the last 7 days.");
+                return;
+            }
+
             var selectedMigrations = _ansiConsole.Prompt(
                 new MultiSelectionPrompt<Migration>()
                     .Title("Select [green]migrations[/] to download?")
