@@ -50,7 +50,7 @@ internal sealed class DownloadRunner : IDownloadRunner
             await DownloadLatestAsync(ct);
             return;
         }
-        
+
         if (!_downloadArgs.Migrations.Any())
         {
             _logger.LogInformation("No migration ids specified, downloading latest migration");
@@ -66,34 +66,55 @@ internal sealed class DownloadRunner : IDownloadRunner
     {
         var migrations = await _migrationService.GetMigrationsAsync(ct);
 
-        if (!migrations.Any())
+        if (migrations.All(e => e.State != MigrationState.Exported))
         {
             _logger.LogInformation("No migrations found");
-            
+
             if (!_globalArgs.Quiet)
             {
                 _ansiConsole.WriteLine("No migrations found");
             }
-            
+
             return;
         }
-        
-        var migration = migrations.OrderBy(m => m.CreatedAt).Last();
-        await DownloadMigrationAsync(migration.Id, ct);
+
+        var migration = migrations
+            .OrderBy(m => m.CreatedAt)
+            .Last(e => e.State == MigrationState.Exported);
+
+        await DownloadMigrationUsingIdAsync(migration.Id, ct);
     }
 
     private async Task DownloadUsingIdsAsync(CancellationToken ct)
     {
         foreach (var id in _downloadArgs.Migrations)
         {
-            await DownloadMigrationAsync(id, ct);
+            await DownloadMigrationUsingIdAsync(id, ct);
         }
     }
 
-    private async Task DownloadMigrationAsync(long id, CancellationToken ct)
+    private async Task DownloadMigrationUsingIdAsync(long id, CancellationToken ct)
     {
-        _logger.LogInformation("Downloading migration {Id}", id);
-        
+        _logger.LogInformation("Downloading migration {Id} to {Destination}", id, _downloadArgs.Destination);
+
+        if (!_globalArgs.Quiet)
+        {
+            _ansiConsole.WriteLine($"Downloading migration {id} to {_downloadArgs.Destination}...");
+            var progress = _ansiConsole.Progress();
+            progress.RefreshRate = TimeSpan.FromSeconds(5);
+            await progress.StartAsync(async _ =>
+            {
+                var path = await DownloadMigrationAsync(id, ct);
+                _ansiConsole.WriteLine($"Downloaded migration {id} to {path}");
+            });
+            return;
+        }
+
+        await DownloadMigrationAsync(id, ct);
+    }
+
+    private async Task<string> DownloadMigrationAsync(long id, CancellationToken ct)
+    {
         var options = new DownloadMigrationOptions(
             id,
             _fileSystem.DirectoryInfo.Wrap(_downloadArgs.Destination),
@@ -101,25 +122,8 @@ internal sealed class DownloadRunner : IDownloadRunner
             _downloadArgs.Overwrite
         );
 
-        var migration = await _migrationService.GetMigrationAsync(id, ct);
-
-        if (migration.State != MigrationState.Exported)
-        {
-            _logger.LogInformation("Migration {Id} is not yet exported - skipping", id);
-            return;
-        }
-
-        if (!_globalArgs.Quiet)
-        {
-            _ansiConsole.WriteLine($"Downloading migration {migration.Id} to {_downloadArgs.Destination}...");
-        }
-
         var path = await _migrationService.DownloadMigrationAsync(options, ct);
         _logger.LogInformation("Downloaded migration {Id} to {Path}", id, path);
-
-        if (!_globalArgs.Quiet)
-        {
-            _ansiConsole.WriteLine($"Downloaded migration {migration.Id} to {path}");
-        }
+        return path;
     }
 }
