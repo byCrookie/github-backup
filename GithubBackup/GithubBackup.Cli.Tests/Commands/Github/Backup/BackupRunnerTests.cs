@@ -14,6 +14,7 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Backup;
 
+[UsesVerify]
 public class BackupRunnerTests
 {
     private readonly IMigrationService _migrationService = Substitute.For<IMigrationService>();
@@ -43,9 +44,8 @@ public class BackupRunnerTests
             .Returns(migrationFile);
 
         await backupRunner.RunAsync(CancellationToken.None);
-
-        _ansiConsole.Lines.Count.Should().Be(1);
-        _ansiConsole.Lines[0].Should().Be(migrationFile);
+        
+        await Verify(_ansiConsole.Output);
     }
     
     [Fact]
@@ -71,10 +71,7 @@ public class BackupRunnerTests
 
         await backupRunner.RunAsync(CancellationToken.None);
 
-        _ansiConsole.Lines.Count.Should().Be(3);
-        _ansiConsole.Lines[0].Should().Be("Logged in as test");
-        _ansiConsole.Lines[1].Should().Be("Downloading migration 1 to test when ready...");
-        _ansiConsole.Lines[2].Should().Be("Downloaded migration 1 (test)");
+        await Verify(_ansiConsole.Output);
     }
 
     private BackupRunner CreateBackupRunner(bool quiet)

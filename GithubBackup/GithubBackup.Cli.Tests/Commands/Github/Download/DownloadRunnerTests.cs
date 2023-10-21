@@ -15,6 +15,7 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Download;
 
+[UsesVerify]
 public class DownloadRunnerTests
 {
     private readonly IMigrationService _migrationService = Substitute.For<IMigrationService>();
@@ -54,7 +55,7 @@ public class DownloadRunnerTests
         
         await runner.RunAsync(CancellationToken.None);
 
-        _ansiConsole.Output.Should().BeEmpty();
+        await Verify(_ansiConsole.Output);
     }
 
     private DownloadRunner CreateRunner(bool quiet, bool latest)
