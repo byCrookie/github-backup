@@ -45,7 +45,7 @@ public class BackupRunnerTests
 
         await backupRunner.RunAsync(CancellationToken.None);
         
-        await Verify(_ansiConsole.Output);
+        await Verify(_ansiConsole.Lines);
     }
     
     [Fact]
@@ -71,7 +71,7 @@ public class BackupRunnerTests
 
         await backupRunner.RunAsync(CancellationToken.None);
 
-        await Verify(_ansiConsole.Output);
+        await Verify(_ansiConsole.Lines);
     }
 
     private BackupRunner CreateBackupRunner(bool quiet)

@@ -29,7 +29,7 @@ public class LoginServiceTests
 
         await action.Should().ThrowAsync<Exception>();
 
-        await Verify(_ansiConsole.Output);
+        await Verify(_ansiConsole.Lines);
     }
     
     [Fact]
@@ -47,7 +47,7 @@ public class LoginServiceTests
 
         await action.Should().ThrowAsync<Exception>();
         
-        await Verify(_ansiConsole.Output);
+        await Verify(_ansiConsole.Lines);
     }
     
     [Fact]
@@ -69,7 +69,7 @@ public class LoginServiceTests
 
         _logger.VerifyLogs();
         
-        await Verify(_ansiConsole.Output);
+        await Verify(_ansiConsole.Lines);
     }
     
     [Fact]
@@ -93,7 +93,7 @@ public class LoginServiceTests
 
         _logger.VerifyLogs();
         
-        await Verify(_ansiConsole.Output);
+        await Verify(_ansiConsole.Lines);
     }
     
     [Fact]
@@ -118,7 +118,7 @@ public class LoginServiceTests
 
         _logger.VerifyLogs();
         
-        await Verify(_ansiConsole.Output);
+        await Verify(_ansiConsole.Lines);
     }
     
     private LoginService CreateLoginService(bool quiet, bool interactive)

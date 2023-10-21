@@ -55,7 +55,7 @@ public class DownloadRunnerTests
         
         await runner.RunAsync(CancellationToken.None);
 
-        await Verify(_ansiConsole.Output);
+        await Verify(_ansiConsole.Lines);
     }
 
     private DownloadRunner CreateRunner(bool quiet, bool latest)
