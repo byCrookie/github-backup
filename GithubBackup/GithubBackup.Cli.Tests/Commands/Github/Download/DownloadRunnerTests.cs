@@ -1,14 +1,12 @@
 ﻿using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using FluentAssertions;
-using GithubBackup.Cli.Commands.Github.Backup;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Download;
-using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Users;
+using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Spectre.Console.Testing;
@@ -28,18 +26,18 @@ public class DownloadRunnerTests
     {
         Piping.IsEnabled = false;
     }
-    
+
     [Fact]
     public async Task RunAsync_QuietAndLatest_DoNotWriteToConsoleAndDownloadLatest()
     {
         var runner = CreateRunner(true, true);
-        
+
         var user = new User("test", "test");
 
         _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
 
         const int id = 1;
-        
+
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
             .Returns(new List<Migration>
@@ -48,20 +46,273 @@ public class DownloadRunnerTests
                 new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
                 new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
             });
-        
+
         _migrationService
             .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), CancellationToken.None)
             .Returns("test");
-        
+
         await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Downloading latest migration"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
+        );
 
         await Verify(_ansiConsole.Lines);
     }
 
-    private DownloadRunner CreateRunner(bool quiet, bool latest)
+    [Fact]
+    public async Task RunAsync_NotQuietAndLatest_DoWriteToConsoleAndDownloadLatest()
+    {
+        var runner = CreateRunner(false, true);
+
+        var user = new User("test", "test");
+
+        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
+
+        const int id = 1;
+
+        _migrationService
+            .GetMigrationsAsync(CancellationToken.None)
+            .Returns(new List<Migration>
+            {
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
+            });
+
+        _migrationService
+            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), CancellationToken.None)
+            .Returns("test");
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Downloading latest migration"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
+        );
+
+        await Verify(_ansiConsole.Lines);
+    }
+
+    [Fact]
+    public async Task RunAsync_QuietAndNoMigrations_DoNotWriteToConsoleAndDownloadLatest()
+    {
+        var runner = CreateRunner(true, false);
+
+        var user = new User("test", "test");
+
+        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
+
+        const int id = 1;
+
+        _migrationService
+            .GetMigrationsAsync(CancellationToken.None)
+            .Returns(new List<Migration>
+            {
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
+            });
+
+        _migrationService
+            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), CancellationToken.None)
+            .Returns("test");
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "No migration ids specified, downloading latest migration"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
+        );
+
+        await Verify(_ansiConsole.Lines);
+    }
+
+    [Fact]
+    public async Task RunAsync_NotQuietAndLatestAndNoMigrations_DoWriteToConsoleAndDownloadLatest()
+    {
+        var runner = CreateRunner(false, false);
+
+        var user = new User("test", "test");
+
+        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
+
+        const int id = 1;
+
+        _migrationService
+            .GetMigrationsAsync(CancellationToken.None)
+            .Returns(new List<Migration>
+            {
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
+            });
+
+        _migrationService
+            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), CancellationToken.None)
+            .Returns("test");
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "No migration ids specified, downloading latest migration"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
+        );
+
+        await Verify(_ansiConsole.Lines);
+    }
+
+    [Fact]
+    public async Task RunAsync_QuietAndLatestAndNoExportedMigrations_DoNotWriteToConsoleAndDoNotDownload()
+    {
+        var runner = CreateRunner(true, true);
+
+        var user = new User("test", "test");
+
+        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
+
+        _migrationService
+            .GetMigrationsAsync(CancellationToken.None)
+            .Returns(new List<Migration>
+            {
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(1, MigrationState.Exporting, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
+            });
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Downloading latest migration"),
+            new LogEntry(LogLevel.Information, "No exported migrations found")
+        );
+
+        await Verify(_ansiConsole.Lines);
+
+        await _migrationService
+            .DidNotReceiveWithAnyArgs()
+            .DownloadMigrationAsync(Arg.Any<DownloadMigrationOptions>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RunAsync_NotQuietAndLatestAndNoExportedMigrations_DoWriteToConsoleAndDoNotDownload()
+    {
+        var runner = CreateRunner(false, true);
+
+        var user = new User("test", "test");
+
+        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
+
+        _migrationService
+            .GetMigrationsAsync(CancellationToken.None)
+            .Returns(new List<Migration>
+            {
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(1, MigrationState.Exporting, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
+            });
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Downloading latest migration"),
+            new LogEntry(LogLevel.Information, "No exported migrations found")
+        );
+        
+        await _migrationService
+            .DidNotReceiveWithAnyArgs()
+            .DownloadMigrationAsync(Arg.Any<DownloadMigrationOptions>(), Arg.Any<CancellationToken>());
+
+        await Verify(_ansiConsole.Lines);
+    }
+
+        [Fact]
+    public async Task RunAsync_QuietAndExportMigrations_DoNotWriteToConsoleAndDoDownload()
+    {
+        var runner = CreateRunner(true, true, new[] { 1L, 2L });
+
+        var user = new User("test", "test");
+
+        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
+
+        _migrationService
+            .GetMigrationsAsync(CancellationToken.None)
+            .Returns(new List<Migration>
+            {
+                new(0, MigrationState.Pending, new DateTime(2022, 1, 1)),
+                new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Exported, new DateTime(2020, 1, 1))
+            });
+        
+        _migrationService
+            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 1), CancellationToken.None)
+            .Returns("test1");
+        
+        _migrationService
+            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 2), CancellationToken.None)
+            .Returns("test2");
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Downloading migrations using ids"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 1 to test1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 2 to test"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 2 to test2")
+        );
+
+        await Verify(_ansiConsole.Lines);
+    }
+
+    [Fact]
+    public async Task RunAsync_NotQuietAndExportMigrations_DoWriteToConsoleAndDoDownload()
+    {
+        var runner = CreateRunner(false, true, new[] { 1L, 2L });
+
+        var user = new User("test", "test");
+
+        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
+
+        _migrationService
+            .GetMigrationsAsync(CancellationToken.None)
+            .Returns(new List<Migration>
+            {
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Exported, new DateTime(2020, 1, 1))
+            });
+        
+        _migrationService
+            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 1), CancellationToken.None)
+            .Returns("test1");
+        
+        _migrationService
+            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 2), CancellationToken.None)
+            .Returns("test2");
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Downloading migrations using ids"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 1 to test1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 2 to test"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 2 to test2")
+        );
+
+        await Verify(_ansiConsole.Lines);
+    }
+
+    private DownloadRunner CreateRunner(bool quiet, bool latest, long[]? ids = null)
     {
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"), false);
-        var downloadArgs = new DownloadArgs(Array.Empty<long>(), latest, new DirectoryInfo("test"), null, true);
+        var downloadArgs = new DownloadArgs(ids ?? Array.Empty<long>(), latest, new DirectoryInfo("test"), null, true);
 
         return new DownloadRunner(
             globalArgs,

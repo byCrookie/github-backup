@@ -1,0 +1,8 @@
+﻿[
+  Logged in as test,
+  Downloading migrations...,
+  Downloading migration 1 to test...,
+  Downloaded migration 1 to test1,
+  Downloading migration 2 to test...,
+  Downloaded migration 2 to test2
+]

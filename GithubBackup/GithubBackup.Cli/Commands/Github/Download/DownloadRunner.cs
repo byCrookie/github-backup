@@ -44,22 +44,37 @@ internal sealed class DownloadRunner : IDownloadRunner
             _ansiConsole.WriteLine($"Logged in as {user.Name}");
         }
 
+        if (_downloadArgs.Migrations.Any())
+        {
+            if (!_globalArgs.Quiet)
+            {
+                _ansiConsole.WriteLine("Downloading migrations...");
+            }
+        
+            _logger.LogInformation("Downloading migrations using ids");
+            await DownloadUsingIdsAsync(ct);
+            return;
+        }
+
         if (_downloadArgs.Latest)
         {
+            if (!_globalArgs.Quiet)
+            {
+                _ansiConsole.WriteLine("Downloading latest migration");
+            }
+            
             _logger.LogInformation("Downloading latest migration");
             await DownloadLatestAsync(ct);
             return;
         }
 
-        if (!_downloadArgs.Migrations.Any())
+        if (!_globalArgs.Quiet)
         {
-            _logger.LogInformation("No migration ids specified, downloading latest migration");
-            await DownloadLatestAsync(ct);
-            return;
+            _ansiConsole.WriteLine("No migration ids specified, downloading latest migration");
         }
-
-        _logger.LogInformation("Downloading migrations using ids");
-        await DownloadUsingIdsAsync(ct);
+            
+        _logger.LogInformation("No migration ids specified, downloading latest migration");
+        await DownloadLatestAsync(ct);
     }
 
     private async Task DownloadLatestAsync(CancellationToken ct)
@@ -68,11 +83,11 @@ internal sealed class DownloadRunner : IDownloadRunner
 
         if (migrations.All(e => e.State != MigrationState.Exported))
         {
-            _logger.LogInformation("No migrations found");
+            _logger.LogInformation("No exported migrations found");
 
             if (!_globalArgs.Quiet)
             {
-                _ansiConsole.WriteLine("No migrations found");
+                _ansiConsole.WriteLine("No exported migrations found");
             }
 
             return;
