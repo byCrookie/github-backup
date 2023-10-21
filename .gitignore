@@ -400,3 +400,4 @@ FodyWeavers.xsd
 !Backup/
 !Github/Backup/
 !Github/Backup/*
+*.received.*

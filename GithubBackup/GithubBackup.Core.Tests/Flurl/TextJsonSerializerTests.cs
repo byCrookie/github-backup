@@ -10,11 +10,11 @@ public class TextJsonSerializerTests
     private readonly TextJsonSerializer _sut = new();
 
     [Fact]
-    public void Serialize_WhenSerializing_ThenIsJson()
+    public async Task Serialize_WhenSerializing_ThenIsJson()
     {
         var item = new Item("test", ItemEnum.Test2);
         var json = _sut.Serialize(item);
-        VerifyJson(json);
+        await Verify(json);
     }
     
     [Fact]

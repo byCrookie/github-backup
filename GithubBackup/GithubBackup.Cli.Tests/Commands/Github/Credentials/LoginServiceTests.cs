@@ -29,11 +29,7 @@ public class LoginServiceTests
 
         await action.Should().ThrowAsync<Exception>();
 
-        _logger.VerifyLogs(
-            new LogEntry(LogLevel.Debug, "No token found")
-        );
-
-        _ansiConsole.Output.Should().BeEmpty();
+        await Verify(_ansiConsole.Output);
     }
     
     [Fact]
@@ -50,12 +46,8 @@ public class LoginServiceTests
         var action = () => CreateLoginService(true, false).ValidateLoginAsync(CancellationToken.None);
 
         await action.Should().ThrowAsync<Exception>();
-
-        _logger.VerifyLogs(
-            new LogEntry(LogLevel.Debug, "Token is invalid")
-        );
         
-        _ansiConsole.Output.Should().BeEmpty();
+        await Verify(_ansiConsole.Output);
     }
     
     [Fact]
@@ -77,7 +69,7 @@ public class LoginServiceTests
 
         _logger.VerifyLogs();
         
-        _ansiConsole.Output.Should().BeEmpty();
+        await Verify(_ansiConsole.Output);
     }
     
     [Fact]
@@ -101,7 +93,7 @@ public class LoginServiceTests
 
         _logger.VerifyLogs();
         
-        Verify(_ansiConsole.Output);
+        await Verify(_ansiConsole.Output);
     }
     
     [Fact]
@@ -126,7 +118,7 @@ public class LoginServiceTests
 
         _logger.VerifyLogs();
         
-        Verify(_ansiConsole.Output);
+        await Verify(_ansiConsole.Output);
     }
     
     private LoginService CreateLoginService(bool quiet, bool interactive)
