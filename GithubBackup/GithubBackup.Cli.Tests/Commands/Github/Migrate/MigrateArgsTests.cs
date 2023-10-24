@@ -10,16 +10,13 @@ namespace GithubBackup.Cli.Tests.Commands.Github.Migrate;
 [UsesVerify]
 public class MigrateArgsTests
 {
-    public MigrateArgsTests()
-    {
-        Piping.IsEnabled = false;
-    }
-    
+    private readonly MigrateArguments _migrateArguments = new(false);
+
     [Fact]
     public async Task InvokeAsync_FlagsArePassed_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(MigrateArgs.Options());
+        rootCommand.AddGlobalOptions(_migrateArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -35,7 +32,7 @@ public class MigrateArgsTests
                 migrateArgs.ExcludeOwnerProjects.Should().BeTrue();
                 migrateArgs.OrgMetadataOnly.Should().BeFalse();
             },
-            new MigrateArgsBinder()
+            new MigrateArgsBinder(_migrateArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -48,7 +45,7 @@ public class MigrateArgsTests
     public async Task InvokeAsync_ShortFlagsArePassed_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(MigrateArgs.Options());
+        rootCommand.AddGlobalOptions(_migrateArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -64,7 +61,7 @@ public class MigrateArgsTests
                 migrateArgs.ExcludeOwnerProjects.Should().BeTrue();
                 migrateArgs.OrgMetadataOnly.Should().BeFalse();
             },
-            new MigrateArgsBinder()
+            new MigrateArgsBinder(_migrateArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -79,7 +76,7 @@ public class MigrateArgsTests
     public async Task InvokeAsync_MigrationIsPassedMultipleTimes_FlagsGetParsed(string migrationArgs)
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(MigrateArgs.Options());
+        rootCommand.AddGlobalOptions(_migrateArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -95,7 +92,7 @@ public class MigrateArgsTests
                 migrateArgs.ExcludeOwnerProjects.Should().BeFalse();
                 migrateArgs.OrgMetadataOnly.Should().BeFalse();
             },
-            new MigrateArgsBinder()
+            new MigrateArgsBinder(_migrateArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -106,7 +103,7 @@ public class MigrateArgsTests
     public async Task InvokeAsync_OnlyRequiredArePassed_FlagsGetParsedWithDefaults()
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(MigrateArgs.Options());
+        rootCommand.AddGlobalOptions(_migrateArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -122,7 +119,7 @@ public class MigrateArgsTests
                 migrateArgs.ExcludeOwnerProjects.Should().BeFalse();
                 migrateArgs.OrgMetadataOnly.Should().BeFalse();
             },
-            new MigrateArgsBinder()
+            new MigrateArgsBinder(_migrateArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -133,16 +130,34 @@ public class MigrateArgsTests
     public async Task InvokeAsync_OrgMetadataOnlyAndRepositories_ValidationFails()
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(MigrateArgs.Options());
+        rootCommand.AddGlobalOptions(_migrateArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
             _ => { },
-            new MigrateArgsBinder()
+            new MigrateArgsBinder(_migrateArguments)
         );
         
         rootCommand.AddCommand(subCommand);
         var action = () => TestCommandline.Build(rootCommand).InvokeAsync("sub --org-metadata-only --repositories repo1 repo2");
+        
+        await action.Should().ThrowAsync<Exception>();
+    }
+    
+    [Fact]
+    public async Task InvokeAsync_NoRepositories_ValidationFails()
+    {
+        var rootCommand = new RootCommand();
+        rootCommand.AddGlobalOptions(_migrateArguments.Options());
+        var subCommand = new Command("sub");
+        
+        subCommand.SetHandler(
+            _ => { },
+            new MigrateArgsBinder(_migrateArguments)
+        );
+        
+        rootCommand.AddCommand(subCommand);
+        var action = () => TestCommandline.Build(rootCommand).InvokeAsync("sub");
         
         await action.Should().ThrowAsync<Exception>();
     }

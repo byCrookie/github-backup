@@ -5,11 +5,18 @@ namespace GithubBackup.Cli.Commands.Github.Repositories;
 
 internal sealed class RepositoriesArgsBinder : BinderBase<RepositoriesArgs>
 {
+    private readonly RepositoriesArguments _repositoriesArguments;
+
+    public RepositoriesArgsBinder(RepositoriesArguments repositoriesArguments)
+    {
+        _repositoriesArguments = repositoriesArguments;
+    }
+    
     protected override RepositoriesArgs GetBoundValue(BindingContext bindingContext)
     {
-        var type = bindingContext.ParseResult.GetRequiredValueForOption(RepositoriesArgs.TypeOption);
-        var affiliation = bindingContext.ParseResult.GetRequiredValueForOption(RepositoriesArgs.AffiliationOption);
-        var visibility = bindingContext.ParseResult.GetRequiredValueForOption(RepositoriesArgs.VisibilityOption);
+        var type = bindingContext.ParseResult.GetRequiredValueForOption(_repositoriesArguments.TypeOption);
+        var affiliation = bindingContext.ParseResult.GetRequiredValueForOption(_repositoriesArguments.AffiliationOption);
+        var visibility = bindingContext.ParseResult.GetRequiredValueForOption(_repositoriesArguments.VisibilityOption);
         return new RepositoriesArgs(type, affiliation, visibility);
     }
 }

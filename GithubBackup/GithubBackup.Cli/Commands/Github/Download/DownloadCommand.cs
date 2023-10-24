@@ -12,12 +12,13 @@ internal static class DownloadCommand
     public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
-        command.AddOptions(DownloadArgs.Options());
+        var downloadArguments = new DownloadArguments(true);
+        command.AddOptions(downloadArguments.Options());
         
         command.SetHandler(
             (globalArgs, migrateArgs) => GithubBackup.Cli.Cli.RunAsync<DownloadRunner, DownloadArgs>(args, globalArgs, migrateArgs),
             new GlobalArgsBinder(),
-            new DowndloadArgsBinder()
+            new DowndloadArgsBinder(downloadArguments)
         );
 
         return command;

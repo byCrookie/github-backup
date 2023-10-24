@@ -12,12 +12,13 @@ internal static class RepositoriesCommand
     public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
-        command.AddOptions(RepositoriesArgs.Options());
+        var repositoriesArguments = new RepositoriesArguments();
+        command.AddOptions(repositoriesArguments.Options());
         
         command.SetHandler(
             (globalArgs, migrationsArgs) => GithubBackup.Cli.Cli.RunAsync<RepositoriesRunner, RepositoriesArgs>(args, globalArgs, migrationsArgs),
             new GlobalArgsBinder(),
-            new RepositoriesArgsBinder()
+            new RepositoriesArgsBinder(repositoriesArguments)
         );
 
         return command;

@@ -1,7 +1,6 @@
 ﻿using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Cli.Utils;
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Users;
 using GithubBackup.TestUtils.Configuration;
@@ -21,11 +20,6 @@ public class LoginRunnerTests
     private readonly IAuthenticationService _authenticationService = Substitute.For<IAuthenticationService>();
     private readonly IUserService _userService = Substitute.For<IUserService>();
     private readonly ICredentialStore _credentialStore = Substitute.For<ICredentialStore>();
-
-    public LoginRunnerTests()
-    {
-        Piping.IsEnabled = false;
-    }
 
     [Fact]
     public async Task RunAsync_QuietAndToken_DoNotWriteToConsoleAndLoginUsingToken()

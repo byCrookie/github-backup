@@ -9,16 +9,13 @@ namespace GithubBackup.Cli.Tests.Commands.Github.Download;
 
 public class DownloadArgsTests
 {
-    public DownloadArgsTests()
-    {
-        Piping.IsEnabled = false;
-    }
-    
+    private readonly DownloadArguments _downloadArguments = new(false);
+
     [Fact]
     public async Task InvokeAsync_FlagsArePassed_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(DownloadArgs.Options());
+        rootCommand.AddGlobalOptions(_downloadArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -31,7 +28,7 @@ public class DownloadArgsTests
                 downloadArgs.NumberOfBackups.Should().Be(5);
                 downloadArgs.Overwrite.Should().BeTrue();
             },
-            new DowndloadArgsBinder()
+            new DowndloadArgsBinder(_downloadArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -42,7 +39,7 @@ public class DownloadArgsTests
     public async Task InvokeAsync_ShortFlagsArePassed_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(DownloadArgs.Options());
+        rootCommand.AddGlobalOptions(_downloadArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -55,7 +52,7 @@ public class DownloadArgsTests
                 downloadArgs.NumberOfBackups.Should().Be(5);
                 downloadArgs.Overwrite.Should().BeTrue();
             },
-            new DowndloadArgsBinder()
+            new DowndloadArgsBinder(_downloadArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -70,7 +67,7 @@ public class DownloadArgsTests
     public async Task InvokeAsync_MigrationIsPassedMultipleTimes_FlagsGetParsed(string migrationArgs)
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(DownloadArgs.Options());
+        rootCommand.AddGlobalOptions(_downloadArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -83,7 +80,7 @@ public class DownloadArgsTests
                 downloadArgs.NumberOfBackups.Should().Be(5);
                 downloadArgs.Overwrite.Should().BeTrue();
             },
-            new DowndloadArgsBinder()
+            new DowndloadArgsBinder(_downloadArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -94,7 +91,7 @@ public class DownloadArgsTests
     public async Task InvokeAsync_OnlyRequiredArePassed_FlagsGetParsedWithDefaults()
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(DownloadArgs.Options());
+        rootCommand.AddGlobalOptions(_downloadArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -103,15 +100,15 @@ public class DownloadArgsTests
                 downloadArgs.Should().NotBeNull();
                 downloadArgs.Destination.Name.Should().Be("migrations");
                 downloadArgs.Latest.Should().BeFalse();
-                downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
+                downloadArgs.Migrations.Should().BeEmpty();
                 downloadArgs.NumberOfBackups.Should().BeNull();
                 downloadArgs.Overwrite.Should().BeTrue();
             },
-            new DowndloadArgsBinder()
+            new DowndloadArgsBinder(_downloadArguments)
         );
         
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub -d ./migrations -m 1 2 3");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub -d ./migrations");
     }
 }
 

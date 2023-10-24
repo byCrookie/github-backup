@@ -2,12 +2,11 @@
 
 public static class Piping
 {
-    public static bool IsEnabled { get; set; } = true;
     public static Seperators Separators { get; } = new(new[]{ ",", ":", ";", "|", "-" });
     
-    public static long[] ReadLongs()
+    public static long[] ReadLongs(bool piping)
     {
-        if (!IsPipedInput())
+        if (!piping || !IsPipedInput())
         {
             return Array.Empty<long>();
         }
@@ -25,9 +24,9 @@ public static class Piping
         return !inputs.Any() ? Array.Empty<long>() : inputs.ToArray();
     }
 
-    public static string[] ReadStrings()
+    public static string[] ReadStrings(bool piping)
     {
-        if (!IsPipedInput())
+        if (!piping || !IsPipedInput())
         {
             return Array.Empty<string>();
         }

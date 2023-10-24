@@ -12,12 +12,13 @@ internal static class LoginCommand
     public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
-        command.AddOptions(LoginArgs.Options());
+        var loginArguments = new LoginArguments();
+        command.AddOptions(loginArguments.Options());
         
         command.SetHandler(
             (globalArgs, loginArgs) => GithubBackup.Cli.Cli.RunAsync<LoginRunner, LoginArgs>(args, globalArgs, loginArgs),
             new GlobalArgsBinder(),
-            new LoginArgsBinder()
+            new LoginArgsBinder(loginArguments)
         );
 
         return command;

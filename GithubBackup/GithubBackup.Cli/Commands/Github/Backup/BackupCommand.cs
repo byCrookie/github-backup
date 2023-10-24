@@ -14,13 +14,15 @@ internal static class BackupCommand
     public static Command Create(string[] args)
     {
         var command = new Command(CommandName, CommandDescription);
-        command.AddOptions(MigrateArgs.Options());
-        command.AddOptions(DownloadArgs.Options());
+        var migrateArguments = new MigrateArguments(true);
+        var downloadArguments = new DownloadArguments(true);
+        command.AddOptions(migrateArguments.Options());
+        command.AddOptions(downloadArguments.Options());
 
         command.SetHandler(
             (globalArgs, manualBackupArgs) => GithubBackup.Cli.Cli.RunAsync<BackupRunner, BackupArgs>(args, globalArgs, manualBackupArgs),
             new GlobalArgsBinder(),
-            new BackupArgsBinder()
+            new BackupArgsBinder(migrateArguments, downloadArguments)
         );
 
         return command;
