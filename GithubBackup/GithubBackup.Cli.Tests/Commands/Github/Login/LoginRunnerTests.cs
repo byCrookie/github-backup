@@ -140,6 +140,42 @@ public class LoginRunnerTests
 
         await Verify(_ansiConsole.Output);
     }
+    
+    [Fact]
+    public async Task RunAsync_QuietAndTokenEnv_DoNotWriteToConsoleAndLoginUsingTokenEnv()
+    {
+        var runner = CreateRunner(true, null, false, "token");
+
+        var user = new User("test", "test");
+
+        _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Using token from environment variable")
+        );
+
+        await Verify(_ansiConsole.Output);
+    }
+
+    [Fact]
+    public async Task RunAsync_NotQuietAndTokenEnv_DoWriteToConsoleAndLoginUsingTokenEnv()
+    {
+        var runner = CreateRunner(false, null, false, "token");
+
+        var user = new User("test", "test");
+
+        _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Using token from environment variable")
+        );
+
+        await Verify(_ansiConsole.Output);
+    }
 
     private LoginRunner CreateRunner(bool quiet, string? token, bool deviceFlowAuth, string? envToken)
     {

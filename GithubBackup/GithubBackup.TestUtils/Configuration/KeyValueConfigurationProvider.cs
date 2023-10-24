@@ -24,7 +24,7 @@ public class KeyValueConfigurationProvider : IConfigurationProvider, IConfigurat
 
     public IChangeToken GetReloadToken()
     {
-        throw new NotImplementedException();
+        return new CancellationChangeToken(CancellationToken.None);
     }
 
     public void Load()
