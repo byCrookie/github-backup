@@ -1,0 +1,2 @@
+﻿Logged in as test
+Migration started with id 1
