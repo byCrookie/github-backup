@@ -59,7 +59,7 @@ public class DownloadRunnerTests
             new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
         );
 
-        await Verify(_ansiConsole.Lines);
+        await Verify(_ansiConsole.Output);
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class DownloadRunnerTests
             new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
         );
 
-        await Verify(_ansiConsole.Lines);
+        await Verify(_ansiConsole.Output);
     }
 
     [Fact]
@@ -129,7 +129,7 @@ public class DownloadRunnerTests
             new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
         );
 
-        await Verify(_ansiConsole.Lines);
+        await Verify(_ansiConsole.Output);
     }
 
     [Fact]
@@ -164,7 +164,7 @@ public class DownloadRunnerTests
             new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
         );
 
-        await Verify(_ansiConsole.Lines);
+        await Verify(_ansiConsole.Output);
     }
 
     [Fact]
@@ -192,7 +192,7 @@ public class DownloadRunnerTests
             new LogEntry(LogLevel.Information, "No exported migrations found")
         );
 
-        await Verify(_ansiConsole.Lines);
+        await Verify(_ansiConsole.Output);
 
         await _migrationService
             .DidNotReceiveWithAnyArgs()
@@ -228,7 +228,7 @@ public class DownloadRunnerTests
             .DidNotReceiveWithAnyArgs()
             .DownloadMigrationAsync(Arg.Any<DownloadMigrationOptions>(), Arg.Any<CancellationToken>());
 
-        await Verify(_ansiConsole.Lines);
+        await Verify(_ansiConsole.Output);
     }
 
         [Fact]
@@ -267,7 +267,7 @@ public class DownloadRunnerTests
             new LogEntry(LogLevel.Information, "Downloaded migration 2 to test2")
         );
 
-        await Verify(_ansiConsole.Lines);
+        await Verify(_ansiConsole.Output);
     }
 
     [Fact]
@@ -306,7 +306,7 @@ public class DownloadRunnerTests
             new LogEntry(LogLevel.Information, "Downloaded migration 2 to test2")
         );
 
-        await Verify(_ansiConsole.Lines);
+        await Verify(_ansiConsole.Output);
     }
 
     private DownloadRunner CreateRunner(bool quiet, bool latest, long[]? ids = null)

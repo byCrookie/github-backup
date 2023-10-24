@@ -1,6 +1,5 @@
 ﻿using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using FluentAssertions;
 using GithubBackup.Cli.Commands.Github.Backup;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Download;
@@ -45,7 +44,7 @@ public class BackupRunnerTests
 
         await backupRunner.RunAsync(CancellationToken.None);
         
-        await Verify(_ansiConsole.Lines);
+        await Verify(_ansiConsole.Output);
     }
     
     [Fact]
@@ -71,7 +70,7 @@ public class BackupRunnerTests
 
         await backupRunner.RunAsync(CancellationToken.None);
 
-        await Verify(_ansiConsole.Lines);
+        await Verify(_ansiConsole.Output);
     }
 
     private BackupRunner CreateBackupRunner(bool quiet)

@@ -6,7 +6,6 @@ using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Commands.Services;
 using GithubBackup.Core.Environment;
 using GithubBackup.TestUtils.Logging;
-using Meziantou.Xunit;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

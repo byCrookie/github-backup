@@ -5,7 +5,6 @@ using FluentAssertions;
 using Flurl.Http;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Migrations;
-using GithubBackup.Core.Tests.Utils;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Flurl;
 using GithubBackup.TestUtils.Logging;

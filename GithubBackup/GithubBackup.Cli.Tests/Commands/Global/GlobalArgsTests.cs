@@ -1,6 +1,8 @@
 ﻿using System.CommandLine;
+using System.CommandLine.Parsing;
 using FluentAssertions;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Tests.Utils;
 using GithubBackup.Cli.Utils;
 using Microsoft.Extensions.Logging;
 
@@ -20,7 +22,7 @@ public class GlobalArgsTests
             {
                 globalArgs.Should().NotBeNull();
                 globalArgs.Interactive.Should().BeTrue();
-                globalArgs.LogFile.Should().Be("./log.txt");
+                globalArgs.LogFile!.Name.Should().Be("log.txt");
                 globalArgs.Quiet.Should().BeTrue();
                 globalArgs.Verbosity.Should().Be(LogLevel.Debug);
             },
@@ -28,7 +30,7 @@ public class GlobalArgsTests
         );
         
         rootCommand.AddCommand(subCommand);
-        await rootCommand.InvokeAsync("sub --quiet --verbosity debug --log-file ./log.txt --interactive");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub --quiet --verbosity debug --log-file ./log.txt --interactive");
     }
     
     [Fact]
@@ -43,7 +45,7 @@ public class GlobalArgsTests
             {
                 globalArgs.Should().NotBeNull();
                 globalArgs.Interactive.Should().BeTrue();
-                globalArgs.LogFile.Should().Be("./log.txt");
+                globalArgs.LogFile!.Name.Should().Be("log.txt");
                 globalArgs.Quiet.Should().BeTrue();
                 globalArgs.Verbosity.Should().Be(LogLevel.Debug);
             },
@@ -51,7 +53,7 @@ public class GlobalArgsTests
         );
         
         rootCommand.AddCommand(subCommand);
-        await rootCommand.InvokeAsync("sub -q -v debug -l ./log.txt -i");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub -q -v debug -l ./log.txt -i");
     }
     
     [Fact]
@@ -74,7 +76,7 @@ public class GlobalArgsTests
         );
         
         rootCommand.AddCommand(subCommand);
-        await rootCommand.InvokeAsync("sub");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub");
     }
 }
 

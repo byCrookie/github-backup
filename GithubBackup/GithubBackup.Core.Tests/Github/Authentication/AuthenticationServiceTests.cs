@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Clients;
-using GithubBackup.Core.Tests.Utils;
 using GithubBackup.TestUtils.Flurl;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;

@@ -1,5 +1,4 @@
 ﻿using Flurl.Http;
-using GithubBackup.Core.Github.Credentials;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GithubBackup.Core.Flurl;

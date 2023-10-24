@@ -3,7 +3,6 @@ using FluentAssertions;
 using Flurl.Http.Testing;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Credentials;
-using GithubBackup.Core.Tests.Utils;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Caching.Memory;

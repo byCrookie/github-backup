@@ -2,7 +2,6 @@ using Flurl.Http;
 using GithubBackup.Core.Environment;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Environment = System.Environment;
 
 namespace GithubBackup.Cli.Commands.Services;
 

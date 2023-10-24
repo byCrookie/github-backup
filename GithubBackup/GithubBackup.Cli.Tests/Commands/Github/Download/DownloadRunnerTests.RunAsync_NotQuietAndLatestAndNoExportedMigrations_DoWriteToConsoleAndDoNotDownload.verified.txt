@@ -1,5 +1,3 @@
-﻿[
-  Logged in as test,
-  Downloading latest migration,
-  No exported migrations found
-]
+﻿Logged in as test
+Downloading latest migration
+No exported migrations found

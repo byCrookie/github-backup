@@ -9,6 +9,7 @@
         <PackageReference Include="FluentAssertions"/>
         <PackageReference Include="NSubstitute"/>
         <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
+        <PackageReference Include="Spectre.Console.Testing" />
     </ItemGroup>
 
     <ItemGroup>

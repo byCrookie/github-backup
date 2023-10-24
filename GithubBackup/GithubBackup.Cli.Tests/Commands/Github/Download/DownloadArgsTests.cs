@@ -1,9 +1,9 @@
 ﻿using System.CommandLine;
+using System.CommandLine.Parsing;
 using FluentAssertions;
 using GithubBackup.Cli.Commands.Github.Download;
-using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Tests.Utils;
 using GithubBackup.Cli.Utils;
-using Microsoft.Extensions.Logging;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Download;
 
@@ -20,7 +20,7 @@ public class DownloadArgsTests
             downloadArgs =>
             {
                 downloadArgs.Should().NotBeNull();
-                downloadArgs.Destination.Should().Be("./migrations");
+                downloadArgs.Destination.Name.Should().Be("migrations");
                 downloadArgs.Latest.Should().BeTrue();
                 downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
                 downloadArgs.NumberOfBackups.Should().Be(5);
@@ -30,7 +30,7 @@ public class DownloadArgsTests
         );
         
         rootCommand.AddCommand(subCommand);
-        await rootCommand.InvokeAsync("sub --destination ./migrations --latest --migrations 1 2 3 --number-of-backups 5 --overwrite");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub --destination ./migrations --latest --migrations 1 2 3 --number-of-backups 5 --overwrite");
     }
     
     [Fact]
@@ -44,7 +44,7 @@ public class DownloadArgsTests
             downloadArgs =>
             {
                 downloadArgs.Should().NotBeNull();
-                downloadArgs.Destination.Should().Be("./migrations");
+                downloadArgs.Destination.Name.Should().Be("migrations");
                 downloadArgs.Latest.Should().BeTrue();
                 downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
                 downloadArgs.NumberOfBackups.Should().Be(5);
@@ -54,7 +54,7 @@ public class DownloadArgsTests
         );
         
         rootCommand.AddCommand(subCommand);
-        await rootCommand.InvokeAsync("sub -d ./migrations -l -m 1 2 3 -n 5 -o");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub -d ./migrations -l -m 1 2 3 -n 5 -o");
     }
     
     [Theory]
@@ -72,7 +72,7 @@ public class DownloadArgsTests
             downloadArgs =>
             {
                 downloadArgs.Should().NotBeNull();
-                downloadArgs.Destination.Should().Be("./migrations");
+                downloadArgs.Destination.Name.Should().Be("migrations");
                 downloadArgs.Latest.Should().BeTrue();
                 downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
                 downloadArgs.NumberOfBackups.Should().Be(5);
@@ -82,7 +82,7 @@ public class DownloadArgsTests
         );
         
         rootCommand.AddCommand(subCommand);
-        await rootCommand.InvokeAsync("sub -d ./migrations -l -o -n 5 " + migrationArgs);
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub -d ./migrations -l -o -n 5 " + migrationArgs);
     }
     
     [Fact]
@@ -96,7 +96,7 @@ public class DownloadArgsTests
             downloadArgs =>
             {
                 downloadArgs.Should().NotBeNull();
-                downloadArgs.Destination.Should().Be("./migrations");
+                downloadArgs.Destination.Name.Should().Be("migrations");
                 downloadArgs.Latest.Should().BeFalse();
                 downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
                 downloadArgs.NumberOfBackups.Should().BeNull();
@@ -106,7 +106,7 @@ public class DownloadArgsTests
         );
         
         rootCommand.AddCommand(subCommand);
-        await rootCommand.InvokeAsync("sub -d ./migrations -m 1 2 3");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub -d ./migrations -m 1 2 3");
     }
 }
 
