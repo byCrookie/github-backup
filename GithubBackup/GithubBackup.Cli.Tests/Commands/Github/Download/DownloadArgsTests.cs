@@ -9,6 +9,11 @@ namespace GithubBackup.Cli.Tests.Commands.Github.Download;
 
 public class DownloadArgsTests
 {
+    public DownloadArgsTests()
+    {
+        Piping.IsEnabled = false;
+    }
+    
     [Fact]
     public async Task InvokeAsync_FlagsArePassed_FlagsGetParsed()
     {

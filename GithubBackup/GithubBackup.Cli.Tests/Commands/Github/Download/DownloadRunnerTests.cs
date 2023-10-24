@@ -21,12 +21,7 @@ public class DownloadRunnerTests
     private readonly IFileSystem _fileSystem = new MockFileSystem();
     private readonly TestConsole _ansiConsole = new();
     private readonly ILogger<DownloadRunner> _logger = Substitute.For<ILogger<DownloadRunner>>();
-
-    public DownloadRunnerTests()
-    {
-        Piping.IsEnabled = false;
-    }
-
+    
     [Fact]
     public async Task RunAsync_QuietAndLatest_DoNotWriteToConsoleAndDownloadLatest()
     {
