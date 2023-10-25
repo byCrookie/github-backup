@@ -10,7 +10,6 @@ namespace GithubBackup.Cli.Commands.Github.Migrations;
 internal sealed class MigrationsRunner : IMigrationsRunner
 {
     private readonly GlobalArgs _globalArgs;
-    private readonly MigrationsArgs _migrationsArgs;
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
     private readonly IAnsiConsole _ansiConsole;
@@ -18,14 +17,16 @@ internal sealed class MigrationsRunner : IMigrationsRunner
 
     public MigrationsRunner(
         GlobalArgs globalArgs,
-        MigrationsArgs migrationsArgs,
+        // Needs to be passed in because of the way ICommand's are resolved in
+        // the cli service.
+        // ReSharper disable once UnusedParameter.Local
+        MigrationsArgs _,
         IMigrationService migrationService,
         ILoginService loginService,
         IAnsiConsole ansiConsole,
         IDateTimeProvider dateTimeProvider)
     {
         _globalArgs = globalArgs;
-        _migrationsArgs = migrationsArgs;
         _migrationService = migrationService;
         _loginService = loginService;
         _ansiConsole = ansiConsole;
