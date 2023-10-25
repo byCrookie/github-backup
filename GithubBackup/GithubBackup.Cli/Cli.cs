@@ -17,8 +17,9 @@ internal static class Cli
     public static async Task<int> RunAsync(string[] args)
     {
         var rootCommand = new RootCommand("Github Backup");
-        rootCommand.AddGlobalOptions(GlobalArgs.Options());
-        GithubCommands.AddCommands(args, rootCommand);
+        var globalArguments = new GlobalArguments();
+        rootCommand.AddGlobalOptions(globalArguments.Options());
+        GithubCommands.AddCommands(args, rootCommand, globalArguments);
 
         var commandLineBuilder = new CommandLineBuilder(rootCommand);
         commandLineBuilder.UseDefaults();

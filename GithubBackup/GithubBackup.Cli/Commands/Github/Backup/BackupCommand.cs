@@ -11,7 +11,7 @@ internal static class BackupCommand
     private const string CommandName = "backup";
     private const string CommandDescription = "Backup a Github user. This command is not interactive.";
     
-    public static Command Create(string[] args)
+    public static Command Create(string[] args, GlobalArguments globalArguments)
     {
         var command = new Command(CommandName, CommandDescription);
         var migrateArguments = new MigrateArguments(true);
@@ -21,7 +21,7 @@ internal static class BackupCommand
 
         command.SetHandler(
             (globalArgs, manualBackupArgs) => GithubBackup.Cli.Cli.RunAsync<BackupRunner, BackupArgs>(args, globalArgs, manualBackupArgs),
-            new GlobalArgsBinder(),
+            new GlobalArgsBinder(globalArguments),
             new BackupArgsBinder(migrateArguments, downloadArguments)
         );
 

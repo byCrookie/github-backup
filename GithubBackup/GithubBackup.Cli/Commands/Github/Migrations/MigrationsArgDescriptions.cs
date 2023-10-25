@@ -2,10 +2,10 @@
 
 internal static class MigrationsArgDescriptions
 {
-    public static readonly Description Ids = new("Ids", "Id",
+    public static readonly Description Long = new("Long", "Long",
         """
-        Only include the migration IDs in the output.
-        Useful for piping into other commands.
+        Full details of the migrations are included in the output.
+        If not supplied, only the migration IDs are included in the output.
         """
     );
 }

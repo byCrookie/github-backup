@@ -8,13 +8,13 @@ internal static class ManualBackupCommand
     private const string CommandName = "manual";
     private const string CommandDescription = "Manually backup a Github user. This command is interactive.";
     
-    public static Command Create(string[] args)
+    public static Command Create(string[] args, GlobalArguments globalArguments)
     {
         var command = new Command(CommandName, CommandDescription);
 
         command.SetHandler(
             (globalArgs, manualBackupArgs) => GithubBackup.Cli.Cli.RunAsync<ManualBackupRunner, ManualBackupArgs>(args, globalArgs, manualBackupArgs),
-            new GlobalArgsBinder(),
+            new GlobalArgsBinder(globalArguments),
             new ManualBackupArgsBinder()
         );
 

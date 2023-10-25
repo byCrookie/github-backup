@@ -9,7 +9,7 @@ internal static class LoginCommand
     private const string CommandName = "login";
     private const string CommandDescription = "Login to Github.";
     
-    public static Command Create(string[] args)
+    public static Command Create(string[] args, GlobalArguments globalArguments)
     {
         var command = new Command(CommandName, CommandDescription);
         var loginArguments = new LoginArguments();
@@ -17,7 +17,7 @@ internal static class LoginCommand
         
         command.SetHandler(
             (globalArgs, loginArgs) => GithubBackup.Cli.Cli.RunAsync<LoginRunner, LoginArgs>(args, globalArgs, loginArgs),
-            new GlobalArgsBinder(),
+            new GlobalArgsBinder(globalArguments),
             new LoginArgsBinder(loginArguments)
         );
 

@@ -9,7 +9,7 @@ internal static class DownloadCommand
     private const string CommandName = "download";
     private const string CommandDescription = "Download migrations.";
     
-    public static Command Create(string[] args)
+    public static Command Create(string[] args, GlobalArguments globalArguments)
     {
         var command = new Command(CommandName, CommandDescription);
         var downloadArguments = new DownloadArguments(true);
@@ -17,7 +17,7 @@ internal static class DownloadCommand
         
         command.SetHandler(
             (globalArgs, migrateArgs) => GithubBackup.Cli.Cli.RunAsync<DownloadRunner, DownloadArgs>(args, globalArgs, migrateArgs),
-            new GlobalArgsBinder(),
+            new GlobalArgsBinder(globalArguments),
             new DowndloadArgsBinder(downloadArguments)
         );
 

@@ -82,7 +82,7 @@ internal sealed class MigrationsRunner : IMigrationsRunner
             return;
         }
 
-        if (_migrationsArgs.Id)
+        if (_migrationsArgs.Long)
         {
             _ansiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
         }

@@ -5,16 +5,16 @@ namespace GithubBackup.Cli.Commands.Github.Migrations;
 
 internal sealed class MigrationsArgsBinder : BinderBase<MigrationsArgs>
 {
-    private readonly MigrationArguments _migrationArguments;
+    private readonly MigrationsArguments _migrationsArguments;
 
-    public MigrationsArgsBinder(MigrationArguments migrationArguments)
+    public MigrationsArgsBinder(MigrationsArguments migrationsArguments)
     {
-        _migrationArguments = migrationArguments;
+        _migrationsArguments = migrationsArguments;
     }
     
     protected override MigrationsArgs GetBoundValue(BindingContext bindingContext)
     {
-        var id = bindingContext.ParseResult.GetRequiredValueForOption(_migrationArguments.IdOption);
+        var id = bindingContext.ParseResult.GetRequiredValueForOption(_migrationsArguments.LongOption);
         return new MigrationsArgs(id);
     }
 }

@@ -1,14 +1,11 @@
-﻿using System.CommandLine;
-using GithubBackup.Cli.Commands.Global;
-
-namespace GithubBackup.Cli.Commands.Github.Migrations;
+﻿namespace GithubBackup.Cli.Commands.Github.Migrations;
 
 internal sealed class MigrationsArgs
 {
-    public bool Id { get; }
+    public bool Long { get; }
 
-    public MigrationsArgs(bool id)
+    public MigrationsArgs(bool @long)
     {
-        Id = id;
+        Long = @long;
     }
 }

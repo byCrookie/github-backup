@@ -10,11 +10,13 @@ namespace GithubBackup.Cli.Tests.Commands.Global;
 
 public class GlobalArgsTests
 {
+    private readonly GlobalArguments _globalArguments = new();
+    
     [Fact]
     public async Task InvokeAsync_FlagsArePassed_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(GlobalArgs.Options());
+        rootCommand.AddGlobalOptions(_globalArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -26,7 +28,7 @@ public class GlobalArgsTests
                 globalArgs.Quiet.Should().BeTrue();
                 globalArgs.Verbosity.Should().Be(LogLevel.Debug);
             },
-            new GlobalArgsBinder()
+            new GlobalArgsBinder(_globalArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -37,7 +39,7 @@ public class GlobalArgsTests
     public async Task InvokeAsync_ShortFlagsArePassed_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(GlobalArgs.Options());
+        rootCommand.AddGlobalOptions(_globalArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -49,7 +51,7 @@ public class GlobalArgsTests
                 globalArgs.Quiet.Should().BeTrue();
                 globalArgs.Verbosity.Should().Be(LogLevel.Debug);
             },
-            new GlobalArgsBinder()
+            new GlobalArgsBinder(_globalArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -60,7 +62,7 @@ public class GlobalArgsTests
     public async Task InvokeAsync_NoFlagsArePassed_DefaultsAreUsed()
     {
         var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(GlobalArgs.Options());
+        rootCommand.AddGlobalOptions(_globalArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -72,7 +74,7 @@ public class GlobalArgsTests
                 globalArgs.Quiet.Should().BeFalse();
                 globalArgs.Verbosity.Should().Be(LogLevel.Information);
             },
-            new GlobalArgsBinder()
+            new GlobalArgsBinder(_globalArguments)
         );
         
         rootCommand.AddCommand(subCommand);

@@ -10,7 +10,7 @@ internal static class MigrateCommand
     private const string CommandName = "migrate";
     private const string CommandDescription = "Migrate a Github user.";
     
-    public static Command Create(string[] args)
+    public static Command Create(string[] args, GlobalArguments globalArguments)
     {
         var command = new Command(CommandName, CommandDescription);
         var migrateArguments = new MigrateArguments(true);
@@ -18,7 +18,7 @@ internal static class MigrateCommand
         
         command.SetHandler(
             (globalArgs, migrateArgs) => GithubBackup.Cli.Cli.RunAsync<MigrationsRunner, MigrateArgs>(args, globalArgs, migrateArgs),
-            new GlobalArgsBinder(),
+            new GlobalArgsBinder(globalArguments),
             new MigrateArgsBinder(migrateArguments)
         );
 

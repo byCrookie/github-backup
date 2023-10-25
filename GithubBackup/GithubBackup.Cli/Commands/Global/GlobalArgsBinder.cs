@@ -5,12 +5,19 @@ namespace GithubBackup.Cli.Commands.Global;
 
 internal sealed class GlobalArgsBinder : BinderBase<GlobalArgs>
 {
+    private readonly GlobalArguments _globalArguments;
+
+    public GlobalArgsBinder(GlobalArguments globalArguments)
+    {
+        _globalArguments = globalArguments;
+    }
+    
     protected override GlobalArgs GetBoundValue(BindingContext bindingContext)
     {
-        var verbosity = bindingContext.ParseResult.GetRequiredValueForOption(GlobalArgs.VerbosityOption);
-        var quiet = bindingContext.ParseResult.GetRequiredValueForOption(GlobalArgs.QuietOption);
-        var logFile = bindingContext.ParseResult.GetValueForOption(GlobalArgs.LogFileOption);
-        var interactive = bindingContext.ParseResult.GetRequiredValueForOption(GlobalArgs.InteractiveOption);
+        var verbosity = bindingContext.ParseResult.GetRequiredValueForOption(_globalArguments.VerbosityOption);
+        var quiet = bindingContext.ParseResult.GetRequiredValueForOption(_globalArguments.QuietOption);
+        var logFile = bindingContext.ParseResult.GetValueForOption(_globalArguments.LogFileOption);
+        var interactive = bindingContext.ParseResult.GetRequiredValueForOption(_globalArguments.InteractiveOption);
         return new GlobalArgs(verbosity, quiet, logFile, interactive);
     }
 }

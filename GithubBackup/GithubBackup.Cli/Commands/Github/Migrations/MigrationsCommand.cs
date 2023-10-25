@@ -9,15 +9,15 @@ internal static class MigrationsCommand
     private const string CommandName = "migrations";
     private const string CommandDescription = "List migrations.";
     
-    public static Command Create(string[] args)
+    public static Command Create(string[] args, GlobalArguments globalArguments)
     {
         var command = new Command(CommandName, CommandDescription);
-        var migrationsArguments = new MigrationArguments();
+        var migrationsArguments = new MigrationsArguments();
         command.AddOptions(migrationsArguments.Options());
         
         command.SetHandler(
             (globalArgs, migrationsArgs) => GithubBackup.Cli.Cli.RunAsync<MigrationsRunner, MigrationsArgs>(args, globalArgs, migrationsArgs),
-            new GlobalArgsBinder(),
+            new GlobalArgsBinder(globalArguments),
             new MigrationsArgsBinder(migrationsArguments)
         );
 
