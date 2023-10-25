@@ -10,6 +10,7 @@ namespace GithubBackup.Cli.Commands.Github.Migrations;
 internal sealed class MigrationsRunner : IMigrationsRunner
 {
     private readonly GlobalArgs _globalArgs;
+    private readonly MigrationsArgs _migrationsArgs;
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
     private readonly IAnsiConsole _ansiConsole;
@@ -17,16 +18,14 @@ internal sealed class MigrationsRunner : IMigrationsRunner
 
     public MigrationsRunner(
         GlobalArgs globalArgs,
-        // Needs to be passed in because of the way ICommand's are resolved in
-        // the cli service.
-        // ReSharper disable once UnusedParameter.Local
-        MigrationsArgs _,
+        MigrationsArgs migrationsArgs,
         IMigrationService migrationService,
         ILoginService loginService,
         IAnsiConsole ansiConsole,
         IDateTimeProvider dateTimeProvider)
     {
         _globalArgs = globalArgs;
+        _migrationsArgs = migrationsArgs;
         _migrationService = migrationService;
         _loginService = loginService;
         _ansiConsole = ansiConsole;
@@ -53,10 +52,27 @@ internal sealed class MigrationsRunner : IMigrationsRunner
 
             return;
         }
+        
+        var filteredMigrations = await migrations
+            .SelectAsync(m => _migrationsArgs.Export ? _migrationService.GetMigrationAsync(m.Id, ct) : Task.FromResult(m))
+            .Where(m => !_migrationsArgs.Export || (m.State == MigrationState.Exported && (_dateTimeProvider.Now - m.CreatedAt).Days <= 7))
+            .Where(m => _migrationsArgs.DaysOld is null || (_dateTimeProvider.Now - m.CreatedAt).Days <= _migrationsArgs.DaysOld)
+            .Where(m => _migrationsArgs.Since is null || m.CreatedAt >= _migrationsArgs.Since)
+            .ToListAsync(cancellationToken: ct);
+        
+        if (!filteredMigrations.Any())
+        {
+            if (!_globalArgs.Quiet)
+            {
+                _ansiConsole.WriteLine("No migrations found after filters were applied.");
+            }
+
+            return;
+        }
 
         if (!_globalArgs.Quiet)
         {
-            var migrationStatus = await migrations
+            var migrationStatus = await filteredMigrations
                 .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
                 .ToListAsync(cancellationToken: ct);
 
@@ -67,6 +83,6 @@ internal sealed class MigrationsRunner : IMigrationsRunner
             }
         }
 
-        _ansiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
+        _ansiConsole.WriteLine(string.Join(" ", filteredMigrations.Select(m => m.Id)));
     }
 }
