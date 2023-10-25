@@ -5,7 +5,7 @@ namespace GithubBackup.Cli.Commands.Github.Migrate;
 
 public class MigrateArguments
 {
-    public Option<string[]> RepositoriesOption { get; }
+    public Option<string[]> RepositoriesOption { get; } 
     public Option<bool> LockRepositoriesOption { get; }
     public Option<bool> ExcludeMetadataOption { get; }
     public Option<bool> ExcludeGitDataOption { get; }

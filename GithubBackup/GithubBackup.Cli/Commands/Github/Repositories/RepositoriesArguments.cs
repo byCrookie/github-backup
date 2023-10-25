@@ -5,30 +5,26 @@ namespace GithubBackup.Cli.Commands.Github.Repositories;
 
 public class RepositoriesArguments
 {
-    public Option<RepositoryType?> TypeOption { get; }
-    public Option<RepositoryAffiliation?> AffiliationOption { get; }
-    public Option<RepositoryVisibility?> VisibilityOption { get; }
+    public Option<RepositoryType?> TypeOption { get; } = new(
+        aliases: new[] { "-t", "--type" },
+        getDefaultValue: () => null,
+        description: RepositoriesArgDescriptions.Type.Long
+    ) { IsRequired = false };
+
+    public Option<RepositoryAffiliation?> AffiliationOption { get; } = new(
+        aliases: new[] { "-a", "--affiliation" },
+        getDefaultValue: () => RepositoryAffiliation.Owner,
+        description: RepositoriesArgDescriptions.Affiliation.Long
+    ) { IsRequired = false };
+
+    public Option<RepositoryVisibility?> VisibilityOption { get; } = new(
+        aliases: new[] { "-v", "--visibility" },
+        getDefaultValue: () => RepositoryVisibility.All,
+        description: RepositoriesArgDescriptions.Visibility.Long
+    ) { IsRequired = false };
 
     public RepositoriesArguments()
     {
-        TypeOption = new Option<RepositoryType?>(
-            aliases: new[] { "-t", "--type" },
-            getDefaultValue: () => null,
-            description: RepositoriesArgDescriptions.Type.Long
-        ) { IsRequired = false };
-        
-        AffiliationOption = new Option<RepositoryAffiliation?>(
-            aliases: new[] { "-a", "--affiliation" },
-            getDefaultValue: () => RepositoryAffiliation.Owner,
-            description: RepositoriesArgDescriptions.Affiliation.Long
-        ) { IsRequired = false };
-        
-        VisibilityOption = new Option<RepositoryVisibility?>(
-            aliases: new[] { "-v", "--visibility" },
-            getDefaultValue: () => RepositoryVisibility.All,
-            description: RepositoriesArgDescriptions.Visibility.Long
-        ) { IsRequired = false };
-        
         TypeOption.AddValidator(result =>
         {
             var type = result.GetValueForOption(TypeOption);
@@ -42,7 +38,7 @@ public class RepositoriesArguments
         });
     }
     
-    public Option[] Options()
+    public IEnumerable<Option> Options()
     {
         return new Option[]
         {
