@@ -14,7 +14,7 @@ internal sealed class RepositoriesArgsBinder : BinderBase<RepositoriesArgs>
     
     protected override RepositoriesArgs GetBoundValue(BindingContext bindingContext)
     {
-        var type = bindingContext.ParseResult.GetRequiredValueForOption(_repositoriesArguments.TypeOption);
+        var type = bindingContext.ParseResult.GetValueForOption(_repositoriesArguments.TypeOption);
         var affiliation = bindingContext.ParseResult.GetRequiredValueForOption(_repositoriesArguments.AffiliationOption);
         var visibility = bindingContext.ParseResult.GetRequiredValueForOption(_repositoriesArguments.VisibilityOption);
         return new RepositoriesArgs(type, affiliation, visibility);

@@ -23,21 +23,6 @@ public class RepositoriesArguments
         description: RepositoriesArgDescriptions.Visibility.Long
     ) { IsRequired = false };
 
-    public RepositoriesArguments()
-    {
-        TypeOption.AddValidator(result =>
-        {
-            var type = result.GetValueForOption(TypeOption);
-            var affiliation = result.GetValueForOption(AffiliationOption);
-            var visibility = result.GetValueForOption(VisibilityOption);
-
-            if (type is not null && (affiliation is not null || visibility is not null))
-            {
-                result.ErrorMessage = "The '-t / --type' option cannot be used with '-a / --affiliation' or '-v / --visibility' options.";
-            }
-        });
-    }
-    
     public IEnumerable<Option> Options()
     {
         return new Option[]
