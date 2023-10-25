@@ -47,9 +47,9 @@ public class DownloadArguments
         ) { IsRequired = false };
     }
     
-    public IEnumerable<Option> Options()
+    public List<Option> Options()
     {
-        return new Option[]
+        return new List<Option>
         {
             MigrationsOption,
             LatestOption,

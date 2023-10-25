@@ -16,8 +16,10 @@ internal static class BackupCommand
         var command = new Command(CommandName, CommandDescription);
         var migrateArguments = new MigrateArguments(true);
         var downloadArguments = new DownloadArguments(true);
+        var downloadOptions = downloadArguments.Options();
+        downloadOptions.Remove(downloadArguments.MigrationsOption);
         command.AddOptions(migrateArguments.Options());
-        command.AddOptions(downloadArguments.Options());
+        command.AddOptions(downloadOptions);
 
         command.SetHandler(
             (globalArgs, manualBackupArgs) => GithubBackup.Cli.Cli.RunAsync<BackupRunner, BackupArgs>(args, globalArgs, manualBackupArgs),
