@@ -2,12 +2,9 @@
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Users;
-using GithubBackup.TestUtils.Configuration;
 using GithubBackup.TestUtils.Logging;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Spectre.Console.Testing;
@@ -23,9 +20,9 @@ public class MigrateRunnerTests
     private readonly ILoginService _loginService = Substitute.For<ILoginService>();
 
     [Fact]
-    public async Task RunAsync_QuietAndNotInteractive_DoNotWriteToConsoleAndMigrate()
+    public async Task RunAsync_Quiet_DoNotWriteToConsoleAndMigrate()
     {
-        var runner = CreateRunner(true, false);
+        var runner = CreateRunner(true);
 
         var user = new User("test", "test");
 
@@ -42,9 +39,9 @@ public class MigrateRunnerTests
     }
     
     [Fact]
-    public async Task RunAsync_NotQuietAndNotInteractive_DoWriteToConsoleAndMigrate()
+    public async Task RunAsync_NotQuiet_DoWriteToConsoleAndMigrate()
     {
-        var runner = CreateRunner(false, false);
+        var runner = CreateRunner(false);
 
         var user = new User("test", "test");
 
@@ -59,53 +56,10 @@ public class MigrateRunnerTests
 
         await Verify(_ansiConsole.Output);
     }
-    
-    [Fact]
-    public async Task RunAsync_NotQuietAndInteractivePromptIsTrue_DoWriteToConsoleAndMigrate()
+
+    private MigrateRunner CreateRunner(bool quiet)
     {
-        var runner = CreateRunner(false, true);
-        
-        _ansiConsole.Input.PushText("y");
-        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
-        
-        _migrationService.StartMigrationAsync(Arg.Any<StartMigrationOptions>(), CancellationToken.None)
-            .Returns(new Migration(1, MigrationState.Pending, DateTime.UtcNow));
-
-        await runner.RunAsync(CancellationToken.None);
-
-        _logger.VerifyLogs();
-
-        await Verify(_ansiConsole.Output);
-    }
-    
-    [Fact]
-    public async Task RunAsync_NotQuietAndInteractivePromptIsTFalse_DoWriteToConsoleAndDoNotMigrate()
-    {
-        var runner = CreateRunner(false, true);
-        
-        _ansiConsole.Input.PushText("n");
-        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
-
-        await runner.RunAsync(CancellationToken.None);
-
-        _logger.VerifyLogs();
-        await _migrationService
-            .Received(0)
-            .StartMigrationAsync(Arg.Any<StartMigrationOptions>(), CancellationToken.None);
-        await Verify(_ansiConsole.Output);
-    }
-
-    private MigrateRunner CreateRunner(bool quiet, bool interactive)
-    {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"), interactive);
+        var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
         var migrateArgs = new MigrateArgs(
             new[] {"test"},
             false,

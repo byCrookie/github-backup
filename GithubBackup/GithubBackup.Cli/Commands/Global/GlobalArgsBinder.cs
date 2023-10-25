@@ -17,7 +17,6 @@ internal sealed class GlobalArgsBinder : BinderBase<GlobalArgs>
         var verbosity = bindingContext.ParseResult.GetRequiredValueForOption(_globalArguments.VerbosityOption);
         var quiet = bindingContext.ParseResult.GetRequiredValueForOption(_globalArguments.QuietOption);
         var logFile = bindingContext.ParseResult.GetValueForOption(_globalArguments.LogFileOption);
-        var interactive = bindingContext.ParseResult.GetRequiredValueForOption(_globalArguments.InteractiveOption);
-        return new GlobalArgs(verbosity, quiet, logFile, interactive);
+        return new GlobalArgs(verbosity, quiet, logFile);
     }
 }

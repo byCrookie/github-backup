@@ -54,32 +54,15 @@ internal sealed class RepositoriesRunner : IRepositoriesRunner
             return;
         }
 
-        if (!_globalArgs.Interactive)
+        if (!_globalArgs.Quiet)
         {
             _ansiConsole.WriteLine($"Found {repositories.Count} repositories:");
             foreach (var repository in repositories)
             {
                 _ansiConsole.WriteLine($"- {repository.FullName}");
             }
-            
-            _ansiConsole.WriteLine(string.Join(" ", repositories.Select(r => r.FullName)));
         }
-        else
-        {
-            var selectedRepositories = _ansiConsole.Prompt(
-                new MultiSelectionPrompt<Repository>()
-                    .Title("Select [green]repositories[/] to print?")
-                    .Required(false)
-                    .PageSize(20)
-                    .MoreChoicesText("(Move up and down to reveal more repositories)")
-                    .InstructionsText(
-                        "(Press [blue]<space>[/] to toggle a repository, " +
-                        "[green]<enter>[/] to accept)")
-                    .AddChoices(repositories)
-                    .UseConverter(r => r.FullName)
-            );
-
-            _ansiConsole.WriteLine(string.Join(" ", selectedRepositories.Select(r => r.FullName)));   
-        }
+        
+        _ansiConsole.WriteLine(string.Join(" ", repositories.Select(r => r.FullName)));
     }
 }

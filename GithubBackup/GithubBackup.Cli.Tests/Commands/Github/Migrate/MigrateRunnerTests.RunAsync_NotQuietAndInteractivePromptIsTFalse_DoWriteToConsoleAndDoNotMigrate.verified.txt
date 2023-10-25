@@ -1,2 +1,0 @@
-﻿Logged in as test
-Do you want to start a migration? [y/n] (n): n

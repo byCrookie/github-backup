@@ -173,7 +173,7 @@ public class LoginRunnerTests
 
     private LoginRunner CreateRunner(bool quiet, string? token, bool deviceFlowAuth, string? envToken)
     {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"), false);
+        var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
         var loginArgs = new LoginArgs(token, deviceFlowAuth);
 
         var configuration = CreateConfiguration(envToken);

@@ -36,11 +36,6 @@ internal sealed class MigrateRunner : IMigrateRunner
             _ansiConsole.WriteLine($"Logged in as {user.Name}");
         }
 
-        if (_globalArgs.Interactive && !_ansiConsole.Confirm("Do you want to start a migration?", false))
-        {
-            return;
-        }
-
         var options = new StartMigrationOptions(
             _migrateArgs.Repositories,
             _migrateArgs.LockRepositories,

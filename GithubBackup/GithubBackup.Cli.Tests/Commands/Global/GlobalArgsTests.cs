@@ -23,7 +23,6 @@ public class GlobalArgsTests
             globalArgs =>
             {
                 globalArgs.Should().NotBeNull();
-                globalArgs.Interactive.Should().BeTrue();
                 globalArgs.LogFile!.Name.Should().Be("log.txt");
                 globalArgs.Quiet.Should().BeTrue();
                 globalArgs.Verbosity.Should().Be(LogLevel.Debug);
@@ -32,7 +31,7 @@ public class GlobalArgsTests
         );
         
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub --quiet --verbosity debug --log-file ./log.txt --interactive");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub --quiet --verbosity debug --log-file ./log.txt");
     }
     
     [Fact]
@@ -46,7 +45,6 @@ public class GlobalArgsTests
             globalArgs =>
             {
                 globalArgs.Should().NotBeNull();
-                globalArgs.Interactive.Should().BeTrue();
                 globalArgs.LogFile!.Name.Should().Be("log.txt");
                 globalArgs.Quiet.Should().BeTrue();
                 globalArgs.Verbosity.Should().Be(LogLevel.Debug);
@@ -55,7 +53,7 @@ public class GlobalArgsTests
         );
         
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub -q -v debug -l ./log.txt -i");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub -q -v debug -l ./log.txt");
     }
     
     [Fact]
@@ -69,7 +67,6 @@ public class GlobalArgsTests
             globalArgs =>
             {
                 globalArgs.Should().NotBeNull();
-                globalArgs.Interactive.Should().BeFalse();
                 globalArgs.LogFile.Should().BeNull();
                 globalArgs.Quiet.Should().BeFalse();
                 globalArgs.Verbosity.Should().Be(LogLevel.Information);

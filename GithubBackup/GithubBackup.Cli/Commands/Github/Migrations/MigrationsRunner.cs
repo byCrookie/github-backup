@@ -53,7 +53,7 @@ internal sealed class MigrationsRunner : IMigrationsRunner
             return;
         }
 
-        if (_globalArgs.Interactive)
+        if (!_globalArgs.Quiet)
         {
             var migrationStatus = await migrations
                 .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
@@ -64,41 +64,8 @@ internal sealed class MigrationsRunner : IMigrationsRunner
             {
                 _ansiConsole.WriteLine($"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)");
             }
-
-            var selectedMigrations = _ansiConsole.Prompt(
-                new MultiSelectionPrompt<Migration>()
-                    .Title("Select [green]migrations[/] to print?")
-                    .Required()
-                    .PageSize(20)
-                    .MoreChoicesText("(Move up and down to reveal more migrations)")
-                    .InstructionsText(
-                        "(Press [blue]<space>[/] to toggle a migration, " +
-                        "[green]<enter>[/] to accept)")
-                    .AddChoices(migrationStatus.Where(m => m.State == MigrationState.Exported && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
-                    .UseConverter(m => $"{m.Id} {m.State} {m.CreatedAt} ({(_dateTimeProvider.Now - m.CreatedAt).Days}d)")
-            );
-
-            _ansiConsole.WriteLine(string.Join(" ", selectedMigrations.Select(m => m.Id)));
-            return;
         }
 
-        if (_migrationsArgs.Long)
-        {
-            _ansiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
-        }
-        else
-        {
-            var migrationStatus = await migrations
-                .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
-                .ToListAsync(cancellationToken: ct);
-
-            _ansiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
-            foreach (var migration in migrationStatus)
-            {
-                _ansiConsole.WriteLine($"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)");
-            }
-
-            _ansiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
-        }
+        _ansiConsole.WriteLine(string.Join(" ", migrations.Select(m => m.Id)));
     }
 }

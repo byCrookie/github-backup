@@ -7,13 +7,11 @@ internal sealed class GlobalArgs
     public LogLevel Verbosity { get; }
     public bool Quiet { get; }
     public FileInfo? LogFile { get; }
-    public bool Interactive { get; }
 
-    public GlobalArgs(LogLevel verbosity, bool quiet, FileInfo? logFile, bool interactive)
+    public GlobalArgs(LogLevel verbosity, bool quiet, FileInfo? logFile)
     {
         Verbosity = verbosity;
         Quiet = quiet;
         LogFile = logFile;
-        Interactive = interactive;
     }
 }

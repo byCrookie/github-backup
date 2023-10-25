@@ -75,7 +75,7 @@ public class BackupRunnerTests
 
     private BackupRunner CreateBackupRunner(bool quiet)
     {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"), false);
+        var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
         var migrateArgs = new MigrateArgs(new []{"test"}, false, false, false, false, false, false, false);
         var downloadArgs = new DownloadArgs(Array.Empty<long>(), false, new DirectoryInfo("test"), null, true);
         var backupArgs = new BackupArgs(migrateArgs, downloadArgs);

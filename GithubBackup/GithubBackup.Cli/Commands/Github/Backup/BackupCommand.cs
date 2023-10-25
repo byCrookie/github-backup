@@ -9,7 +9,7 @@ namespace GithubBackup.Cli.Commands.Github.Backup;
 internal static class BackupCommand
 {
     private const string CommandName = "backup";
-    private const string CommandDescription = "Backup a Github user. This command is not interactive.";
+    private const string CommandDescription = "Backup a Github user.";
     
     public static Command Create(string[] args, GlobalArguments globalArguments)
     {

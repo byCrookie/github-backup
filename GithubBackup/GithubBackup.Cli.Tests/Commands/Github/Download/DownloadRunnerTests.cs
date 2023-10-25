@@ -3,7 +3,6 @@ using System.IO.Abstractions.TestingHelpers;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Download;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Cli.Utils;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Users;
 using GithubBackup.TestUtils.Logging;
@@ -306,7 +305,7 @@ public class DownloadRunnerTests
 
     private DownloadRunner CreateRunner(bool quiet, bool latest, long[]? ids = null)
     {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"), false);
+        var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
         var downloadArgs = new DownloadArgs(ids ?? Array.Empty<long>(), latest, new DirectoryInfo("test"), null, true);
 
         return new DownloadRunner(

@@ -22,34 +22,13 @@ public class GlobalArguments
         description: GlobalArgDescriptions.Verbosity.Long
     );
 
-    public Option<bool> InteractiveOption { get; } = new(
-        aliases: new[] { "-i", "--interactive" },
-        getDefaultValue: () => false,
-        description: GlobalArgDescriptions.Interactive.Long
-    );
-
-    public GlobalArguments()
-    {
-        QuietOption.AddValidator(result =>
-        {
-            var interactive = result.GetValueForOption(InteractiveOption);
-            var quiet = result.GetValueOrDefault<bool>();
-
-            if (interactive && quiet)
-            {
-                result.ErrorMessage = "Quiet mode can only be used when interactive mode is disabled.";
-            }
-        });
-    }
-
     public IEnumerable<Option> Options()
     {
         return new Option[]
         {
             QuietOption,
             LogFileOption,
-            VerbosityOption,
-            InteractiveOption
+            VerbosityOption
         };
     }
 }
