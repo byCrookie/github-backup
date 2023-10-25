@@ -7,7 +7,6 @@ public class RepositoriesArguments
 {
     public Option<RepositoryType?> TypeOption { get; } = new(
         aliases: new[] { "-t", "--type" },
-        getDefaultValue: () => null,
         description: RepositoriesArgDescriptions.Type.Long
     ) { IsRequired = false };
 

@@ -36,7 +36,6 @@ public class DownloadArguments
 
         NumberOfBackupsOption = new Option<int?>(
             aliases: new[] { "-n", "--number-of-backups" },
-            getDefaultValue: () => null,
             description: DownloadArgDescriptions.NumberOfBackups.Long
         ) { IsRequired = false };
 

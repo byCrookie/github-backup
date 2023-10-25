@@ -7,7 +7,7 @@ internal static class DownloadArgDescriptions
     public static readonly Description Migrations = new("Migrations", "Migrations",
         $"""
          Id's of the migrations to download.
-         Instead piping can be used to provide the id's. Supported separators: {Piping.Separators.Values}.
+         Instead piping can be used to provide the id's. Supported separators: {Piping.Separators}.
          If not specified, the latest migration will be downloaded.
          """
     );

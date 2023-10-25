@@ -12,13 +12,11 @@ public class MigrationsArguments
     
     public Option<DateTime?> SinceOption { get; } = new(
         aliases: new[] { "-s", "--since" },
-        getDefaultValue: () => null,
         description: MigrationsArgDescriptions.Since.Long
     ) { IsRequired = false };
     
     public Option<long?> DaysOldOption { get; } = new(
         aliases: new[] { "-d", "--days-old" },
-        getDefaultValue: () => null,
         description: MigrationsArgDescriptions.DaysOld.Long
     ) { IsRequired = false };
 

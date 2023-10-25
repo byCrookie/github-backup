@@ -6,7 +6,6 @@ public class LoginArguments
 {
     public Option<string?> TokenOption { get; } = new(
         aliases: new[] { "-t", "--token" },
-        getDefaultValue: () => null,
         description: LoginArgDescriptions.Token.Long
     ) { IsRequired = false };
 
