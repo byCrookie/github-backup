@@ -4,7 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubBackup.Cli", "GithubB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{B58CB078-54A4-4083-B6DA-B2D1C6E8CE68}"
 	ProjectSection(SolutionItems) = preProject
-		.dockerignore = .dockerignore
 		global.json = global.json
 		..\.gitignore = ..\.gitignore
 		..\LICENSE = ..\LICENSE
