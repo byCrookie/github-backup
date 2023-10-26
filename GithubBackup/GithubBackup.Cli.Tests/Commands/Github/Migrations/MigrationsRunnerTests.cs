@@ -1,4 +1,5 @@
-﻿using GithubBackup.Cli.Commands.Github.Credentials;
+﻿using System.Globalization;
+using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrations;
 using GithubBackup.Cli.Commands.Global;
@@ -20,6 +21,11 @@ public class MigrationsRunnerTests
     private readonly IMigrationService _migrationService = Substitute.For<IMigrationService>();
     private readonly ILoginService _loginService = Substitute.For<ILoginService>();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
+
+    public MigrationsRunnerTests()
+    {
+        CultureInfo.CurrentCulture = new CultureInfo("de-CH");
+    }
 
     [Fact]
     public async Task RunAsync_QuietAndNoMigrations_DoNotWriteToConsoleAndReadMigrations()

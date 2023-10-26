@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Globalization;
+using FluentAssertions;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -7,6 +8,11 @@ namespace GithubBackup.TestUtils.Tests;
 
 public class LoggerExtensionsTests
 {
+    public LoggerExtensionsTests()
+    {
+        CultureInfo.CurrentCulture = new CultureInfo("de-CH");
+    }
+    
     [Fact]
     public void VerifyLogs_WhenHasLogs_MatchPatterns()
     {

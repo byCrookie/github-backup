@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿using System.Globalization;
+using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Login;
@@ -18,7 +19,6 @@ using Environment = GithubBackup.Core.Environment.Environment;
 namespace GithubBackup.Cli.Tests.Commands.Github.Manual;
 
 [UsesVerify]
-[DisableParallelization]
 public class ManualRunnerTests
 {
     private readonly TestConsole _ansiConsole = new();
@@ -34,6 +34,7 @@ public class ManualRunnerTests
     public ManualRunnerTests()
     {
         _ansiConsole.Profile.Capabilities.Interactive = true;
+        CultureInfo.CurrentCulture = new CultureInfo("de-CH");
     }
 
     [Fact]
@@ -284,7 +285,7 @@ public class ManualRunnerTests
 
         _logger.VerifyLogs();
 
-        await Verify(_ansiConsole.Output);
+        await Verify(_ansiConsole.Output).UniqueForOSPlatform();
     }
     
     [Fact]
