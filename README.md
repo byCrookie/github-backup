@@ -32,8 +32,8 @@ For automated, scheduled backups, you can utilize the --interval option. This al
 ## Donations
 If you find the github-backup cli tool useful and wish to support its development, donations are greatly appreciated. You can make contributions in Ethereum (ETH) and Bitcoin (BTC) to the following addresses:
 
-* ETH Address: 0xYourEthereumAddress
-* BTC Address: YourBitcoinAddress
+* ETH Address: 0x1C0416cC1DDaAEEb3017D4b8Dcd3f0B82f4d94C1
+* BTC Address: bc1qygqya2w3hgpvy8hupctfkv5x06l69ydq4su2e2
 
 ## Star Our Repository
 If you find the github-backup cli tool beneficial and appreciate the effort that went into its creation, please consider showing your support by giving our repository a star on GitHub. Your encouragement keeps us motivated to maintain and improve the tool.
