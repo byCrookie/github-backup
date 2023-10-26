@@ -1,0 +1,27 @@
+﻿Do you want to continue as test? [y/n] (y): y
+Logged in as test
+Do you want to start a migration? [y/n] (n): n
+Found 3 migrations:
+- 1 Exported 01.01.2020 00:00:00 (10d)
+- 2 Exported 06.01.2020 00:00:00 (5d)
+- 3 Exported 10.01.2020 00:00:00 (1d)
+Select migrations to download?                          
+                                                        
+> [ ] 2 Exported 06.01.2020 00:00:00 (5d)               
+  [ ] 3 Exported 10.01.2020 00:00:00 (1d)               
+                                                        
+(Press <space> to toggle a migration, <enter> to accept)Select migrations to download?                          
+                                                        
+  [ ] 2 Exported 06.01.2020 00:00:00 (5d)               
+> [ ] 3 Exported 10.01.2020 00:00:00 (1d)               
+                                                        
+(Press <space> to toggle a migration, <enter> to accept)Select migrations to download?                          
+                                                        
+  [ ] 2 Exported 06.01.2020 00:00:00 (5d)               
+> [X] 3 Exported 10.01.2020 00:00:00 (1d)               
+                                                        
+(Press <space> to toggle a migration, <enter> to accept)Where do you want to save the migration files? C:\test1
+The destination directory does not exist. Please enter a valid directory. C:\test2
+Downloading migration 3 to C:\test2...
+Downloaded migration 3 (C:\test2\test3.zip)
+Fetch migration status again? [y/n] (y): n
