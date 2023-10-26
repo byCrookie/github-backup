@@ -1,0 +1,20 @@
+﻿Do you want to continue as test? [y/n] (y): y
+Logged in as test
+Do you want to start a migration? [y/n] (n): y
+Do you want to select repositories by type? If selected, no affiliation or 
+visibility can be selected. [y/n] (n): y
+What type of repositories do you want to backup?
+                                                
+> All                                           
+  Public                                        
+  Private                                       
+  Forks                                         
+  Sources                                       
+  Member                                        What type of repositories do you want to backup?
+                                                
+  All                                           
+> Public                                        
+  Private                                       
+  Forks                                         
+  Sources                                       
+  Member                                        No repositories found.

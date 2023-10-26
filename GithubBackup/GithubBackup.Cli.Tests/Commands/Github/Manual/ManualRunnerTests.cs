@@ -32,6 +32,11 @@ public class ManualRunnerTests
     private readonly IFileSystem _fileSystem = new MockFileSystem();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
+    public ManualRunnerTests()
+    {
+        _ansiConsole.Profile.Capabilities.Interactive = true;
+    }
+
     [Fact]
     public async Task RunAsync_HasValidTokenAndWantsToContinue_StopWhenNoRepositories()
     {
@@ -255,8 +260,6 @@ public class ManualRunnerTests
         _migrationService.GetMigrationAsync(id, CancellationToken.None)
             .Returns(migrations[2]);
 
-        _ansiConsole.Profile.Capabilities.Interactive = true;
-
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.Spacebar);
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
@@ -278,6 +281,125 @@ public class ManualRunnerTests
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
         
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs();
+
+        await Verify(_ansiConsole.Output);
+    }
+    
+    [Fact]
+    public async Task RunAsync_TryStartMigrationWithTypeButNoRepositories_NoStart()
+    {
+        var runner = CreateRunner();
+
+        var user = new User("test", "test");
+
+        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
+
+        _ansiConsole.Input.PushCharacter('y');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushCharacter('y');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushCharacter('y');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        
+        _repositoryService.GetRepositoriesAsync(Arg.Is<RepositoryOptions>(o => o.Type == RepositoryType.Public), CancellationToken.None)
+            .Returns(new List<Repository>());
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs();
+
+        await Verify(_ansiConsole.Output);
+    }
+    
+    [Fact]
+    public async Task RunAsync_TryStartMigrationWithAffiliationAndVisibilityButNoRepositories_NoStart()
+    {
+        var runner = CreateRunner();
+
+        var user = new User("test", "test");
+
+        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
+
+        _ansiConsole.Input.PushCharacter('y');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushCharacter('y');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushCharacter('n');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        
+        _repositoryService.GetRepositoriesAsync(Arg
+                .Is<RepositoryOptions>(o => o.Type == null 
+                                            && o.Affiliation == RepositoryAffiliation.Collaborator
+                                            && o.Visibility == RepositoryVisibility.Private), CancellationToken.None)
+            .Returns(new List<Repository>());
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs();
+
+        await Verify(_ansiConsole.Output);
+    }
+    
+    [Fact]
+    public async Task RunAsync_StartMigrationWithSelectedRepositories_Start()
+    {
+        var runner = CreateRunner();
+
+        var user = new User("test", "test");
+
+        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
+
+        _ansiConsole.Input.PushCharacter('y');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushCharacter('y');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushCharacter('n');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        
+        _repositoryService.GetRepositoriesAsync(Arg
+                .Is<RepositoryOptions>(o => o.Type == null 
+                                            && o.Affiliation == RepositoryAffiliation.Collaborator
+                                            && o.Visibility == RepositoryVisibility.Private), CancellationToken.None)
+            .Returns(new List<Repository>
+            {
+                new("test1"),
+                new("test2")
+            });
+        
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.Spacebar);
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.Spacebar);
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.Spacebar);
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
+        _ansiConsole.Input.PushKey(ConsoleKey.Spacebar);
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs();
