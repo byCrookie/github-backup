@@ -1,7 +1,6 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Parsing;
 using FluentAssertions;
-using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Github.Migrations;
 using GithubBackup.Cli.Tests.Utils;
 using GithubBackup.Cli.Utils;

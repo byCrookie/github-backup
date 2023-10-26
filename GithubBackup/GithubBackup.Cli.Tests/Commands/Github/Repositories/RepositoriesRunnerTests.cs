@@ -1,9 +1,7 @@
 ﻿using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Login;
-using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Github.Repositories;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
 using GithubBackup.TestUtils.Logging;

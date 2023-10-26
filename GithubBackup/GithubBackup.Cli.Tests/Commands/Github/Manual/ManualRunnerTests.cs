@@ -12,7 +12,6 @@ using GithubBackup.TestUtils.Logging;
 using Meziantou.Xunit;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Spectre.Console;
 using Spectre.Console.Testing;
 using Environment = GithubBackup.Core.Environment.Environment;
 

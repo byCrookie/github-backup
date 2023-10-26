@@ -1,6 +1,4 @@
-﻿using System.CommandLine;
-
-namespace GithubBackup.Cli.Commands.Github.Login;
+﻿namespace GithubBackup.Cli.Commands.Github.Login;
 
 internal sealed class LoginArgs
 {
