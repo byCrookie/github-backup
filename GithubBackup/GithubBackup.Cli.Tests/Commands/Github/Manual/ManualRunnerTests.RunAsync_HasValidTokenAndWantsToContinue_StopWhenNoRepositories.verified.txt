@@ -1,0 +1,4 @@
+﻿Do you want to continue as test? [y/n] (y): y
+Logged in as test
+Do you want to start a migration? [y/n] (n): n
+No migrations found.

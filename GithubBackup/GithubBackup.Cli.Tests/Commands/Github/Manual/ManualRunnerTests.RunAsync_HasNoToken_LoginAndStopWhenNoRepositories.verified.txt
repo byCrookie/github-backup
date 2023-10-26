@@ -1,0 +1,6 @@
+﻿Go to uri
+and enter user
+You have 0 seconds to authenticate before the code expires.
+Logged in as test
+Do you want to start a migration? [y/n] (n): n
+No migrations found.

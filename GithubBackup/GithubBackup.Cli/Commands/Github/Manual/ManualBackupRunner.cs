@@ -243,7 +243,6 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
             deviceAndUserCodes.Interval,
             ct
         );
-        await _credentialStore.StoreTokenAsync(accessToken.Token, ct);
         return accessToken.Token;
     }
 }
