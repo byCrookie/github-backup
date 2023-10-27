@@ -54,6 +54,7 @@ internal sealed class LoginRunner : ILoginRunner
         if (!string.IsNullOrWhiteSpace(_loginArgs.Token))
         {
             _logger.LogInformation("Using token from command line");
+            await _credentialStore.StoreTokenAsync(_loginArgs.Token, ct);
             return await _userService.WhoAmIAsync(ct);
         }
 

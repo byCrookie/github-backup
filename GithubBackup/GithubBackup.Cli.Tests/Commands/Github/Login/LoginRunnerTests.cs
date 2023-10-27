@@ -35,6 +35,10 @@ public class LoginRunnerTests
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Using token from command line")
         );
+        
+        await _credentialStore
+            .Received(1)
+            .StoreTokenAsync("token", CancellationToken.None);
 
         await Verify(_ansiConsole.Output);
     }
@@ -53,6 +57,10 @@ public class LoginRunnerTests
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Using token from command line")
         );
+        
+        await _credentialStore
+            .Received(1)
+            .StoreTokenAsync("token", CancellationToken.None);
 
         await Verify(_ansiConsole.Output);
     }
