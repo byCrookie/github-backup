@@ -4,7 +4,7 @@ namespace GithubBackup.Cli.Utils;
 
 public static partial class Piping
 {
-    public static Seperators Separators { get; } = new(new[] { ",", ":", ";", "|", "-", " " });
+    public static Seperators Separators { get; } = new(new[] { ",", ":", ";", " " });
     private static Regex ArgRegex { get; } = GetArgRegex();
 
     public static long[] ReadLongs(TextReader stdin, bool piping, bool force)
@@ -60,6 +60,6 @@ public static partial class Piping
         }
     }
 
-    [GeneratedRegex("(?<match>\\w+)|\"(?<match>[\\S\\s]*?)\"|'(?<match>[\\S\\s]*?)'", RegexOptions.Compiled)]
+    [GeneratedRegex("(?<match>[\\w\\/-]+)|\"(?<match>[\\S\\s]*?)\"|'(?<match>[\\S\\s]*?)'", RegexOptions.Compiled)]
     private static partial Regex GetArgRegex();
 }

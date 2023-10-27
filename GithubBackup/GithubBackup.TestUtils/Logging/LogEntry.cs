@@ -7,6 +7,6 @@ public record LogEntry(LogLevel Level, [StringSyntax(StringSyntaxAttribute.Regex
 {
     public override string ToString()
     {
-        return $"{Level} - {Message}";
+        return $"new LogEntry(LogLevel.{Level}, \"{Message}\")";
     }
 };

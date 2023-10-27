@@ -23,11 +23,15 @@ internal class GithubWebClient : IGithubWebClient
         _logger = logger;
     }
     
-    public Task<IFlurlResponse> PostJsonAsync(Url url, object data, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
+    public async Task<IFlurlResponse> PostJsonAsync(Url url, object data, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
     {
         var request = _client.Value.Request(url);
         _logger.LogDebug("Posting to {Url}", request.Url);
-        var content = new CapturedJsonContent(request.Settings.JsonSerializer.Serialize(data));
-        return request.SendAsync(HttpMethod.Post, content, ct ?? CancellationToken.None);
+        var json = request.Settings.JsonSerializer.Serialize(data);
+        _logger.LogTrace("Sending {Verb} request to {Url} with content {Content}", HttpMethod.Post, request.Url, json);
+        var content = new CapturedJsonContent(json);
+        var response = await request.SendAsync(HttpMethod.Post, content, ct ?? CancellationToken.None);
+        _logger.LogTrace("Received {StatusCode} response from {Url} with content {Content}", response.StatusCode, request.Url, await response.GetStringAsync());
+        return response;
     }
 }

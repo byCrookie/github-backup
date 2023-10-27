@@ -182,8 +182,10 @@ internal class GithubApiClient : IGithubApiClient
 
             _logger.LogDebug("Cache - Resource has changed, returning new response for {Verb} - {Url}", verb, request.Url);
         }
-
+        
+        _logger.LogTrace("Sending {Verb} request to {Url} with content {Content}", verb, request.Url, content is not null ? await content.ReadAsStringAsync() : string.Empty);
         var response = await request.SendAsync(verb, content, ct ?? CancellationToken.None, HttpCompletionOption.ResponseHeadersRead);
+        _logger.LogTrace("Received {StatusCode} response from {Url} with content {Content}", response.StatusCode, request.Url, await response.GetStringAsync());
 
         if (verb == HttpMethod.Get && response.StatusCode == (int)HttpStatusCode.OK && !string.IsNullOrWhiteSpace(response.Headers.Get(ETagHeader)))
         {

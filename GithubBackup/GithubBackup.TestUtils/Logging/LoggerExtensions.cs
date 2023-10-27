@@ -66,7 +66,7 @@ public static class LoggerExtensions
         }
 
         var errorMessage = string.Join(Environment.NewLine, logVerifications);
-        var logStack = string.Join(logs.Count > 0 ? Environment.NewLine : string.Empty, logs.Select(log => log.ToString()));
+        var logStack = string.Join(logs.Count > 0 ? $",{Environment.NewLine}" : string.Empty, logs.Select(log => log.ToString()));
         throw new Exception(errorMessage + $"{Environment.NewLine}{Environment.NewLine}Received:{Environment.NewLine}{logStack}");
     }
 }

@@ -53,9 +53,9 @@ public class LoggerExtensionsTests
             Invalid: Expected log does not exist - Expected: Information 4 - Actual:  
             
             Received:
-            Debug - 1 10/12/2020 00:00:00
-            Critical - 2 10/12/2021 00:00:00
-            Error - 3
+            new LogEntry(LogLevel.Debug, "1 10/12/2020 00:00:00"),
+            new LogEntry(LogLevel.Critical, "2 10/12/2021 00:00:00"),
+            new LogEntry(LogLevel.Error, "3")
             """
         );
     }
@@ -81,9 +81,9 @@ public class LoggerExtensionsTests
             Invalid: Log is not expected - Expected:   - Actual: Error 3
             
             Received:
-            Debug - 1 10/12/2020 00:00:00
-            Critical - 2 10/12/2021 00:00:00
-            Error - 3
+            new LogEntry(LogLevel.Debug, "1 10/12/2020 00:00:00"),
+            new LogEntry(LogLevel.Critical, "2 10/12/2021 00:00:00"),
+            new LogEntry(LogLevel.Error, "3")
             """
         );
     }

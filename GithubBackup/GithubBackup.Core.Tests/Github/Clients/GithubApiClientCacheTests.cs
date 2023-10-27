@@ -70,6 +70,8 @@ public class GithubApiClientCacheTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
+            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"Items":\[]}"""),
             new LogEntry(LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
             new LogEntry(LogLevel.Debug, "Cache - Returning cached response for GET - https://api.github.com/test")
@@ -111,10 +113,13 @@ public class GithubApiClientCacheTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
+            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"Items":\[]}"""),
             new LogEntry(LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Debug,
-                "Cache - Resource has changed, returning new response for GET - https://api.github.com/test")
+            new LogEntry(LogLevel.Debug, "Cache - Resource has changed, returning new response for GET - https://api.github.com/test"),
+            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
+            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"Items":\[]}""")
         );
     }
 
@@ -144,9 +149,13 @@ public class GithubApiClientCacheTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Debug, "Caching response for GET - https://api.github.com/test"),
+            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
+            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"Items":\[]}"""),
+            new LogEntry(LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Debug, "Resource has changed, returning new response for GET - https://api.github.com/test"),
+            new LogEntry(LogLevel.Debug, "Cache - Resource has changed, returning new response for GET - https://api.github.com/test"),
+            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
+            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"Items":\[]}"""),
             new LogEntry(LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test")
         );
     }
@@ -173,7 +182,11 @@ public class GithubApiClientCacheTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test")
+            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
+            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"Items":\[]}"""),
+            new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
+            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
+            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"Items":\[]}""")
         );
     }
 
