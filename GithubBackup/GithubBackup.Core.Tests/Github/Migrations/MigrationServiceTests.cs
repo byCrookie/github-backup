@@ -96,7 +96,7 @@ public class MigrationServiceTests
                 Arg.Is<MigrationRequest>(r => r.ExcludeAttachements
                                               && r.ExcludeMetadata
                                               && r.ExcludeGitData
-                                              && r.ExcludeMetadataOnly
+                                              && r.OrgMetadataOnly
                                               && r.ExcludeOwnerProjects
                                               && r.ExcludeReleases
                                               && r.LockRepositories

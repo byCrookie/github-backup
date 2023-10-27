@@ -28,8 +28,9 @@ internal sealed class MigrationRequest
     [JsonPropertyName("exclude_owner_projects")]
     public bool ExcludeOwnerProjects { get; }
 
-    [JsonPropertyName("exclude_metadata_only")]
-    public bool ExcludeMetadataOnly { get; }
+    [JsonPropertyName("org_metadata_only")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool OrgMetadataOnly { get; }
 
     public MigrationRequest(
         string[] repositories,
@@ -39,7 +40,7 @@ internal sealed class MigrationRequest
         bool excludeAttachements,
         bool excludeReleases,
         bool excludeOwnerProjects,
-        bool excludeMetadataOnly
+        bool orgMetadataOnly
     )
     {
         Exclude = new[] { "repositories" };
@@ -50,6 +51,6 @@ internal sealed class MigrationRequest
         ExcludeAttachements = excludeAttachements;
         ExcludeReleases = excludeReleases;
         ExcludeOwnerProjects = excludeOwnerProjects;
-        ExcludeMetadataOnly = excludeMetadataOnly;
+        OrgMetadataOnly = orgMetadataOnly;
     }
 }
