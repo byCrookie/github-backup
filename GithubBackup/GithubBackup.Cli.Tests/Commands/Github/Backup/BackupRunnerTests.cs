@@ -3,6 +3,7 @@ using System.IO.Abstractions.TestingHelpers;
 using GithubBackup.Cli.Commands.Github.Backup;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Download;
+using GithubBackup.Cli.Commands.Github.Interval;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Core.Github.Migrations;
@@ -76,8 +77,8 @@ public class BackupRunnerTests
     private BackupRunner CreateBackupRunner(bool quiet)
     {
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
-        var migrateArgs = new MigrateArgs(new []{"test"}, false, false, false, false, false, false, false);
-        var downloadArgs = new DownloadArgs(Array.Empty<long>(), false, new DirectoryInfo("test"), null, true);
+        var migrateArgs = new MigrateArgs(new []{"test"}, false, false, false, false, false, false, false, new IntervalArgs(null));
+        var downloadArgs = new DownloadArgs(Array.Empty<long>(), false, new DirectoryInfo("test"), null, true, new IntervalArgs(null));
         var backupArgs = new BackupArgs(migrateArgs, downloadArgs);
 
         return new BackupRunner(

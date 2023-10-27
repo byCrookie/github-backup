@@ -1,4 +1,5 @@
 ﻿using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Interval;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
@@ -68,7 +69,8 @@ public class MigrateRunnerTests
             false,
             false,
             false,
-            false
+            false,
+            new IntervalArgs(null)
         );
 
         return new MigrateRunner(

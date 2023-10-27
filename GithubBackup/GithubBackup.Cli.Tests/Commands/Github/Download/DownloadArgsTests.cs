@@ -2,6 +2,7 @@
 using System.CommandLine.Parsing;
 using FluentAssertions;
 using GithubBackup.Cli.Commands.Github.Download;
+using GithubBackup.Cli.Commands.Github.Interval;
 using GithubBackup.Cli.Tests.Utils;
 using GithubBackup.Cli.Utils;
 
@@ -10,12 +11,14 @@ namespace GithubBackup.Cli.Tests.Commands.Github.Download;
 public class DownloadArgsTests
 {
     private readonly DownloadArguments _downloadArguments = new(false);
+    private readonly IntervalArguments _intervalArguments = new();
 
     [Fact]
     public async Task InvokeAsync_FlagsArePassed_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_downloadArguments.Options());
+        rootCommand.AddGlobalOptions(_intervalArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -27,12 +30,13 @@ public class DownloadArgsTests
                 downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
                 downloadArgs.NumberOfBackups.Should().Be(5);
                 downloadArgs.Overwrite.Should().BeTrue();
+                downloadArgs.IntervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(100));
             },
-            new DowndloadArgsBinder(_downloadArguments)
+            new DowndloadArgsBinder(_downloadArguments, _intervalArguments)
         );
         
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub --destination ./migrations --latest --migrations 1 2 3 --number-of-backups 5 --overwrite");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub --destination ./migrations --latest --migrations 1 2 3 --number-of-backups 5 --overwrite --interval 100");
     }
     
     [Fact]
@@ -40,6 +44,7 @@ public class DownloadArgsTests
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_downloadArguments.Options());
+        rootCommand.AddGlobalOptions(_intervalArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -51,12 +56,13 @@ public class DownloadArgsTests
                 downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
                 downloadArgs.NumberOfBackups.Should().Be(5);
                 downloadArgs.Overwrite.Should().BeTrue();
+                downloadArgs.IntervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(100));
             },
-            new DowndloadArgsBinder(_downloadArguments)
+            new DowndloadArgsBinder(_downloadArguments, _intervalArguments)
         );
         
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub -d ./migrations -l -m 1 2 3 -n 5 -o");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub -d ./migrations -l -m 1 2 3 -n 5 -o -i 100");
     }
     
     [Theory]
@@ -68,6 +74,7 @@ public class DownloadArgsTests
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_downloadArguments.Options());
+        rootCommand.AddGlobalOptions(_intervalArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -79,8 +86,9 @@ public class DownloadArgsTests
                 downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
                 downloadArgs.NumberOfBackups.Should().Be(5);
                 downloadArgs.Overwrite.Should().BeTrue();
+                downloadArgs.IntervalArgs.Interval.Should().BeNull();
             },
-            new DowndloadArgsBinder(_downloadArguments)
+            new DowndloadArgsBinder(_downloadArguments, _intervalArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -92,6 +100,7 @@ public class DownloadArgsTests
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_downloadArguments.Options());
+        rootCommand.AddGlobalOptions(_intervalArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -103,8 +112,9 @@ public class DownloadArgsTests
                 downloadArgs.Migrations.Should().BeEmpty();
                 downloadArgs.NumberOfBackups.Should().BeNull();
                 downloadArgs.Overwrite.Should().BeTrue();
+                downloadArgs.IntervalArgs.Interval.Should().BeNull();
             },
-            new DowndloadArgsBinder(_downloadArguments)
+            new DowndloadArgsBinder(_downloadArguments, _intervalArguments)
         );
         
         rootCommand.AddCommand(subCommand);

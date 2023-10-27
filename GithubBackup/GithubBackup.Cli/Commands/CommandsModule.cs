@@ -34,6 +34,6 @@ internal static class CommandsModule
             .GetRequiredService<IFactory<TCommandArgs, TCliCommand>>()
             .Create(commandArgs));
 
-        services.AddServices();
+        services.AddServices(commandArgs);
     }
 }

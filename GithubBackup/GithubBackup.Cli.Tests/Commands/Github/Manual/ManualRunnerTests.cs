@@ -10,7 +10,6 @@ using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
-using Meziantou.Xunit;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Spectre.Console.Testing;

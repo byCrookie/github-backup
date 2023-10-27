@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using GithubBackup.Cli.Commands.Github.Interval;
 using GithubBackup.Cli.Commands.Github.Migrations;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
@@ -14,12 +15,14 @@ internal static class MigrateCommand
     {
         var command = new Command(CommandName, CommandDescription);
         var migrateArguments = new MigrateArguments(true);
+        var intervalArguments = new IntervalArguments();
         command.AddOptions(migrateArguments.Options());
+        command.AddOptions(intervalArguments.Options());
         
         command.SetHandler(
             (globalArgs, migrateArgs) => GithubBackup.Cli.Cli.RunAsync<MigrationsRunner, MigrateArgs>(args, globalArgs, migrateArgs),
             new GlobalArgsBinder(globalArguments),
-            new MigrateArgsBinder(migrateArguments)
+            new MigrateArgsBinder(migrateArguments, intervalArguments)
         );
 
         return command;

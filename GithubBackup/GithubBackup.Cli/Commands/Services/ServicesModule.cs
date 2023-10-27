@@ -10,10 +10,20 @@ internal static class ServicesModule
     /// during startup.
     /// </summary>
     /// <param name="services">Dependencies are registered on this service collection</param>
-    public static void AddServices(this IServiceCollection services)
+    /// <param name="commandArgs">The arguments for the specific command</param>
+    public static void AddServices<TCommandArgs>(this IServiceCollection services, TCommandArgs commandArgs)
+        where TCommandArgs : class
     {
         services.AddTransient<ICommandRunnerService, CommandRunnerService>();
-        
-        services.AddHostedService(sp => sp.GetRequiredService<IFactory<ICommandRunnerService>>().Create());
+        services.AddTransient<ICommandIntervalRunnerService, CommandIntervalRunnerService>();
+
+        if (commandArgs is ICommandIntervalArgs { IntervalArgs.Interval: not null } intervalArgs)
+        {
+            services.AddHostedService(sp => sp.GetRequiredService<IFactory<TimeSpan, ICommandIntervalRunnerService>>().Create(intervalArgs.IntervalArgs.Interval.Value));
+        }
+        else
+        {
+            services.AddHostedService(sp => sp.GetRequiredService<IFactory<ICommandRunnerService>>().Create());
+        }
     }
 }

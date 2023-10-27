@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using GithubBackup.Cli.Commands.Github.Download;
+using GithubBackup.Cli.Commands.Github.Interval;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
@@ -16,15 +17,17 @@ internal static class BackupCommand
         var command = new Command(CommandName, CommandDescription);
         var migrateArguments = new MigrateArguments(true);
         var downloadArguments = new DownloadArguments(true);
+        var intervalArguments = new IntervalArguments();
         var downloadOptions = downloadArguments.Options();
         downloadOptions.Remove(downloadArguments.MigrationsOption);
         command.AddOptions(migrateArguments.Options());
         command.AddOptions(downloadOptions);
+        command.AddOptions(intervalArguments.Options());
 
         command.SetHandler(
             (globalArgs, manualBackupArgs) => GithubBackup.Cli.Cli.RunAsync<BackupRunner, BackupArgs>(args, globalArgs, manualBackupArgs),
             new GlobalArgsBinder(globalArguments),
-            new BackupArgsBinder(migrateArguments, downloadArguments)
+            new BackupArgsBinder(migrateArguments, downloadArguments, intervalArguments)
         );
 
         return command;
