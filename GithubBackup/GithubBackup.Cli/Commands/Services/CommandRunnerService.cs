@@ -8,7 +8,7 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Services;
 
-internal sealed class CommandRunnerService : ICommandRunnerService
+internal sealed class CommandRunnerService : IHostedService
 {
     private readonly GlobalArgs _globalArgs;
     private readonly ILogger<CommandRunnerService> _logger;

@@ -7,7 +7,7 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Services;
 
-internal sealed class CommandIntervalRunnerService : ICommandIntervalRunnerService
+internal sealed class CommandIntervalRunnerService : IHostedService
 {
     private readonly GlobalArgs _globalArgs;
     private readonly TimeSpan _interval;
@@ -49,11 +49,11 @@ internal sealed class CommandIntervalRunnerService : ICommandIntervalRunnerServi
         
         var periodicTimer = new PeriodicTimer(_interval);
 
-        while (await periodicTimer.WaitForNextTickAsync(cancellationToken))
+        do
         {
             var now = _dateTimeProvider.Now;
             var stopWatch = _stopwatch.StartNew();
-            
+
             try
             {
                 _logger.LogInformation("Starting command: {Type}", _commandRunner.GetType().Name);
@@ -76,7 +76,7 @@ internal sealed class CommandIntervalRunnerService : ICommandIntervalRunnerServi
             {
                 stopWatch.Stop();
                 _logger.LogInformation("Command finished. Duration: {Duration}", stopWatch.Elapsed);
-                
+
                 var waitUntil = now.Add(_interval);
                 _logger.LogInformation("Waiting until {WaitUntil} for next run", waitUntil);
 
@@ -86,7 +86,7 @@ internal sealed class CommandIntervalRunnerService : ICommandIntervalRunnerServi
                     _ansiConsole.WriteLine($"Waiting until {waitUntil} for next run");
                 }
             }
-        }
+        } while (await periodicTimer.WaitForNextTickAsync(cancellationToken));
 
         _hostApplicationLifetime.StopApplication();
     }
