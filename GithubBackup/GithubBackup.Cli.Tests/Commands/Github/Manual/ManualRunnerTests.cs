@@ -4,6 +4,7 @@ using System.IO.Abstractions.TestingHelpers;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Manual;
+using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
@@ -276,17 +277,17 @@ public class ManualRunnerTests
 
         _migrationService.DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), CancellationToken.None)
             .Returns(call => _fileSystem.Path.Combine(pathValid.FullName, $"test{call.Arg<DownloadMigrationOptions>().Id}.zip"));
-        
+
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
-        
+
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs();
 
         await Verify(_ansiConsole.Output).UniqueForOSPlatform();
     }
-    
+
     [Fact]
     public async Task RunAsync_TryStartMigrationWithTypeButNoRepositories_NoStart()
     {
@@ -306,7 +307,7 @@ public class ManualRunnerTests
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
-        
+
         _repositoryService.GetRepositoriesAsync(Arg.Is<RepositoryOptions>(o => o.Type == RepositoryType.Public), CancellationToken.None)
             .Returns(new List<Repository>());
 
@@ -316,7 +317,7 @@ public class ManualRunnerTests
 
         await Verify(_ansiConsole.Output);
     }
-    
+
     [Fact]
     public async Task RunAsync_TryStartMigrationWithAffiliationAndVisibilityButNoRepositories_NoStart()
     {
@@ -339,9 +340,9 @@ public class ManualRunnerTests
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
-        
+
         _repositoryService.GetRepositoriesAsync(Arg
-                .Is<RepositoryOptions>(o => o.Type == null 
+                .Is<RepositoryOptions>(o => o.Type == null
                                             && o.Affiliation == RepositoryAffiliation.Collaborator
                                             && o.Visibility == RepositoryVisibility.Private), CancellationToken.None)
             .Returns(new List<Repository>());
@@ -352,7 +353,7 @@ public class ManualRunnerTests
 
         await Verify(_ansiConsole.Output);
     }
-    
+
     [Fact]
     public async Task RunAsync_StartMigrationWithSelectedRepositories_Start()
     {
@@ -375,9 +376,9 @@ public class ManualRunnerTests
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
-        
+
         _repositoryService.GetRepositoriesAsync(Arg
-                .Is<RepositoryOptions>(o => o.Type == null 
+                .Is<RepositoryOptions>(o => o.Type == null
                                             && o.Affiliation == RepositoryAffiliation.Collaborator
                                             && o.Visibility == RepositoryVisibility.Private), CancellationToken.None)
             .Returns(new List<Repository>
@@ -385,11 +386,11 @@ public class ManualRunnerTests
                 new("test1"),
                 new("test2")
             });
-        
+
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.Spacebar);
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
-        
+
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.Spacebar);
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
@@ -411,6 +412,7 @@ public class ManualRunnerTests
         var manualBackupArgs = new ManualBackupArgs();
 
         return new ManualBackupRunner(
+            new GlobalArgs(LogLevel.Debug, false, new FileInfo("test")),
             manualBackupArgs,
             _authenticationService,
             _migrationService,

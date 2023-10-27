@@ -48,12 +48,17 @@
     },
     "GithubBackup.Cli Download": {
       "commandName": "Project",
-      "commandLineArgs": "download --destination M:\\Development\\Temp\\github-backup --latest",
+      "commandLineArgs": "download --destination M:\\Development\\Temp\\github-backup --latest --interval 120",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Manual Backup": {
       "commandName": "Project",
       "commandLineArgs": "manual",
+      "environmentVariables": {}
+    },
+    "GithubBackup.Cli Migrate": {
+      "commandName": "Project",
+      "commandLineArgs": "migrate --repositories \"byCrookie/TypeCode\"",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Login": {

@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Migrate;
+using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Migrations;
@@ -26,7 +27,9 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
         // Needs to be passed in because of the way ICommand's are resolved in
         // the cli service.
         // ReSharper disable once UnusedParameter.Local
-        ManualBackupArgs _,
+        GlobalArgs _1,
+        // ReSharper disable once UnusedParameter.Local
+        ManualBackupArgs _2,
         IAuthenticationService authenticationService,
         IMigrationService migrationService,
         IUserService userService,

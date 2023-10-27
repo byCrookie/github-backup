@@ -39,10 +39,13 @@ internal class GithubApiClient : IGithubApiClient
     private const string UserAgent = "github-backup";
     private const string Accept = "application/vnd.github.v3+json";
     private const string BaseUrl = "https://api.github.com";
+    private const string ApiVersionHeader = "X-GitHub-Api-Version";
+    private const string ApiVersion = "2022-11-28";
 
     private readonly Lazy<IFlurlClient> _client = new(() => new FlurlClient(BaseUrl)
         .WithHeader(HeaderNames.Accept, Accept)
-        .WithHeader(HeaderNames.UserAgent, UserAgent));
+        .WithHeader(HeaderNames.UserAgent, UserAgent)
+        .WithHeader(ApiVersionHeader, ApiVersion));
 
     public GithubApiClient(
         IMemoryCache memoryCache,
