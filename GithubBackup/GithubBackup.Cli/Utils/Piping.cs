@@ -1,44 +1,47 @@
-﻿namespace GithubBackup.Cli.Utils;
+﻿using System.Text.RegularExpressions;
 
-public static class Piping
+namespace GithubBackup.Cli.Utils;
+
+public static partial class Piping
 {
-    public static Seperators Separators { get; } = new(new[]{ ",", ":", ";", "|", "-" });
-    
-    public static long[] ReadLongs(bool piping)
+    public static Seperators Separators { get; } = new(new[] { ",", ":", ";", "|", "-", " " });
+    private static Regex ArgRegex { get; } = GetArgRegex();
+
+    public static long[] ReadLongs(TextReader stdin, bool piping, bool force)
     {
-        if (!piping || !IsPipedInput())
+        if (!force && (!piping || !IsPipedInput()))
         {
             return Array.Empty<long>();
         }
-        
-        var inputs = new List<long>();
-        while (Console.ReadLine() is { } line && !string.IsNullOrEmpty(line))
-        {
-            var ints = line
-                .Split(Separators.Values, StringSplitOptions.RemoveEmptyEntries)
-                .Select(input => long.Parse(input.Trim()));
 
+        var inputs = new List<long>();
+        while (stdin.ReadLine() is { } line && !string.IsNullOrEmpty(line))
+        {
+            var ints = ArgRegex.Matches(line)
+                .Select(m => m.Groups["match"].Value)
+                .Select(long.Parse);
+            
             inputs.AddRange(ints);
         }
 
         return !inputs.Any() ? Array.Empty<long>() : inputs.ToArray();
     }
 
-    public static string[] ReadStrings(bool piping)
+    public static string[] ReadStrings(TextReader stdin, bool piping, bool force)
     {
-        if (!piping || !IsPipedInput())
+        if (!force && (!piping || !IsPipedInput()))
         {
             return Array.Empty<string>();
         }
 
         var inputs = new List<string>();
-        while (Console.ReadLine() is { } line && !string.IsNullOrEmpty(line))
+        while (stdin.ReadLine() is { } line && !string.IsNullOrEmpty(line))
         {
-            var ints = line
-                .Split(Separators.Values, StringSplitOptions.RemoveEmptyEntries)
-                .Select(input => input.Trim());
-
-            inputs.AddRange(ints);
+            var strings = ArgRegex
+                .Matches(line)
+                .Select(m => m.Groups["match"].Value);
+            
+            inputs.AddRange(strings);
         }
 
         return !inputs.Any() ? Array.Empty<string>() : inputs.ToArray();
@@ -56,4 +59,7 @@ public static class Piping
             return true;
         }
     }
+
+    [GeneratedRegex("(?<match>\\w+)|\"(?<match>[\\S\\s]*?)\"|'(?<match>[\\S\\s]*?)'", RegexOptions.Compiled)]
+    private static partial Regex GetArgRegex();
 }

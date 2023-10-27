@@ -15,7 +15,7 @@ public class DownloadArguments
     {
         MigrationsOption = new Option<long[]>(
             aliases: new[] { "-m", "--migrations" },
-            getDefaultValue: () => Piping.ReadLongs(piping),
+            getDefaultValue: () => Piping.ReadLongs(Console.In, piping, false),
             description: DownloadArgDescriptions.Migrations.Long)
         {
             IsRequired = false,
