@@ -45,9 +45,9 @@ public class GlobalArgsTests
             globalArgs =>
             {
                 globalArgs.Should().NotBeNull();
-                globalArgs.LogFile!.Name.Should().Be("log.txt");
+                globalArgs.LogFile.Should().BeNull();
                 globalArgs.Quiet.Should().BeTrue();
-                globalArgs.Verbosity.Should().Be(LogLevel.Debug);
+                globalArgs.Verbosity.Should().Be(LogLevel.Information);
             },
             new GlobalArgsBinder(_globalArguments)
         );
@@ -68,7 +68,7 @@ public class GlobalArgsTests
             {
                 globalArgs.Should().NotBeNull();
                 globalArgs.LogFile.Should().BeNull();
-                globalArgs.Quiet.Should().BeFalse();
+                globalArgs.Quiet.Should().BeTrue();
                 globalArgs.Verbosity.Should().Be(LogLevel.Information);
             },
             new GlobalArgsBinder(_globalArguments)

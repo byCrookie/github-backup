@@ -6,18 +6,18 @@ namespace GithubBackup.Cli.Commands.Global;
 public class GlobalArguments
 {
     public Option<bool> QuietOption { get; } = new(
-        aliases: new[] { "-q", "--quiet" },
-        getDefaultValue: () => false,
+        aliases: new[] { "--quiet" },
+        getDefaultValue: () => true,
         description: GlobalArgDescriptions.Quiet.Long
     );
 
     public Option<FileInfo?> LogFileOption { get; } = new(
-        aliases: new[] { "-l", "--log-file" },
+        aliases: new[] { "--log-file" },
         description: GlobalArgDescriptions.LogFile.Long
     );
 
     public Option<LogLevel> VerbosityOption { get; } = new(
-        aliases: new[] { "-v", "--verbosity" },
+        aliases: new[] { "--verbosity" },
         getDefaultValue: () => LogLevel.Information,
         description: GlobalArgDescriptions.Verbosity.Long
     );
