@@ -22,6 +22,7 @@ internal sealed class BackupArgsBinder : BinderBase<BackupArgs>
     {
         var migrateArgs = new MigrateArgsBinder(_migrateArguments, _intervalArguments).Get(bindingContext);
         var downloadArgs = new DowndloadArgsBinder(_downloadArguments, _intervalArguments).Get(bindingContext);
-        return new BackupArgs(migrateArgs, downloadArgs);
+        var intervalArgs = new IntervalArgsBinder(_intervalArguments).Get(bindingContext);
+        return new BackupArgs(migrateArgs, downloadArgs, intervalArgs);
     }
 }

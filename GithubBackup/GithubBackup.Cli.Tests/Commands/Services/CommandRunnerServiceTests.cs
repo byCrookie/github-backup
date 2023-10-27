@@ -1,18 +1,23 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using FluentAssertions;
 using Flurl;
 using Flurl.Http;
 using GithubBackup.Cli.Commands;
+using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Services;
 using GithubBackup.Core.Environment;
+using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Services;
 
+[UsesVerify]
 public class CommandRunnerServiceTests
 {
     private readonly CommandRunnerService _sut;
@@ -20,6 +25,7 @@ public class CommandRunnerServiceTests
     private readonly IHostApplicationLifetime _hostApplicationLifeTime;
     private readonly ICommandRunner _commandRunner;
     private readonly IEnvironment _environment;
+    private readonly TestConsole _ansiConsole;
 
     public CommandRunnerServiceTests()
     {
@@ -27,8 +33,21 @@ public class CommandRunnerServiceTests
         _hostApplicationLifeTime = Substitute.For<IHostApplicationLifetime>();
         _commandRunner = Substitute.For<ICommandRunner>();
         _environment = Substitute.For<IEnvironment>();
+        _ansiConsole = new TestConsole();
+        var stopwatch = Substitute.For<IStopwatch>();
 
-        _sut = new CommandRunnerService(_logger, _hostApplicationLifeTime, _commandRunner, _environment);
+        var fakeStopWatch = new Stopwatch();
+        stopwatch.StartNew().Returns(fakeStopWatch);
+
+        _sut = new CommandRunnerService(
+            new GlobalArgs(LogLevel.Debug, false, new FileInfo("test")),
+            _logger,
+            _hostApplicationLifeTime,
+            _commandRunner,
+            _environment,
+            _ansiConsole,
+            stopwatch
+        );
     }
 
     [Fact]
@@ -40,8 +59,12 @@ public class CommandRunnerServiceTests
         await _commandRunner.Received(1).RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs(
-            new LogEntry(LogLevel.Information, "Starting command: (.*)")
+            new LogEntry(LogLevel.Information, "Running command"),
+            new LogEntry(LogLevel.Information, "Starting command: (.*)"),
+            new LogEntry(LogLevel.Information, "Command finished. Duration: (.*)")
         );
+
+        await Verify(_ansiConsole.Output);
 
         _environment.ExitCode.Should().Be(0);
     }
@@ -58,9 +81,13 @@ public class CommandRunnerServiceTests
         await _commandRunner.Received(1).RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Running command"),
             new LogEntry(LogLevel.Information, "Starting command: (.*)"),
-            new LogEntry(LogLevel.Critical, "Unhandled exception [(]Command: (.*)[)]: Test")
+            new LogEntry(LogLevel.Critical, "Unhandled exception [(]Command: (.*)[)]: Test"),
+            new LogEntry(LogLevel.Information, "Command finished. Duration: (.*)")
         );
+        
+        await Verify(_ansiConsole.Output);
 
         _environment.ExitCode.Should().Be(1);
     }
@@ -77,9 +104,13 @@ public class CommandRunnerServiceTests
         await _commandRunner.Received(1).RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Running command"),
             new LogEntry(LogLevel.Information, "Starting command: (.*)"),
-            new LogEntry(LogLevel.Critical, "Unhandled exception [(]Command: (.*)[)]: Test")
+            new LogEntry(LogLevel.Critical, "Unhandled exception [(]Command: (.*)[)]: Test"),
+            new LogEntry(LogLevel.Information, "Command finished. Duration: (.*)")
         );
+        
+        await Verify(_ansiConsole.Output);
 
         _environment.ExitCode.Should().Be(1);
     }

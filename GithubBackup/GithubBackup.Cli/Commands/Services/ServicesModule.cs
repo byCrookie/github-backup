@@ -1,3 +1,4 @@
+using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Core.DependencyInjection.Factory;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,7 +12,7 @@ internal static class ServicesModule
     /// </summary>
     /// <param name="services">Dependencies are registered on this service collection</param>
     /// <param name="commandArgs">The arguments for the specific command</param>
-    public static void AddServices<TCommandArgs>(this IServiceCollection services, TCommandArgs commandArgs)
+    public static void AddServices<TCommandArgs>(this IServiceCollection services, GlobalArgs globalArgs, TCommandArgs commandArgs)
         where TCommandArgs : class
     {
         services.AddTransient<ICommandRunnerService, CommandRunnerService>();
@@ -19,7 +20,7 @@ internal static class ServicesModule
 
         if (commandArgs is ICommandIntervalArgs { IntervalArgs.Interval: not null } intervalArgs)
         {
-            services.AddHostedService(sp => sp.GetRequiredService<IFactory<TimeSpan, ICommandIntervalRunnerService>>().Create(intervalArgs.IntervalArgs.Interval.Value));
+            services.AddHostedService(sp => sp.GetRequiredService<IFactory<GlobalArgs, TimeSpan, ICommandIntervalRunnerService>>().Create(globalArgs, intervalArgs.IntervalArgs.Interval.Value));
         }
         else
         {

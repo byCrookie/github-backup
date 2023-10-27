@@ -1,0 +1,2 @@
+﻿Running command
+Command finished. Duration: 00:00:00

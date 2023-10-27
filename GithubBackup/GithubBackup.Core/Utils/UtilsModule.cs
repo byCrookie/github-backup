@@ -8,5 +8,6 @@ public static class UtilsModule
     {
         services.AddTransient<IDateTimeProvider, DateTimeProvider>();
         services.AddTransient<IDateTimeOffsetProvider, DateTimeOffsetProvider>();
+        services.AddTransient<IStopwatch, Stopwatch>();
     }
 }

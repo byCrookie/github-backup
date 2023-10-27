@@ -79,7 +79,7 @@ public class BackupRunnerTests
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
         var migrateArgs = new MigrateArgs(new []{"test"}, false, false, false, false, false, false, false, new IntervalArgs(null));
         var downloadArgs = new DownloadArgs(Array.Empty<long>(), false, new DirectoryInfo("test"), null, true, new IntervalArgs(null));
-        var backupArgs = new BackupArgs(migrateArgs, downloadArgs);
+        var backupArgs = new BackupArgs(migrateArgs, downloadArgs, new IntervalArgs(null));
 
         return new BackupRunner(
             globalArgs,
