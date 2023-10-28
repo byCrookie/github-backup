@@ -46,7 +46,7 @@ internal sealed class CommandIntervalRunnerService : IHostedService
         {
             _ansiConsole.WriteLine($"Running command. Interval: {_interval}");
         }
-        
+
         var periodicTimer = new PeriodicTimer(_interval);
 
         do
@@ -86,9 +86,15 @@ internal sealed class CommandIntervalRunnerService : IHostedService
                     _ansiConsole.WriteLine($"Waiting until {waitUntil} for next run");
                 }
             }
-        } while (await periodicTimer.WaitForNextTickAsync(cancellationToken));
+        } while (await WaitForNextTickAsync(periodicTimer, cancellationToken));
 
         _hostApplicationLifetime.StopApplication();
+    }
+
+    private static Task<bool> WaitForNextTickAsync(PeriodicTimer periodicTimer, CancellationToken ct)
+    {
+        var wait = periodicTimer.WaitForNextTickAsync(ct);
+        return wait.BoolOrCanceledAsFalseAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
