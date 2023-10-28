@@ -67,7 +67,7 @@ public class CommandIntervalRunnerServiceTests
             new LogEntry(LogLevel.Information, "Running command. Interval: 00:00:02"),
             new LogEntry(LogLevel.Information, "Starting command: (.*)"),
             new LogEntry(LogLevel.Information, "Command finished. Duration: (.*)"),
-            new LogEntry(LogLevel.Information, "Waiting until 01/01/0001 00:00:02 for next run")
+            new LogEntry(LogLevel.Information, "Waiting until 01.01.0001 00:00:02 (.*) for next run")
         );
 
         await Verify(_ansiConsole.Output);
@@ -94,7 +94,7 @@ public class CommandIntervalRunnerServiceTests
             new LogEntry(LogLevel.Information, "Starting command: (.*)"),
             new LogEntry(LogLevel.Error, """Unhandled exception \(Command: (.*)\): Test"""),
             new LogEntry(LogLevel.Information, "Command finished. Duration: 00:00:00"),
-            new LogEntry(LogLevel.Information, "Waiting until 01/01/0001 00:00:02 for next run")
+            new LogEntry(LogLevel.Information, "Waiting until 01.01.0001 00:00:02 (.*) for next run")
         );
         
         await Verify(_ansiConsole.Output);
@@ -121,7 +121,7 @@ public class CommandIntervalRunnerServiceTests
             new LogEntry(LogLevel.Information, "Starting command: (.*)"),
             new LogEntry(LogLevel.Error, """Unhandled exception \(Command: (.*)\): Test"""),
             new LogEntry(LogLevel.Information, "Command finished. Duration: 00:00:00"),
-            new LogEntry(LogLevel.Information, "Waiting until 01/01/0001 00:00:02 for next run")
+            new LogEntry(LogLevel.Information, "Waiting until 01.01.0001 00:00:02 (.*) for next run")
         );
         
         await Verify(_ansiConsole.Output);
