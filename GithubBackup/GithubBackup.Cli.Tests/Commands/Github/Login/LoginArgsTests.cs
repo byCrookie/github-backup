@@ -44,13 +44,13 @@ public class LoginArgsTests
             {
                 loginArgs.Should().NotBeNull();
                 loginArgs.Token.Should().Be("token");
-                loginArgs.DeviceFlowAuth.Should().BeTrue();
+                loginArgs.DeviceFlowAuth.Should().BeFalse();
             },
             new LoginArgsBinder(_loginArguments)
         );
         
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub -t token -dfa");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub -t token");
     }
     
     [Fact]

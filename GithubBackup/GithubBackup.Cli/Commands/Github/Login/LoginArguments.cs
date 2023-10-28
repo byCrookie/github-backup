@@ -10,7 +10,7 @@ public class LoginArguments
     ) { IsRequired = false };
 
     public Option<bool> DeviceFlowAuthOption { get; } = new(
-        aliases: new[] { "-dfa", "--device-flow-auth" },
+        aliases: new[] { "-d", "--device-flow-auth" },
         getDefaultValue: () => false,
         description: LoginArgDescriptions.DeviceFlowAuth.Long
     ) { IsRequired = false };

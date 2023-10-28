@@ -80,9 +80,18 @@ internal sealed class LoginRunner : ILoginRunner
     private async Task<string> GetOAuthTokenAsync(CancellationToken ct)
     {
         var deviceAndUserCodes = await _authenticationService.RequestDeviceAndUserCodesAsync(ct);
-        _ansiConsole.WriteLine(
-            $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}");
-        _ansiConsole.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
+
+        if (!_globalArgs.Quiet)
+        {
+            _ansiConsole.WriteLine(
+                $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}");
+            _ansiConsole.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
+        }
+        else
+        {
+            _ansiConsole.WriteLine($"{deviceAndUserCodes.VerificationUri} - {deviceAndUserCodes.UserCode}");
+        }
+        
         var accessToken = await _authenticationService.PollForAccessTokenAsync(
             deviceAndUserCodes.DeviceCode,
             deviceAndUserCodes.Interval,

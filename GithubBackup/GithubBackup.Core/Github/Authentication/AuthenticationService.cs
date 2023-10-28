@@ -63,6 +63,11 @@ internal sealed class AuthenticationService : IAuthenticationService
             )
             .ReceiveJson<AccessTokenResponse>(), ct);
 
+        if (string.IsNullOrWhiteSpace(response.AccessToken))
+        {
+            throw new Exception("Authentication failed. No access token received. Please try again.");
+        }
+
         return new AccessToken(response.AccessToken!, response.TokenType!, response.Scope!);
     }
 
