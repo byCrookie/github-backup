@@ -7,7 +7,6 @@ using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Interval;
-using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -80,8 +79,7 @@ public class BackupRunnerTests
             _migrationService,
             _loginService,
             _fileSystem,
-            _ansiConsole,
-            Substitute.For<IGithubTokenStore>()
+            _ansiConsole
         );
     }
 }

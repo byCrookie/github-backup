@@ -1,7 +1,6 @@
 using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
 using Spectre.Console;
 
@@ -15,7 +14,6 @@ internal sealed class BackupRunner : IBackupRunner
     private readonly ILoginService _loginService;
     private readonly IFileSystem _fileSystem;
     private readonly IAnsiConsole _ansiConsole;
-    private readonly IGithubTokenStore _githubTokenStore;
 
     public BackupRunner(
         GlobalArgs globalArgs,
@@ -23,8 +21,7 @@ internal sealed class BackupRunner : IBackupRunner
         IMigrationService migrationService,
         ILoginService loginService,
         IFileSystem fileSystem,
-        IAnsiConsole ansiConsole,
-        IGithubTokenStore githubTokenStore)
+        IAnsiConsole ansiConsole)
     {
         _globalArgs = globalArgs;
         _backupArgs = backupArgs;
@@ -32,15 +29,14 @@ internal sealed class BackupRunner : IBackupRunner
         _loginService = loginService;
         _fileSystem = fileSystem;
         _ansiConsole = ansiConsole;
-        _githubTokenStore = githubTokenStore;
     }
 
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.LoginAsync(
+        await _loginService.WithPersistentAsync(
             _globalArgs,
             _backupArgs.LoginArgs,
-            (_, _) => Task.CompletedTask, 
+            false,
             ct
         );
 
@@ -54,7 +50,7 @@ internal sealed class BackupRunner : IBackupRunner
             _backupArgs.MigrateArgs.ExcludeOwnerProjects,
             _backupArgs.MigrateArgs.OrgMetadataOnly
         );
-        
+
         var migration = await _migrationService.StartMigrationAsync(options, ct);
 
         if (!_globalArgs.Quiet)

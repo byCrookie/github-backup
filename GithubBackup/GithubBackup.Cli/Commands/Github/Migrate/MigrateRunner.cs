@@ -29,10 +29,10 @@ internal sealed class MigrateRunner : IMigrateRunner
 
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.LoginAsync(
+        await _loginService.WithPersistentAsync(
             _globalArgs,
             _migrateArgs.LoginArgs,
-            (_, _) => Task.CompletedTask,
+            false,
             ct
         );
 

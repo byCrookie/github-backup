@@ -1,7 +1,6 @@
 using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
@@ -17,7 +16,6 @@ internal sealed class DownloadRunner : IDownloadRunner
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<DownloadRunner> _logger;
     private readonly IAnsiConsole _ansiConsole;
-    private readonly IGithubTokenStore _githubTokenStore;
 
     public DownloadRunner(
         GlobalArgs globalArgs,
@@ -26,8 +24,7 @@ internal sealed class DownloadRunner : IDownloadRunner
         ILoginService loginService,
         IFileSystem fileSystem,
         ILogger<DownloadRunner> logger,
-        IAnsiConsole ansiConsole,
-        IGithubTokenStore githubTokenStore)
+        IAnsiConsole ansiConsole)
     {
         _globalArgs = globalArgs;
         _downloadArgs = downloadArgs;
@@ -36,15 +33,14 @@ internal sealed class DownloadRunner : IDownloadRunner
         _fileSystem = fileSystem;
         _logger = logger;
         _ansiConsole = ansiConsole;
-        _githubTokenStore = githubTokenStore;
     }
 
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.LoginAsync(
+        await _loginService.WithPersistentAsync(
             _globalArgs,
             _downloadArgs.LoginArgs,
-            (_, _) => Task.CompletedTask,
+            false,
             ct
         );
 

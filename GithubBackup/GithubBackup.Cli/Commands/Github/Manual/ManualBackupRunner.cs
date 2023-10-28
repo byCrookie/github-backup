@@ -16,9 +16,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
 {
     private readonly GlobalArgs _globalArgs;
     private readonly IMigrationService _migrationService;
-    private readonly IUserService _userService;
     private readonly IRepositoryService _repositoryService;
-    private readonly IPersistentCredentialStore _persistentCredentialStore;
     private readonly IFileSystem _fileSystem;
     private readonly IAnsiConsole _ansiConsole;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -32,9 +30,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
         // ReSharper disable once UnusedParameter.Local
         ManualBackupArgs _2,
         IMigrationService migrationService,
-        IUserService userService,
         IRepositoryService repositoryService,
-        IPersistentCredentialStore persistentCredentialStore,
         IFileSystem fileSystem,
         IAnsiConsole ansiConsole,
         IDateTimeProvider dateTimeProvider,
@@ -42,9 +38,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
     {
         _globalArgs = globalArgs;
         _migrationService = migrationService;
-        _userService = userService;
         _repositoryService = repositoryService;
-        _persistentCredentialStore = persistentCredentialStore;
         _fileSystem = fileSystem;
         _ansiConsole = ansiConsole;
         _dateTimeProvider = dateTimeProvider;
@@ -205,16 +199,11 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
     {
         try
         {
-            var token = await _persistentCredentialStore.LoadTokenAsync(ct);
+            var user = await _loginService.PersistentOnlyAsync(_globalArgs, new LoginArgs(null, false), ct);
 
-            if (!string.IsNullOrWhiteSpace(token))
+            if (user is not null && _ansiConsole.Confirm($"Do you want to continue as {user.Name}?"))
             {
-                var user = await _userService.WhoAmIAsync(ct);
-
-                if (_ansiConsole.Confirm($"Do you want to continue as {user.Name}?"))
-                {
-                    return;
-                }
+                return;
             }
 
             await LoginInternAsync(ct);
@@ -231,19 +220,19 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
 
         if (useDeviceFlowAuth)
         {
-            return _loginService.LoginAsync(
+            return _loginService.WithoutPersistentAsync(
                 new GlobalArgs(_globalArgs.Verbosity, false, _globalArgs.LogFile),
                 new LoginArgs(null, true),
-                (t, _) => _persistentCredentialStore.StoreTokenAsync(t, ct),
+                true,
                 ct
             );
         }
 
         var token = _ansiConsole.Ask<string>("Please enter your Github token:");
-        return _loginService.LoginAsync(
+        return _loginService.WithoutPersistentAsync(
             new GlobalArgs(_globalArgs.Verbosity, false, _globalArgs.LogFile),
             new LoginArgs(token, false),
-            (t, _) => _persistentCredentialStore.StoreTokenAsync(t, ct),
+            true,
             ct
         );
     }

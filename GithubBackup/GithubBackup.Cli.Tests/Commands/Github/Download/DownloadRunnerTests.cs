@@ -5,7 +5,6 @@ using GithubBackup.Cli.Commands.Github.Download;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Interval;
-using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
@@ -293,8 +292,7 @@ public class DownloadRunnerTests
             _loginService,
             _fileSystem,
             _logger,
-            _ansiConsole,
-            Substitute.For<IGithubTokenStore>()
+            _ansiConsole
         );
     }
 }
