@@ -60,6 +60,6 @@ public static partial class Piping
         }
     }
 
-    [GeneratedRegex("(?<match>[\\w\\/-]+)|\"(?<match>[\\S\\s]*?)\"|'(?<match>[\\S\\s]*?)'", RegexOptions.Compiled)]
+    [GeneratedRegex("""(?<match>([\w\/-]|\.)+)|"(?<match>[\S\s]*?)"|'(?<match>[\S\s]*?)'""", RegexOptions.Compiled)]
     private static partial Regex GetArgRegex();
 }

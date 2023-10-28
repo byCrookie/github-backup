@@ -56,8 +56,8 @@ public class PipingTests
     [Fact]
     public void ReadStrings_MixedQuotes_Parse()
     {
-        const string input = "ab,b/c:c-_d;de|e\"Quote,:; d1\"f-'fg' gh  \"hi\"   ij";
-        var expected = new[] { "ab", "b/c", "c-_d", "de", "e", "Quote,:; d1", "f-", "fg", "gh", "hi", "ij" };
+        const string input = "ab,b/c.d:c-_d;de|e\"Quote,:; d1\"f-'fg' gh  \"hi\"   ij";
+        var expected = new[] { "ab", "b/c.d", "c-_d", "de", "e", "Quote,:; d1", "f-", "fg", "gh", "hi", "ij" };
         var textReader = new StringReader(input);
 
         var result = Piping.ReadStrings(textReader, true, true);
