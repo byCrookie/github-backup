@@ -43,7 +43,7 @@ public class LoginArgsTests
             loginArgs =>
             {
                 loginArgs.Should().NotBeNull();
-                loginArgs.Token.Should().Be("token");
+                loginArgs.Token.Should().BeNull();
                 loginArgs.DeviceFlowAuth.Should().BeFalse();
             },
             new LoginArgsBinder(_loginArguments)

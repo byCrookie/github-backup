@@ -1,10 +1,10 @@
 ﻿using System.Globalization;
-using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrations;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
-using GithubBackup.Core.Github.Users;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
@@ -31,10 +31,6 @@ public class MigrationsRunnerTests
     public async Task RunAsync_QuietAndNoMigrations_DoNotWriteToConsoleAndReadMigrations()
     {
         var runner = CreateRunner(true, false, null, null);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         var migrations = new List<Migration>();
         
@@ -52,10 +48,6 @@ public class MigrationsRunnerTests
     public async Task RunAsync_NotQuietNoMigrations_DoWriteToConsoleAndReadMigrations()
     {
         var runner = CreateRunner(false, false, null, null);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         var migrations = new List<Migration>();
         
@@ -73,10 +65,6 @@ public class MigrationsRunnerTests
     public async Task RunAsync_QuietAndMigrationsAndNoFilters_DoNotWriteToConsoleAndReadMigrations()
     {
         var runner = CreateRunner(true, false, null, null);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         var migrations = new List<Migration>
         {
@@ -101,10 +89,6 @@ public class MigrationsRunnerTests
     public async Task RunAsync_NotQuietAndMigrationsAndNoFilters_DoWriteToConsoleAndReadMigrations()
     {
         var runner = CreateRunner(false, false, null, null);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         var migrations = new List<Migration>
         {
@@ -138,10 +122,6 @@ public class MigrationsRunnerTests
     public async Task RunAsync_QuietAndMigrationsAndExportFilter_DoNotWriteToConsoleAndReadOnlyExportableMigrations()
     {
         var runner = CreateRunner(true, true, null, null);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         var migrations = new List<Migration>
         {
@@ -175,10 +155,6 @@ public class MigrationsRunnerTests
     public async Task RunAsync_QuietAndMigrationsAndSinceFilter_DoNotWriteToConsoleAndReadOnlySinceMigrations()
     {
         var runner = CreateRunner(true, false, null, new DateTime(2020, 1, 6));
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         var migrations = new List<Migration>
         {
@@ -212,10 +188,6 @@ public class MigrationsRunnerTests
     public async Task RunAsync_QuietAndMigrationsAndDaysOldFilter_DoNotWriteToConsoleAndReadOnlyDaysOldMigrations()
     {
         var runner = CreateRunner(true, false, 5, null);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         var migrations = new List<Migration>
         {
@@ -249,10 +221,6 @@ public class MigrationsRunnerTests
     public async Task RunAsync_QuietAndMigrationsAndNoMigrationsAfterFilter_DoNotWriteToConsole()
     {
         var runner = CreateRunner(true, false, 0, null);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         var migrations = new List<Migration>
         {
@@ -286,10 +254,6 @@ public class MigrationsRunnerTests
     public async Task RunAsync_NotQuietAndMigrationsAndNoMigrationsAfterFilter_DoWriteToConsole()
     {
         var runner = CreateRunner(false, false, 0, null);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         var migrations = new List<Migration>
         {
@@ -322,7 +286,7 @@ public class MigrationsRunnerTests
     private MigrationsRunner CreateRunner(bool quiet, bool export, long? daysOld, DateTime? since)
     {
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
-        var migrateArgs = new MigrationsArgs(export, daysOld, since);
+        var migrateArgs = new MigrationsArgs(export, daysOld, since, new LoginArgs(null, false));
 
         return new MigrationsRunner(
             globalArgs,
@@ -330,7 +294,8 @@ public class MigrationsRunnerTests
             _migrationService,
             _loginService,
             _ansiConsole,
-            _dateTimeProvider
+            _dateTimeProvider,
+            Substitute.For<IGithubTokenStore>()
         );
     }
 }

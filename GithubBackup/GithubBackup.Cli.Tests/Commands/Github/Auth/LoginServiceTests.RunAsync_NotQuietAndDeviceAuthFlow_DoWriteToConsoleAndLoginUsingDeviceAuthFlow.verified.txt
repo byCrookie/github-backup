@@ -1,0 +1,3 @@
+﻿Go to verificationUri
+and enter userCode
+You have 60 seconds to authenticate before the code expires.

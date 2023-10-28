@@ -1,5 +1,4 @@
-﻿Logged in as test
-Found 3 migrations:
+﻿Found 3 migrations:
 - 1 Pending 01.01.2020 00:00:00 (10d)
 - 2 Exporting 06.01.2020 00:00:00 (5d)
 - 3 Exported 10.01.2020 00:00:00 (1d)

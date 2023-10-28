@@ -1,5 +1,5 @@
-﻿using GithubBackup.Cli.Commands.Github.Backup;
-using GithubBackup.Cli.Commands.Github.Credentials;
+﻿using GithubBackup.Cli.Commands.Github.Auth;
+using GithubBackup.Cli.Commands.Github.Backup;
 using GithubBackup.Cli.Commands.Github.Download;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Manual;
@@ -22,6 +22,6 @@ internal static class GithubModule
         services.AddTransient<ILoginRunner, LoginRunner>();
         services.AddTransient<IDownloadRunner, DownloadRunner>();
         
-        services.AddCredentials();
+        services.AddAuth();
     }
 }

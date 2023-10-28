@@ -1,13 +1,14 @@
 ﻿using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Backup;
-using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Download;
+using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Interval;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
-using GithubBackup.Core.Github.Users;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Spectre.Console.Testing;
@@ -26,10 +27,6 @@ public class BackupRunnerTests
     public async Task RunAsync_Quiet_DoNotWriteToConsole()
     {
         var backupRunner = CreateBackupRunner(true);
-        
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
 
         const int id = 1;
         
@@ -52,10 +49,6 @@ public class BackupRunnerTests
     public async Task RunAsync_NotQuiet_DoWriteToConsole()
     {
         var backupRunner = CreateBackupRunner(false);
-        
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
 
         const int id = 1;
         
@@ -77,9 +70,9 @@ public class BackupRunnerTests
     private BackupRunner CreateBackupRunner(bool quiet)
     {
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
-        var migrateArgs = new MigrateArgs(new []{"test"}, false, false, false, false, false, false, false, new IntervalArgs(null));
-        var downloadArgs = new DownloadArgs(Array.Empty<long>(), false, new DirectoryInfo("test"), null, true, new IntervalArgs(null));
-        var backupArgs = new BackupArgs(migrateArgs, downloadArgs, new IntervalArgs(null));
+        var migrateArgs = new MigrateArgs(new []{"test"}, false, false, false, false, false, false, false, new IntervalArgs(null), new LoginArgs(null, false));
+        var downloadArgs = new DownloadArgs(Array.Empty<long>(), false, new DirectoryInfo("test"), null, true, new IntervalArgs(null), new LoginArgs(null, false));
+        var backupArgs = new BackupArgs(migrateArgs, downloadArgs, new IntervalArgs(null), new LoginArgs(null, false));
 
         return new BackupRunner(
             globalArgs,
@@ -87,7 +80,8 @@ public class BackupRunnerTests
             _migrationService,
             _loginService,
             _fileSystem,
-            _ansiConsole
+            _ansiConsole,
+            Substitute.For<IGithubTokenStore>()
         );
     }
 }

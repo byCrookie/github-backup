@@ -2,6 +2,6 @@
 
 public interface IGithubTokenStore
 {
-    void Set(string? token);
-    string Get();
+    Task SetAsync(string? token);
+    Task<string> GetAsync();
 }

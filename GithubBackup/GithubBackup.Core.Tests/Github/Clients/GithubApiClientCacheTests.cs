@@ -25,7 +25,7 @@ public class GithubApiClientCacheTests
         _logger = Substitute.For<ILogger<GithubApiClient>>();
         var tokenStore = Substitute.For<IGithubTokenStore>();
 
-        tokenStore.Get().Returns(Token);
+        tokenStore.GetAsync().Returns(Token);
 
         _sut = new GithubApiClient(
             new MemoryCache(new MemoryCacheOptions()),

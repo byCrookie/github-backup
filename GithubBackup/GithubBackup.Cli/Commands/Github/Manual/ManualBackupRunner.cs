@@ -1,5 +1,5 @@
 using System.IO.Abstractions;
-using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
@@ -18,7 +18,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
     private readonly IMigrationService _migrationService;
     private readonly IUserService _userService;
     private readonly IRepositoryService _repositoryService;
-    private readonly ICredentialStore _credentialStore;
+    private readonly IPersistentCredentialStore _persistentCredentialStore;
     private readonly IFileSystem _fileSystem;
     private readonly IAnsiConsole _ansiConsole;
     private readonly IDateTimeProvider _dateTimeProvider;
@@ -34,7 +34,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
         IMigrationService migrationService,
         IUserService userService,
         IRepositoryService repositoryService,
-        ICredentialStore credentialStore,
+        IPersistentCredentialStore persistentCredentialStore,
         IFileSystem fileSystem,
         IAnsiConsole ansiConsole,
         IDateTimeProvider dateTimeProvider)
@@ -43,7 +43,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
         _migrationService = migrationService;
         _userService = userService;
         _repositoryService = repositoryService;
-        _credentialStore = credentialStore;
+        _persistentCredentialStore = persistentCredentialStore;
         _fileSystem = fileSystem;
         _ansiConsole = ansiConsole;
         _dateTimeProvider = dateTimeProvider;
@@ -204,7 +204,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
     {
         try
         {
-            var token = await _credentialStore.LoadTokenAsync(ct);
+            var token = await _persistentCredentialStore.LoadTokenAsync(ct);
 
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -232,7 +232,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
     private async Task LoginAndStoreAsync(CancellationToken ct)
     {
         var token = await GetOAuthTokenAsync(ct);
-        await _credentialStore.StoreTokenAsync(token, ct);
+        await _persistentCredentialStore.StoreTokenAsync(token, ct);
     }
 
     private async Task<string> GetOAuthTokenAsync(CancellationToken ct)

@@ -11,6 +11,8 @@ internal sealed class LoginArgsBinder : BinderBase<LoginArgs>
         _loginArguments = loginArguments;
     }
     
+    public LoginArgs Get(BindingContext bindingContext) => GetBoundValue(bindingContext);
+    
     protected override LoginArgs GetBoundValue(BindingContext bindingContext)
     {
         var token = bindingContext.ParseResult.GetValueForOption(_loginArguments.TokenOption);

@@ -1,4 +1,3 @@
-﻿Logged in as test
-Downloading latest migration
+﻿Downloading latest migration
 Downloading migration 1 to test...
 Downloaded migration 1 to test

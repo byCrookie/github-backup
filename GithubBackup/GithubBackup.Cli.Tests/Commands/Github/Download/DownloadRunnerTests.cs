@@ -1,11 +1,12 @@
 ﻿using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Download;
+using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Interval;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
-using GithubBackup.Core.Github.Users;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -21,15 +22,11 @@ public class DownloadRunnerTests
     private readonly IFileSystem _fileSystem = new MockFileSystem();
     private readonly TestConsole _ansiConsole = new();
     private readonly ILogger<DownloadRunner> _logger = Substitute.For<ILogger<DownloadRunner>>();
-    
+
     [Fact]
     public async Task RunAsync_QuietAndLatest_DoNotWriteToConsoleAndDownloadLatest()
     {
         var runner = CreateRunner(true, true);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
 
         const int id = 1;
 
@@ -62,10 +59,6 @@ public class DownloadRunnerTests
     {
         var runner = CreateRunner(false, true);
 
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
-
         const int id = 1;
 
         _migrationService
@@ -96,10 +89,6 @@ public class DownloadRunnerTests
     public async Task RunAsync_QuietAndNoMigrations_DoNotWriteToConsoleAndDownloadLatest()
     {
         var runner = CreateRunner(true, false);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
 
         const int id = 1;
 
@@ -132,10 +121,6 @@ public class DownloadRunnerTests
     {
         var runner = CreateRunner(false, false);
 
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
-
         const int id = 1;
 
         _migrationService
@@ -167,10 +152,6 @@ public class DownloadRunnerTests
     {
         var runner = CreateRunner(true, true);
 
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
-
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
             .Returns(new List<Migration>
@@ -199,10 +180,6 @@ public class DownloadRunnerTests
     {
         var runner = CreateRunner(false, true);
 
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
-
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
             .Returns(new List<Migration>
@@ -218,7 +195,7 @@ public class DownloadRunnerTests
             new LogEntry(LogLevel.Information, "Downloading latest migration"),
             new LogEntry(LogLevel.Information, "No exported migrations found")
         );
-        
+
         await _migrationService
             .DidNotReceiveWithAnyArgs()
             .DownloadMigrationAsync(Arg.Any<DownloadMigrationOptions>(), Arg.Any<CancellationToken>());
@@ -226,14 +203,10 @@ public class DownloadRunnerTests
         await Verify(_ansiConsole.Output);
     }
 
-        [Fact]
+    [Fact]
     public async Task RunAsync_QuietAndExportMigrations_DoNotWriteToConsoleAndDoDownload()
     {
         var runner = CreateRunner(true, true, new[] { 1L, 2L });
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
@@ -243,11 +216,11 @@ public class DownloadRunnerTests
                 new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
                 new(2, MigrationState.Exported, new DateTime(2020, 1, 1))
             });
-        
+
         _migrationService
             .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 1), CancellationToken.None)
             .Returns("test1");
-        
+
         _migrationService
             .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 2), CancellationToken.None)
             .Returns("test2");
@@ -270,10 +243,6 @@ public class DownloadRunnerTests
     {
         var runner = CreateRunner(false, true, new[] { 1L, 2L });
 
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
-
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
             .Returns(new List<Migration>
@@ -282,11 +251,11 @@ public class DownloadRunnerTests
                 new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
                 new(2, MigrationState.Exported, new DateTime(2020, 1, 1))
             });
-        
+
         _migrationService
             .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 1), CancellationToken.None)
             .Returns("test1");
-        
+
         _migrationService
             .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 2), CancellationToken.None)
             .Returns("test2");
@@ -307,7 +276,15 @@ public class DownloadRunnerTests
     private DownloadRunner CreateRunner(bool quiet, bool latest, long[]? ids = null)
     {
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
-        var downloadArgs = new DownloadArgs(ids ?? Array.Empty<long>(), latest, new DirectoryInfo("test"), null, true, new IntervalArgs(null));
+        var downloadArgs = new DownloadArgs(
+            ids ?? Array.Empty<long>(),
+            latest,
+            new DirectoryInfo("test"),
+            null,
+            true,
+            new IntervalArgs(null),
+            new LoginArgs(null, false)
+        );
 
         return new DownloadRunner(
             globalArgs,
@@ -316,7 +293,8 @@ public class DownloadRunnerTests
             _loginService,
             _fileSystem,
             _logger,
-            _ansiConsole
+            _ansiConsole,
+            Substitute.For<IGithubTokenStore>()
         );
     }
 }

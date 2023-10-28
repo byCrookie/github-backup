@@ -1,4 +1,5 @@
 ﻿using System.CommandLine.Binding;
+using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Interval;
 using GithubBackup.Cli.Utils;
 
@@ -8,11 +9,17 @@ internal sealed class MigrateArgsBinder : BinderBase<MigrateArgs>
 {
     private readonly MigrateArguments _migrateArguments;
     private readonly IntervalArguments _intervalArguments;
+    private readonly LoginArguments _loginArguments;
 
-    public MigrateArgsBinder(MigrateArguments migrateArguments, IntervalArguments intervalArguments)
+    public MigrateArgsBinder(
+        MigrateArguments migrateArguments,
+        IntervalArguments intervalArguments,
+        LoginArguments loginArguments
+        )
     {
         _migrateArguments = migrateArguments;
         _intervalArguments = intervalArguments;
+        _loginArguments = loginArguments;
     }
     
     public MigrateArgs Get(BindingContext bindingContext) => GetBoundValue(bindingContext);
@@ -29,6 +36,7 @@ internal sealed class MigrateArgsBinder : BinderBase<MigrateArgs>
         var excludeMetadataOnly = bindingContext.ParseResult.GetRequiredValueForOption(_migrateArguments.OrgMetadataOnlyOption);
 
         var intervalArgs = new IntervalArgsBinder(_intervalArguments).Get(bindingContext);
+        var loginArgs = new LoginArgsBinder(_loginArguments).Get(bindingContext);
 
         return new MigrateArgs(
             repositories,
@@ -39,7 +47,8 @@ internal sealed class MigrateArgsBinder : BinderBase<MigrateArgs>
             excludeReleases,
             excludeOwnerProjects,
             excludeMetadataOnly,
-            intervalArgs
+            intervalArgs,
+            loginArgs
         );
     }
 }

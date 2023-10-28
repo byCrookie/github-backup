@@ -1,9 +1,9 @@
-﻿using GithubBackup.Cli.Commands.Github.Credentials;
+﻿using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Repositories;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Repositories;
-using GithubBackup.Core.Github.Users;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -23,10 +23,6 @@ public class RepositoriesRunnerTests
     public async Task RunAsync_QuietAndNoRepositories_DoNotWriteToConsoleAndReadRepositories()
     {
         var runner = CreateRunner(true);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         _repositoryService.GetRepositoriesAsync(Arg.Any<RepositoryOptions>(), CancellationToken.None)
             .Returns(new List<Repository>());
@@ -42,10 +38,6 @@ public class RepositoriesRunnerTests
     public async Task RunAsync_NotQuietAndNoRepositories_DoWriteToConsoleAndReadRepositories()
     {
         var runner = CreateRunner(false);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         _repositoryService.GetRepositoriesAsync(Arg.Any<RepositoryOptions>(), CancellationToken.None)
             .Returns(new List<Repository>());
@@ -61,10 +53,6 @@ public class RepositoriesRunnerTests
     public async Task RunAsync_QuietAndRepositories_DoNotWriteToConsoleAndReadRepositories()
     {
         var runner = CreateRunner(true);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
 
         var repositories = new List<Repository>
         {
@@ -86,10 +74,6 @@ public class RepositoriesRunnerTests
     public async Task RunAsync_NotQuietAndRepositories_DoWriteToConsoleAndReadRepositories()
     {
         var runner = CreateRunner(false);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         var repositories = new List<Repository>
         {
@@ -113,7 +97,8 @@ public class RepositoriesRunnerTests
         var migrateArgs = new RepositoriesArgs(
             RepositoryType.Public,
             RepositoryAffiliation.Owner,
-            RepositoryVisibility.All
+            RepositoryVisibility.All,
+            new LoginArgs(null, false)
         );
 
         return new RepositoriesRunner(
@@ -121,7 +106,8 @@ public class RepositoriesRunnerTests
             migrateArgs,
             _repositoryService,
             _loginService,
-            _ansiConsole
+            _ansiConsole,
+            Substitute.For<IGithubTokenStore>()
         );
     }
 }

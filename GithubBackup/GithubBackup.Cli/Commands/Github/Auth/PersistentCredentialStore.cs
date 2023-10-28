@@ -1,45 +1,48 @@
 ﻿using System.IO.Abstractions;
 using System.Security.Cryptography;
 using GithubBackup.Core.Environment;
-using GithubBackup.Core.Github.Credentials;
+using Microsoft.Extensions.Logging;
 using static System.Text.Encoding;
 using Convert = System.Convert;
 using Environment = System.Environment;
 
-namespace GithubBackup.Cli.Commands.Github.Credentials;
+namespace GithubBackup.Cli.Commands.Github.Auth;
 
-internal sealed class CredentialStore : ICredentialStore
+internal sealed class PersistentCredentialStore : IPersistentCredentialStore
 {
     private readonly IFileSystem _fileSystem;
-    private readonly IGithubTokenStore _githubTokenStore;
     private readonly IEnvironment _environment;
+    private readonly ILogger<PersistentCredentialStore> _logger;
 
     private const string Key = "LBaZO3iFnF";
     private const string Salt = "fqCKmp5nwk";
     private const string TokenFileName = "token";
     private const string AppDirectory = "github-backup";
 
-    public CredentialStore(
+    public PersistentCredentialStore(
         IFileSystem fileSystem,
-        IGithubTokenStore githubTokenStore,
-        IEnvironment environment)
+        IEnvironment environment,
+        ILogger<PersistentCredentialStore> logger)
     {
         _fileSystem = fileSystem;
-        _githubTokenStore = githubTokenStore;
         _environment = environment;
+        _logger = logger;
     }
 
     public Task StoreTokenAsync(string accessToken, CancellationToken ct)
     {
         if (!TryRetrieveTokenStoreFilePath(out var file))
         {
-            _githubTokenStore.Set(null);
-            return Task.CompletedTask;
+            throw new Exception(
+                """
+                Peristence of token failed. Unable to retrieve token store file path.
+                Do not use login command, just provide login arguments to the specific command.
+                """
+            );
         }
 
-        _githubTokenStore.Set(accessToken);
-
         var encryptedToken = EncryptString(accessToken, Key, Salt);
+        _logger.LogDebug("Storing encrypted token in {File}", file);
         return _fileSystem.File.WriteAllTextAsync(file!, encryptedToken, ct);
     }
 
@@ -47,26 +50,24 @@ internal sealed class CredentialStore : ICredentialStore
     {
         if (!TryRetrieveTokenStoreFilePath(out var file))
         {
-            _githubTokenStore.Set(null);
             return null;
         }
 
         if (_fileSystem.File.Exists(file))
         {
+            _logger.LogDebug("Loading encrypted token from {File}", file);
             var encryptedToken = await _fileSystem.File.ReadAllTextAsync(file, ct);
 
             if (string.IsNullOrWhiteSpace(encryptedToken))
             {
-                _githubTokenStore.Set(null);
+                _logger.LogWarning("Token file {File} is empty", file);
                 return null;
             }
-            
-            var decryptedToken = DecryptString(encryptedToken, Key, Salt);
-            _githubTokenStore.Set(decryptedToken);
-            return decryptedToken;
-        }
 
-        _githubTokenStore.Set(null);
+            return DecryptString(encryptedToken, Key, Salt);
+        }
+        
+        _logger.LogDebug("Token file {File} does not exist", file);
         return null;
     }
 
@@ -107,31 +108,37 @@ internal sealed class CredentialStore : ICredentialStore
     private bool TryRetrieveTokenStoreFilePath(out string? path)
     {
         var appDataPath = _environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).FullName;
+        _logger.LogDebug("AppData path is {AppDataPath}", appDataPath);
 
         if (_fileSystem.Directory.Exists(appDataPath))
         {
             var backupPath = _fileSystem.Path.Combine(appDataPath, AppDirectory);
             var tokenPath = _fileSystem.Path.Combine(backupPath, TokenFileName);
+            _logger.LogDebug("Token path is {TokenPath}", tokenPath);
 
             if (_fileSystem.Directory.Exists(backupPath))
             {
+                _logger.LogDebug("Path {Path} exists", backupPath);
                 path = tokenPath;
                 return true;
             }
 
             try
             {
+                _logger.LogDebug("Creating path {Path}", backupPath);
                 _fileSystem.Directory.CreateDirectory(backupPath);
                 path = tokenPath;
                 return true;
             }
             catch (Exception)
             {
+                _logger.LogWarning("Unable to create path {Path}", backupPath);
                 path = null;
                 return false;
             }
         }
-
+        
+        _logger.LogWarning("AppData path {Path} does not exist", appDataPath);
         path = null;
         return false;
     }

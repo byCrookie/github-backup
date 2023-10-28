@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Parsing;
 using FluentAssertions;
+using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Interval;
 using GithubBackup.Cli.Tests.Utils;
@@ -13,6 +14,7 @@ public class MigrateArgsTests
 {
     private readonly MigrateArguments _migrateArguments = new(false);
     private readonly IntervalArguments _intervalArguments = new();
+    private readonly LoginArguments _loginArguments = new();
 
     [Fact]
     public async Task InvokeAsync_FlagsArePassed_FlagsGetParsed()
@@ -20,8 +22,9 @@ public class MigrateArgsTests
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrateArguments.Options());
         rootCommand.AddGlobalOptions(_intervalArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             migrateArgs =>
             {
@@ -35,24 +38,28 @@ public class MigrateArgsTests
                 migrateArgs.ExcludeOwnerProjects.Should().BeTrue();
                 migrateArgs.OrgMetadataOnly.Should().BeFalse();
                 migrateArgs.IntervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(100));
+                migrateArgs.LoginArgs.Token.Should().Be("test");
+                migrateArgs.LoginArgs.DeviceFlowAuth.Should().BeTrue();
             },
-            new MigrateArgsBinder(_migrateArguments, _intervalArguments)
+            new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         await TestCommandline.Build(rootCommand)
             .InvokeAsync("sub --repositories repo1 repo2 --lock-repositories --exclude-metadata" +
-                         " --exclude-git-data --exclude-attachements --exclude-releases --exclude-owner-projects --interval 100");
+                         " --exclude-git-data --exclude-attachements --exclude-releases --exclude-owner-projects --interval 100" +
+                         " --token test --device-flow-auth");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_ShortFlagsArePassed_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrateArguments.Options());
         rootCommand.AddGlobalOptions(_intervalArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             migrateArgs =>
             {
@@ -66,14 +73,16 @@ public class MigrateArgsTests
                 migrateArgs.ExcludeOwnerProjects.Should().BeTrue();
                 migrateArgs.OrgMetadataOnly.Should().BeFalse();
                 migrateArgs.IntervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(100));
+                migrateArgs.LoginArgs.Token.Should().BeNull();
+                migrateArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
             },
-            new MigrateArgsBinder(_migrateArguments, _intervalArguments)
+            new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         await TestCommandline.Build(rootCommand).InvokeAsync("sub -r repo1 repo2 -lr -em -egd -ea -er -eop -i 100");
     }
-    
+
     [Theory]
     [InlineData("-r repo1 -r repo2")]
     [InlineData("-r repo1 repo2")]
@@ -84,8 +93,9 @@ public class MigrateArgsTests
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrateArguments.Options());
         rootCommand.AddGlobalOptions(_intervalArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             migrateArgs =>
             {
@@ -99,22 +109,25 @@ public class MigrateArgsTests
                 migrateArgs.ExcludeOwnerProjects.Should().BeFalse();
                 migrateArgs.OrgMetadataOnly.Should().BeFalse();
                 migrateArgs.IntervalArgs.Interval.Should().BeNull();
+                migrateArgs.LoginArgs.Token.Should().BeNull();
+                migrateArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
             },
-            new MigrateArgsBinder(_migrateArguments, _intervalArguments)
+            new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         await TestCommandline.Build(rootCommand).InvokeAsync("sub " + migrationArgs);
     }
-    
+
     [Fact]
     public async Task InvokeAsync_OnlyRequiredArePassed_FlagsGetParsedWithDefaults()
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrateArguments.Options());
         rootCommand.AddGlobalOptions(_intervalArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             migrateArgs =>
             {
@@ -128,49 +141,53 @@ public class MigrateArgsTests
                 migrateArgs.ExcludeOwnerProjects.Should().BeFalse();
                 migrateArgs.OrgMetadataOnly.Should().BeFalse();
                 migrateArgs.IntervalArgs.Interval.Should().BeNull();
+                migrateArgs.LoginArgs.Token.Should().BeNull();
+                migrateArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
             },
-            new MigrateArgsBinder(_migrateArguments, _intervalArguments)
+            new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         await TestCommandline.Build(rootCommand).InvokeAsync("sub -r repo1 repo2");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_OrgMetadataOnlyAndRepositories_ValidationFails()
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrateArguments.Options());
         rootCommand.AddGlobalOptions(_intervalArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             _ => { },
-            new MigrateArgsBinder(_migrateArguments, _intervalArguments)
+            new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         var action = () => TestCommandline.Build(rootCommand).InvokeAsync("sub --org-metadata-only --repositories repo1 repo2");
-        
+
         await action.Should().ThrowAsync<Exception>();
     }
-    
+
     [Fact]
     public async Task InvokeAsync_NoRepositories_ValidationFails()
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrateArguments.Options());
         rootCommand.AddGlobalOptions(_intervalArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             _ => { },
-            new MigrateArgsBinder(_migrateArguments, _intervalArguments)
+            new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         var action = () => TestCommandline.Build(rootCommand).InvokeAsync("sub");
-        
+
         await action.Should().ThrowAsync<Exception>();
     }
 }

@@ -1,2 +1,1 @@
-﻿Logged in as test
-No migrations found after filters were applied.
+﻿No migrations found after filters were applied.

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Interval;
 using GithubBackup.Cli.Commands.Services;
 
@@ -15,6 +16,7 @@ internal sealed class MigrateArgs : ICommandIntervalArgs
     public bool ExcludeOwnerProjects { get; }
     public bool OrgMetadataOnly { get; }
     public IntervalArgs IntervalArgs { get; }
+    public LoginArgs LoginArgs { get; }
 
     public MigrateArgs(
         string[] repositories,
@@ -25,7 +27,8 @@ internal sealed class MigrateArgs : ICommandIntervalArgs
         bool excludeReleases,
         bool excludeOwnerProjects,
         bool orgMetadataOnly,
-        IntervalArgs intervalArgs
+        IntervalArgs intervalArgs,
+        LoginArgs loginArgs
     )
     {
         Repositories = repositories;
@@ -37,6 +40,7 @@ internal sealed class MigrateArgs : ICommandIntervalArgs
         ExcludeOwnerProjects = excludeOwnerProjects;
         OrgMetadataOnly = orgMetadataOnly;
         IntervalArgs = intervalArgs;
+        LoginArgs = loginArgs;
 
         new MigrateArgsValidator().ValidateAndThrow(this);
     }

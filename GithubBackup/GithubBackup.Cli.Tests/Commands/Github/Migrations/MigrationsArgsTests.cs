@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Parsing;
 using FluentAssertions;
+using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrations;
 using GithubBackup.Cli.Tests.Utils;
 using GithubBackup.Cli.Utils;
@@ -11,12 +12,14 @@ namespace GithubBackup.Cli.Tests.Commands.Github.Migrations;
 public class MigrationsArgsTests
 {
     private readonly MigrationsArguments _migrationsArguments = new();
+    private readonly LoginArguments _loginArguments = new();
 
     [Fact]
     public async Task InvokeAsync_FlagsArePassedWithDaysOld_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -26,13 +29,15 @@ public class MigrationsArgsTests
                 migrationsArgs.Export.Should().BeTrue();
                 migrationsArgs.DaysOld.Should().Be(7);
                 migrationsArgs.Since.Should().BeNull();
+                migrationsArgs.LoginArgs.Token.Should().Be("test");
+                migrationsArgs.LoginArgs.DeviceFlowAuth.Should().BeTrue();
             },
-            new MigrationsArgsBinder(_migrationsArguments)
+            new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
         
         rootCommand.AddCommand(subCommand);
         await TestCommandline.Build(rootCommand)
-            .InvokeAsync("sub --export --days-old 7");
+            .InvokeAsync("sub --export --days-old 7 --token test --device-flow-auth");
     }
     
     [Fact]
@@ -40,6 +45,7 @@ public class MigrationsArgsTests
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -49,8 +55,10 @@ public class MigrationsArgsTests
                 migrationsArgs.Export.Should().BeTrue();
                 migrationsArgs.DaysOld.Should().BeNull();
                 migrationsArgs.Since.Should().Be(new DateTime(2021, 1, 1));
+                migrationsArgs.LoginArgs.Token.Should().BeNull();
+                migrationsArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
             },
-            new MigrationsArgsBinder(_migrationsArguments)
+            new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -63,6 +71,7 @@ public class MigrationsArgsTests
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -72,8 +81,10 @@ public class MigrationsArgsTests
                 migrationsArgs.Export.Should().BeTrue();
                 migrationsArgs.DaysOld.Should().Be(7);
                 migrationsArgs.Since.Should().BeNull();
+                migrationsArgs.LoginArgs.Token.Should().BeNull();
+                migrationsArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
             },
-            new MigrationsArgsBinder(_migrationsArguments)
+            new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -86,6 +97,7 @@ public class MigrationsArgsTests
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -95,8 +107,10 @@ public class MigrationsArgsTests
                 migrationsArgs.Export.Should().BeTrue();
                 migrationsArgs.DaysOld.Should().BeNull();
                 migrationsArgs.Since.Should().Be(new DateTime(2021, 1, 1));
+                migrationsArgs.LoginArgs.Token.Should().BeNull();
+                migrationsArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
             },
-            new MigrationsArgsBinder(_migrationsArguments)
+            new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -109,6 +123,7 @@ public class MigrationsArgsTests
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
@@ -118,8 +133,10 @@ public class MigrationsArgsTests
                 migrationsArgs.Export.Should().BeTrue();
                 migrationsArgs.DaysOld.Should().BeNull();
                 migrationsArgs.Since.Should().BeNull();
+                migrationsArgs.LoginArgs.Token.Should().BeNull();
+                migrationsArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
             },
-            new MigrationsArgsBinder(_migrationsArguments)
+            new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
         
         rootCommand.AddCommand(subCommand);
@@ -131,11 +148,12 @@ public class MigrationsArgsTests
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
+        rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
         
         subCommand.SetHandler(
             _ => { },
-            new MigrationsArgsBinder(_migrationsArguments)
+            new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
         
         rootCommand.AddCommand(subCommand);

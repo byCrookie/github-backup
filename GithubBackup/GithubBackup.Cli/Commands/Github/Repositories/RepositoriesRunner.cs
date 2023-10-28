@@ -1,5 +1,6 @@
-using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Repositories;
 using Spectre.Console;
 
@@ -12,29 +13,32 @@ internal sealed class RepositoriesRunner : IRepositoriesRunner
     private readonly IRepositoryService _repositoryService;
     private readonly ILoginService _loginService;
     private readonly IAnsiConsole _ansiConsole;
+    private readonly IGithubTokenStore _githubTokenStore;
 
     public RepositoriesRunner(
         GlobalArgs globalArgs,
         RepositoriesArgs repositoriesArgs,
         IRepositoryService repositoryService,
         ILoginService loginService,
-        IAnsiConsole ansiConsole)
+        IAnsiConsole ansiConsole,
+        IGithubTokenStore githubTokenStore)
     {
         _globalArgs = globalArgs;
         _repositoriesArgs = repositoriesArgs;
         _repositoryService = repositoryService;
         _loginService = loginService;
         _ansiConsole = ansiConsole;
+        _githubTokenStore = githubTokenStore;
     }
 
     public async Task RunAsync(CancellationToken ct)
     {
-        var user = await _loginService.ValidateLoginAsync(ct);
-
-        if (!_globalArgs.Quiet)
-        {
-            _ansiConsole.WriteLine($"Logged in as {user.Name}");
-        }
+        await _loginService.LoginAsync(
+            _globalArgs,
+            _repositoriesArgs.LoginArgs,
+            (token, _) => _githubTokenStore.SetAsync(token),
+            ct
+        );
 
         var options = new RepositoryOptions(
             _repositoriesArgs.Type,
@@ -62,7 +66,7 @@ internal sealed class RepositoriesRunner : IRepositoriesRunner
                 _ansiConsole.WriteLine($"- {repository.FullName}");
             }
         }
-        
+
         _ansiConsole.WriteLine(string.Join(" ", repositories.Select(r => r.FullName)));
     }
 }

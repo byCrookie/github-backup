@@ -1,6 +1,7 @@
-using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Utils;
 using Spectre.Console;
@@ -15,6 +16,7 @@ internal sealed class MigrationsRunner : IMigrationsRunner
     private readonly ILoginService _loginService;
     private readonly IAnsiConsole _ansiConsole;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IGithubTokenStore _githubTokenStore;
 
     public MigrationsRunner(
         GlobalArgs globalArgs,
@@ -22,7 +24,8 @@ internal sealed class MigrationsRunner : IMigrationsRunner
         IMigrationService migrationService,
         ILoginService loginService,
         IAnsiConsole ansiConsole,
-        IDateTimeProvider dateTimeProvider)
+        IDateTimeProvider dateTimeProvider,
+        IGithubTokenStore githubTokenStore)
     {
         _globalArgs = globalArgs;
         _migrationsArgs = migrationsArgs;
@@ -30,16 +33,17 @@ internal sealed class MigrationsRunner : IMigrationsRunner
         _loginService = loginService;
         _ansiConsole = ansiConsole;
         _dateTimeProvider = dateTimeProvider;
+        _githubTokenStore = githubTokenStore;
     }
 
     public async Task RunAsync(CancellationToken ct)
     {
-        var user = await _loginService.ValidateLoginAsync(ct);
-
-        if (!_globalArgs.Quiet)
-        {
-            _ansiConsole.WriteLine($"Logged in as {user.Name}");
-        }
+        await _loginService.LoginAsync(
+            _globalArgs,
+            _migrationsArgs.LoginArgs,
+            (token, _) => _githubTokenStore.SetAsync(token),
+            ct
+        );
 
         var migrations = await _migrationService.GetMigrationsAsync(ct);
 
@@ -52,14 +56,14 @@ internal sealed class MigrationsRunner : IMigrationsRunner
 
             return;
         }
-        
+
         var filteredMigrations = await migrations
             .SelectAsync(m => _migrationsArgs.Export ? _migrationService.GetMigrationAsync(m.Id, ct) : Task.FromResult(m))
             .Where(m => !_migrationsArgs.Export || (m.State == MigrationState.Exported && (_dateTimeProvider.Now - m.CreatedAt).Days <= 7))
             .Where(m => _migrationsArgs.DaysOld is null || (_dateTimeProvider.Now - m.CreatedAt).Days <= _migrationsArgs.DaysOld)
             .Where(m => _migrationsArgs.Since is null || m.CreatedAt >= _migrationsArgs.Since)
             .ToListAsync(cancellationToken: ct);
-        
+
         if (!filteredMigrations.Any())
         {
             if (!_globalArgs.Quiet)

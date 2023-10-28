@@ -65,7 +65,7 @@ public class CommandIntervalRunnerServiceTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Running command. Interval: 00:00:02"),
-            new LogEntry(LogLevel.Information, "Starting command: ObjectProxy_2"),
+            new LogEntry(LogLevel.Information, "Starting command: (.*)"),
             new LogEntry(LogLevel.Information, "Command finished. Duration: (.*)"),
             new LogEntry(LogLevel.Information, "Waiting until 01/01/0001 00:00:02 for next run")
         );

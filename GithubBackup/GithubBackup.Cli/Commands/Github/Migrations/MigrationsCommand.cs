@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
 
@@ -13,12 +14,14 @@ internal static class MigrationsCommand
     {
         var command = new Command(CommandName, CommandDescription);
         var migrationsArguments = new MigrationsArguments();
+        var loginArguments = new LoginArguments();
         command.AddOptions(migrationsArguments.Options());
+        command.AddOptions(loginArguments.Options());
         
         command.SetHandler(
             (globalArgs, migrationsArgs) => GithubBackup.Cli.Cli.RunAsync<MigrationsRunner, MigrationsArgs>(args, globalArgs, migrationsArgs),
             new GlobalArgsBinder(globalArguments),
-            new MigrationsArgsBinder(migrationsArguments)
+            new MigrationsArgsBinder(migrationsArguments, loginArguments)
         );
 
         return command;

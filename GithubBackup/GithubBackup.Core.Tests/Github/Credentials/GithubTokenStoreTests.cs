@@ -17,18 +17,18 @@ public class GithubTokenStoreTests
     }
 
     [Fact]
-    public void Get_TokenNotSet_ThrowException()
+    public async Task GetAsync_TokenNotSet_ThrowException()
     {
-        var result = _sut.Get;
-        result.Should().Throw<InvalidOperationException>();
+        var result = _sut.GetAsync;
+       await result.Should().ThrowAsync<InvalidOperationException>();
     }
     
     [Fact]
-    public void Get_TokenSet_ReturnToken()
+    public async Task GetAsync_TokenSet_ReturnToken()
     {
         const string token = "Token";
-        _sut.Set(token);
-        var result = _sut.Get();
+        await _sut.SetAsync(token);
+        var result = await _sut.GetAsync();
         result.Should().Be(token);
     }
 }

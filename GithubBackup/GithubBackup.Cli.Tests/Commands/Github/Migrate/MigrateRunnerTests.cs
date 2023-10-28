@@ -1,10 +1,10 @@
-﻿using GithubBackup.Cli.Commands.Github.Credentials;
+﻿using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Interval;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
-using GithubBackup.Core.Github.Users;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -24,10 +24,6 @@ public class MigrateRunnerTests
     public async Task RunAsync_Quiet_DoNotWriteToConsoleAndMigrate()
     {
         var runner = CreateRunner(true);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         _migrationService.StartMigrationAsync(Arg.Any<StartMigrationOptions>(), CancellationToken.None)
             .Returns(new Migration(1, MigrationState.Pending, DateTime.UtcNow));
@@ -43,10 +39,6 @@ public class MigrateRunnerTests
     public async Task RunAsync_NotQuiet_DoWriteToConsoleAndMigrate()
     {
         var runner = CreateRunner(false);
-
-        var user = new User("test", "test");
-
-        _loginService.ValidateLoginAsync(CancellationToken.None).Returns(user);
         
         _migrationService.StartMigrationAsync(Arg.Any<StartMigrationOptions>(), CancellationToken.None)
             .Returns(new Migration(1, MigrationState.Pending, DateTime.UtcNow));
@@ -70,7 +62,8 @@ public class MigrateRunnerTests
             false,
             false,
             false,
-            new IntervalArgs(null)
+            new IntervalArgs(null),
+            new LoginArgs(null, false)
         );
 
         return new MigrateRunner(
@@ -78,7 +71,8 @@ public class MigrateRunnerTests
             migrateArgs,
             _migrationService,
             _loginService,
-            _ansiConsole
+            _ansiConsole,
+            Substitute.For<IGithubTokenStore>()
         );
     }
 }

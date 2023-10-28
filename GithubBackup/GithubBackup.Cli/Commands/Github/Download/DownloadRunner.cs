@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
-using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
@@ -16,6 +17,7 @@ internal sealed class DownloadRunner : IDownloadRunner
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<DownloadRunner> _logger;
     private readonly IAnsiConsole _ansiConsole;
+    private readonly IGithubTokenStore _githubTokenStore;
 
     public DownloadRunner(
         GlobalArgs globalArgs,
@@ -24,7 +26,8 @@ internal sealed class DownloadRunner : IDownloadRunner
         ILoginService loginService,
         IFileSystem fileSystem,
         ILogger<DownloadRunner> logger,
-        IAnsiConsole ansiConsole)
+        IAnsiConsole ansiConsole,
+        IGithubTokenStore githubTokenStore)
     {
         _globalArgs = globalArgs;
         _downloadArgs = downloadArgs;
@@ -33,16 +36,17 @@ internal sealed class DownloadRunner : IDownloadRunner
         _fileSystem = fileSystem;
         _logger = logger;
         _ansiConsole = ansiConsole;
+        _githubTokenStore = githubTokenStore;
     }
 
     public async Task RunAsync(CancellationToken ct)
     {
-        var user = await _loginService.ValidateLoginAsync(ct);
-
-        if (!_globalArgs.Quiet)
-        {
-            _ansiConsole.WriteLine($"Logged in as {user.Name}");
-        }
+        await _loginService.LoginAsync(
+            _globalArgs,
+            _downloadArgs.LoginArgs,
+            (token, _) => _githubTokenStore.SetAsync(token),
+            ct
+        );
 
         if (_downloadArgs.Migrations.Any())
         {
@@ -50,7 +54,7 @@ internal sealed class DownloadRunner : IDownloadRunner
             {
                 _ansiConsole.WriteLine("Downloading migrations...");
             }
-        
+
             _logger.LogInformation("Downloading migrations using ids");
             await DownloadUsingIdsAsync(ct);
             return;
@@ -62,7 +66,7 @@ internal sealed class DownloadRunner : IDownloadRunner
             {
                 _ansiConsole.WriteLine("Downloading latest migration");
             }
-            
+
             _logger.LogInformation("Downloading latest migration");
             await DownloadLatestAsync(ct);
             return;
@@ -72,7 +76,7 @@ internal sealed class DownloadRunner : IDownloadRunner
         {
             _ansiConsole.WriteLine("No migration ids specified, downloading latest migration");
         }
-            
+
         _logger.LogInformation("No migration ids specified, downloading latest migration");
         await DownloadLatestAsync(ct);
     }

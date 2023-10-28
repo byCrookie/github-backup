@@ -1,3 +1,2 @@
-﻿Logged in as test
-Downloading latest migration
+﻿Downloading latest migration
 No exported migrations found

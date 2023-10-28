@@ -1,4 +1,5 @@
-﻿using GithubBackup.Cli.Commands.Interval;
+﻿using GithubBackup.Cli.Commands.Github.Login;
+using GithubBackup.Cli.Commands.Interval;
 using GithubBackup.Cli.Commands.Services;
 
 namespace GithubBackup.Cli.Commands.Github.Download;
@@ -11,6 +12,7 @@ internal sealed class DownloadArgs : ICommandIntervalArgs
     public int? NumberOfBackups { get; }
     public bool Overwrite { get; }
     public IntervalArgs IntervalArgs { get; }
+    public LoginArgs LoginArgs { get; }
 
     public DownloadArgs(
         long[] migrations,
@@ -18,7 +20,8 @@ internal sealed class DownloadArgs : ICommandIntervalArgs
         DirectoryInfo destination,
         int? numberOfBackups,
         bool overwrite,
-        IntervalArgs intervalArgs)
+        IntervalArgs intervalArgs,
+        LoginArgs loginArgs)
     {
         Migrations = migrations;
         Latest = latest;
@@ -26,5 +29,6 @@ internal sealed class DownloadArgs : ICommandIntervalArgs
         NumberOfBackups = numberOfBackups;
         Overwrite = overwrite;
         IntervalArgs = intervalArgs;
+        LoginArgs = loginArgs;
     }
 }

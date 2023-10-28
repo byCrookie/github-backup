@@ -59,14 +59,14 @@ internal class GithubApiClient : IGithubApiClient
         _logger = logger;
     }
 
-    public Task<List<TItem>> ReceiveJsonPagedAsync<TReponse, TItem>(Url url, int perPage,
+    public async Task<List<TItem>> ReceiveJsonPagedAsync<TReponse, TItem>(Url url, int perPage,
         Func<TReponse, List<TItem>> getItems, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
     {
         var request = _client.Value.Request(url);
         configure?.Invoke(request);
         _logger.LogDebug("Requesting {Url} paged", request.Url);
-        return request
-            .WithOAuthBearerToken(_githubTokenStore.Get())
+        return await request
+            .WithOAuthBearerToken(await _githubTokenStore.GetAsync())
             .SetQueryParam("per_page", perPage)
             .GetPagedJsonAsync(
                 getItems,
@@ -81,7 +81,7 @@ internal class GithubApiClient : IGithubApiClient
         Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
     {
         var request = _client.Value.Request(url)
-            .WithOAuthBearerToken(_githubTokenStore.Get());
+            .WithOAuthBearerToken(await _githubTokenStore.GetAsync());
         configure?.Invoke(request);
         _logger.LogDebug("Downloading {Url}", request.Url);
         var file = await request.DownloadFileAsync(path, fileName, 4096, ct ?? CancellationToken.None);
@@ -89,23 +89,23 @@ internal class GithubApiClient : IGithubApiClient
         return file;
     }
 
-    public Task<IFlurlResponse> GetAsync(Url url, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
+    public async Task<IFlurlResponse> GetAsync(Url url, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
     {
         var request = _client.Value.Request(url)
-            .WithOAuthBearerToken(_githubTokenStore.Get());
+            .WithOAuthBearerToken(await _githubTokenStore.GetAsync());
         configure?.Invoke(request);
         _logger.LogDebug("Requesting {Url}", request.Url);
-        return SendAsync(request, HttpMethod.Get, null, ct ?? CancellationToken.None);
+        return await SendAsync(request, HttpMethod.Get, null, ct ?? CancellationToken.None);
     }
 
-    public Task<IFlurlResponse> PostJsonAsync(Url url, object data, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
+    public async Task<IFlurlResponse> PostJsonAsync(Url url, object data, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
     {
         var request = _client.Value.Request(url)
-            .WithOAuthBearerToken(_githubTokenStore.Get());
+            .WithOAuthBearerToken(await _githubTokenStore.GetAsync());
         configure?.Invoke(request);
         _logger.LogDebug("Posting to {Url}", request.Url);
         var content = new CapturedJsonContent(request.Settings.JsonSerializer.Serialize(data));
-        return SendAsync(request, HttpMethod.Post, content, ct ?? CancellationToken.None);
+        return await SendAsync(request, HttpMethod.Post, content, ct ?? CancellationToken.None);
     }
 
     private async Task<IFlurlResponse> SendAsync(IFlurlRequest request, HttpMethod verb,

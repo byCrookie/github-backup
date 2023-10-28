@@ -1,5 +1,6 @@
-using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
 using Spectre.Console;
 
@@ -12,29 +13,32 @@ internal sealed class MigrateRunner : IMigrateRunner
     private readonly IMigrationService _migrationService;
     private readonly ILoginService _loginService;
     private readonly IAnsiConsole _ansiConsole;
+    private readonly IGithubTokenStore _githubTokenStore;
 
     public MigrateRunner(
         GlobalArgs globalArgs,
         MigrateArgs migrateArgs,
         IMigrationService migrationService,
         ILoginService loginService,
-        IAnsiConsole ansiConsole)
+        IAnsiConsole ansiConsole,
+        IGithubTokenStore githubTokenStore)
     {
         _globalArgs = globalArgs;
         _migrateArgs = migrateArgs;
         _migrationService = migrationService;
         _loginService = loginService;
         _ansiConsole = ansiConsole;
+        _githubTokenStore = githubTokenStore;
     }
 
     public async Task RunAsync(CancellationToken ct)
     {
-        var user = await _loginService.ValidateLoginAsync(ct);
-        
-        if (!_globalArgs.Quiet)
-        {
-            _ansiConsole.WriteLine($"Logged in as {user.Name}");
-        }
+        await _loginService.LoginAsync(
+            _globalArgs,
+            _migrateArgs.LoginArgs,
+            (token, _) => _githubTokenStore.SetAsync(token),
+            ct
+        );
 
         var options = new StartMigrationOptions(
             _migrateArgs.Repositories,

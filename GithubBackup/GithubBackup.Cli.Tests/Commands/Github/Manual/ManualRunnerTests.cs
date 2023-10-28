@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
-using GithubBackup.Cli.Commands.Github.Credentials;
+using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Manual;
 using GithubBackup.Cli.Commands.Global;
@@ -27,7 +27,7 @@ public class ManualRunnerTests
     private readonly IAuthenticationService _authenticationService = Substitute.For<IAuthenticationService>();
     private readonly IUserService _userService = Substitute.For<IUserService>();
     private readonly IRepositoryService _repositoryService = Substitute.For<IRepositoryService>();
-    private readonly ICredentialStore _credentialStore = Substitute.For<ICredentialStore>();
+    private readonly IPersistentCredentialStore _persistentCredentialStore = Substitute.For<IPersistentCredentialStore>();
     private readonly IFileSystem _fileSystem = new MockFileSystem();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
 
@@ -44,7 +44,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
         _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
 
@@ -67,7 +67,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
         _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
         var deviceUserCodes = new DeviceAndUserCodes("device", "user", "uri", 0, 0);
@@ -84,7 +84,7 @@ public class ManualRunnerTests
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs();
-        await _credentialStore.Received(1).StoreTokenAsync(accessToken.Token, CancellationToken.None);
+        await _persistentCredentialStore.Received(1).StoreTokenAsync(accessToken.Token, CancellationToken.None);
         await Verify(_ansiConsole.Output);
     }
 
@@ -95,7 +95,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns((string?)null);
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns((string?)null);
         _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
         var deviceUserCodes = new DeviceAndUserCodes("device", "user", "uri", 0, 0);
@@ -112,7 +112,7 @@ public class ManualRunnerTests
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs();
-        await _credentialStore.Received(1).StoreTokenAsync(accessToken.Token, CancellationToken.None);
+        await _persistentCredentialStore.Received(1).StoreTokenAsync(accessToken.Token, CancellationToken.None);
         await Verify(_ansiConsole.Output);
     }
 
@@ -123,7 +123,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
         _userService.WhoAmIAsync(CancellationToken.None).Returns(_ => throw new Exception(), _ => user);
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
         var deviceUserCodes = new DeviceAndUserCodes("device", "user", "uri", 0, 0);
@@ -140,7 +140,7 @@ public class ManualRunnerTests
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs();
-        await _credentialStore.Received(1).StoreTokenAsync(accessToken.Token, CancellationToken.None);
+        await _persistentCredentialStore.Received(1).StoreTokenAsync(accessToken.Token, CancellationToken.None);
         await Verify(_ansiConsole.Output);
     }
 
@@ -151,7 +151,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
 
         _ansiConsole.Input.PushCharacter('y');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
@@ -182,7 +182,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
 
         _ansiConsole.Input.PushCharacter('y');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
@@ -227,7 +227,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
 
         _ansiConsole.Input.PushCharacter('y');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
@@ -295,7 +295,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
         _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
 
@@ -325,7 +325,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
         _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
 
@@ -361,7 +361,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _credentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
         _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
 
@@ -418,7 +418,7 @@ public class ManualRunnerTests
             _migrationService,
             _userService,
             _repositoryService,
-            _credentialStore,
+            _persistentCredentialStore,
             _fileSystem,
             _ansiConsole,
             _dateTimeProvider

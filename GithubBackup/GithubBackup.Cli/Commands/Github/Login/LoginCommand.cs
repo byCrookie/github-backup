@@ -7,14 +7,22 @@ namespace GithubBackup.Cli.Commands.Github.Login;
 internal static class LoginCommand
 {
     private const string CommandName = "login";
-    private const string CommandDescription = "Login to Github.";
-    
+
+    private const string CommandDescription =
+        """
+        Login to Github. Persists your login token to disk for future use.
+        Only one login token can be persisted at a time. {0}
+        """;
+
     public static Command Create(string[] args, GlobalArguments globalArguments)
     {
-        var command = new Command(CommandName, CommandDescription);
+        var homeDirectoryDescription = GetHomeDirectoryDescription();
+        var description = string.Format(CommandDescription, homeDirectoryDescription);
+
+        var command = new Command(CommandName, description);
         var loginArguments = new LoginArguments();
         command.AddOptions(loginArguments.Options());
-        
+
         command.SetHandler(
             (globalArgs, loginArgs) => GithubBackup.Cli.Cli.RunAsync<LoginRunner, LoginArgs>(args, globalArgs, loginArgs),
             new GlobalArgsBinder(globalArguments),
@@ -22,5 +30,13 @@ internal static class LoginCommand
         );
 
         return command;
+    }
+
+    private static string GetHomeDirectoryDescription()
+    {
+        var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        return string.IsNullOrWhiteSpace(homeDirectory)
+            ? $"{Environment.NewLine}ERROR: Could not determine home directory. Login command will not work."
+            : string.Empty;
     }
 }

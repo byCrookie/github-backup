@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
 
@@ -13,12 +14,14 @@ internal static class RepositoriesCommand
     {
         var command = new Command(CommandName, CommandDescription);
         var repositoriesArguments = new RepositoriesArguments();
+        var loginArguments = new LoginArguments();
         command.AddOptions(repositoriesArguments.Options());
+        command.AddOptions(loginArguments.Options());
         
         command.SetHandler(
             (globalArgs, migrationsArgs) => GithubBackup.Cli.Cli.RunAsync<RepositoriesRunner, RepositoriesArgs>(args, globalArgs, migrationsArgs),
             new GlobalArgsBinder(globalArguments),
-            new RepositoriesArgsBinder(repositoriesArguments)
+            new RepositoriesArgsBinder(repositoriesArguments, loginArguments)
         );
 
         return command;

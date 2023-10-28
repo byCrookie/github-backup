@@ -1,5 +1,4 @@
-﻿Logged in as test
-Found 2 repositories:
+﻿Found 2 repositories:
 - test
 - test2
 test test2
