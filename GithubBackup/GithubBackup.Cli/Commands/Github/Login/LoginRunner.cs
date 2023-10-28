@@ -1,10 +1,5 @@
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Core.Github.Authentication;
-using GithubBackup.Core.Github.Users;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Login;
 

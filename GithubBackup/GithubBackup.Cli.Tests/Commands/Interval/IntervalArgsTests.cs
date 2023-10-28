@@ -1,11 +1,9 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Parsing;
 using FluentAssertions;
-using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Interval;
 using GithubBackup.Cli.Tests.Utils;
 using GithubBackup.Cli.Utils;
-using Microsoft.Extensions.Logging;
 
 namespace GithubBackup.Cli.Tests.Commands.Interval;
 

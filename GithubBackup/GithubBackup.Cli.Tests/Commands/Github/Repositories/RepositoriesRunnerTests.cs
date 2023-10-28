@@ -2,7 +2,6 @@
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Repositories;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
@@ -106,8 +105,7 @@ public class RepositoriesRunnerTests
             migrateArgs,
             _repositoryService,
             _loginService,
-            _ansiConsole,
-            Substitute.For<IGithubTokenStore>()
+            _ansiConsole
         );
     }
 }

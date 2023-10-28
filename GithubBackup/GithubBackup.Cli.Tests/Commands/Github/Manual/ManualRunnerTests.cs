@@ -5,7 +5,6 @@ using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Manual;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
@@ -13,6 +12,7 @@ using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Spectre.Console.Testing;
 using Environment = GithubBackup.Core.Environment.Environment;
 
@@ -24,12 +24,12 @@ public class ManualRunnerTests
     private readonly TestConsole _ansiConsole = new();
     private readonly ILogger<LoginRunner> _logger = Substitute.For<ILogger<LoginRunner>>();
     private readonly IMigrationService _migrationService = Substitute.For<IMigrationService>();
-    private readonly IAuthenticationService _authenticationService = Substitute.For<IAuthenticationService>();
     private readonly IUserService _userService = Substitute.For<IUserService>();
     private readonly IRepositoryService _repositoryService = Substitute.For<IRepositoryService>();
     private readonly IPersistentCredentialStore _persistentCredentialStore = Substitute.For<IPersistentCredentialStore>();
     private readonly IFileSystem _fileSystem = new MockFileSystem();
     private readonly IDateTimeProvider _dateTimeProvider = Substitute.For<IDateTimeProvider>();
+    private readonly ILoginService _loginService = Substitute.For<ILoginService>();
 
     public ManualRunnerTests()
     {
@@ -66,25 +66,30 @@ public class ManualRunnerTests
         var runner = CreateRunner();
 
         var user = new User("test", "test");
+        
+        const string validToken = "token1";
 
-        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns(validToken);
         _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
-        var deviceUserCodes = new DeviceAndUserCodes("device", "user", "uri", 0, 0);
-        _authenticationService.RequestDeviceAndUserCodesAsync(CancellationToken.None).Returns(deviceUserCodes);
-        var accessToken = new AccessToken("token", "bearer", "scope");
-        _authenticationService.PollForAccessTokenAsync(deviceUserCodes.DeviceCode, deviceUserCodes.Interval, CancellationToken.None)
-            .Returns(accessToken);
+        _loginService.LoginAsync(Arg.Any<GlobalArgs>(), Arg.Is<LoginArgs>(a => a.Token == validToken), Arg.Any<Func<string, CancellationToken,
+            Task>>(), Arg.Any<CancellationToken>()).Returns(user);
 
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        
+        _ansiConsole.Input.PushCharacter('n');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushText(validToken);
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
 
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs();
-        await _persistentCredentialStore.Received(1).StoreTokenAsync(accessToken.Token, CancellationToken.None);
+
         await Verify(_ansiConsole.Output);
     }
 
@@ -94,15 +99,20 @@ public class ManualRunnerTests
         var runner = CreateRunner();
 
         var user = new User("test", "test");
+        
+        const string validToken = "token1";
 
         _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns((string?)null);
         _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
-        var deviceUserCodes = new DeviceAndUserCodes("device", "user", "uri", 0, 0);
-        _authenticationService.RequestDeviceAndUserCodesAsync(CancellationToken.None).Returns(deviceUserCodes);
-        var accessToken = new AccessToken("token", "bearer", "scope");
-        _authenticationService.PollForAccessTokenAsync(deviceUserCodes.DeviceCode, deviceUserCodes.Interval, CancellationToken.None)
-            .Returns(accessToken);
+        
+        _loginService.LoginAsync(Arg.Any<GlobalArgs>(), Arg.Is<LoginArgs>(a => a.Token == validToken), Arg.Any<Func<string, CancellationToken,
+            Task>>(), Arg.Any<CancellationToken>()).Returns(user);
+        
+        _ansiConsole.Input.PushCharacter('n');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushText(validToken);
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
 
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
@@ -112,7 +122,7 @@ public class ManualRunnerTests
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs();
-        await _persistentCredentialStore.Received(1).StoreTokenAsync(accessToken.Token, CancellationToken.None);
+
         await Verify(_ansiConsole.Output);
     }
 
@@ -122,16 +132,20 @@ public class ManualRunnerTests
         var runner = CreateRunner();
 
         var user = new User("test", "test");
+        const string invalidToken = "token";
+        const string validToken = "token1";
 
-        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns("token");
-        _userService.WhoAmIAsync(CancellationToken.None).Returns(_ => throw new Exception(), _ => user);
+        _persistentCredentialStore.LoadTokenAsync(CancellationToken.None).Returns(invalidToken);
+        _userService.WhoAmIAsync(CancellationToken.None).ThrowsAsync<Exception>();
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
-        var deviceUserCodes = new DeviceAndUserCodes("device", "user", "uri", 0, 0);
-        _authenticationService.RequestDeviceAndUserCodesAsync(CancellationToken.None).Returns(deviceUserCodes);
-        var accessToken = new AccessToken("token", "bearer", "scope");
-        _authenticationService.PollForAccessTokenAsync(deviceUserCodes.DeviceCode, deviceUserCodes.Interval, CancellationToken.None)
-            .Returns(accessToken);
-
+        _loginService.LoginAsync(Arg.Any<GlobalArgs>(), Arg.Is<LoginArgs>(a => a.Token == validToken), Arg.Any<Func<string, CancellationToken,
+            Task>>(), Arg.Any<CancellationToken>()).Returns(user);
+        
+        _ansiConsole.Input.PushCharacter('n');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        _ansiConsole.Input.PushText(validToken);
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+        
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
         _ansiConsole.Input.PushCharacter('n');
@@ -140,7 +154,7 @@ public class ManualRunnerTests
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs();
-        await _persistentCredentialStore.Received(1).StoreTokenAsync(accessToken.Token, CancellationToken.None);
+
         await Verify(_ansiConsole.Output);
     }
 
@@ -414,14 +428,14 @@ public class ManualRunnerTests
         return new ManualBackupRunner(
             new GlobalArgs(LogLevel.Debug, false, new FileInfo("test")),
             manualBackupArgs,
-            _authenticationService,
             _migrationService,
             _userService,
             _repositoryService,
             _persistentCredentialStore,
             _fileSystem,
             _ansiConsole,
-            _dateTimeProvider
+            _dateTimeProvider,
+            _loginService
         );
     }
 }

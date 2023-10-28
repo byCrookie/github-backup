@@ -1,7 +1,6 @@
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
-using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Utils;
 using Spectre.Console;
@@ -16,7 +15,6 @@ internal sealed class MigrationsRunner : IMigrationsRunner
     private readonly ILoginService _loginService;
     private readonly IAnsiConsole _ansiConsole;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IGithubTokenStore _githubTokenStore;
 
     public MigrationsRunner(
         GlobalArgs globalArgs,
@@ -24,8 +22,7 @@ internal sealed class MigrationsRunner : IMigrationsRunner
         IMigrationService migrationService,
         ILoginService loginService,
         IAnsiConsole ansiConsole,
-        IDateTimeProvider dateTimeProvider,
-        IGithubTokenStore githubTokenStore)
+        IDateTimeProvider dateTimeProvider)
     {
         _globalArgs = globalArgs;
         _migrationsArgs = migrationsArgs;
@@ -33,7 +30,6 @@ internal sealed class MigrationsRunner : IMigrationsRunner
         _loginService = loginService;
         _ansiConsole = ansiConsole;
         _dateTimeProvider = dateTimeProvider;
-        _githubTokenStore = githubTokenStore;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -41,7 +37,7 @@ internal sealed class MigrationsRunner : IMigrationsRunner
         await _loginService.LoginAsync(
             _globalArgs,
             _migrationsArgs.LoginArgs,
-            (token, _) => _githubTokenStore.SetAsync(token),
+            (_, _) => Task.CompletedTask,
             ct
         );
 

@@ -1,9 +1,9 @@
 using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Auth;
+using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
-using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
@@ -14,7 +14,7 @@ namespace GithubBackup.Cli.Commands.Github.Manual;
 
 internal sealed class ManualBackupRunner : IManualBackupRunner
 {
-    private readonly IAuthenticationService _authenticationService;
+    private readonly GlobalArgs _globalArgs;
     private readonly IMigrationService _migrationService;
     private readonly IUserService _userService;
     private readonly IRepositoryService _repositoryService;
@@ -22,24 +22,25 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
     private readonly IFileSystem _fileSystem;
     private readonly IAnsiConsole _ansiConsole;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly ILoginService _loginService;
 
     public ManualBackupRunner(
         // Needs to be passed in because of the way ICommand's are resolved in
         // the cli service.
         // ReSharper disable once UnusedParameter.Local
-        GlobalArgs _1,
+        GlobalArgs globalArgs,
         // ReSharper disable once UnusedParameter.Local
         ManualBackupArgs _2,
-        IAuthenticationService authenticationService,
         IMigrationService migrationService,
         IUserService userService,
         IRepositoryService repositoryService,
         IPersistentCredentialStore persistentCredentialStore,
         IFileSystem fileSystem,
         IAnsiConsole ansiConsole,
-        IDateTimeProvider dateTimeProvider)
+        IDateTimeProvider dateTimeProvider,
+        ILoginService loginService)
     {
-        _authenticationService = authenticationService;
+        _globalArgs = globalArgs;
         _migrationService = migrationService;
         _userService = userService;
         _repositoryService = repositoryService;
@@ -47,12 +48,12 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
         _fileSystem = fileSystem;
         _ansiConsole = ansiConsole;
         _dateTimeProvider = dateTimeProvider;
+        _loginService = loginService;
     }
 
     public async Task RunAsync(CancellationToken ct)
     {
-        var user = await LoginAsync(ct);
-        _ansiConsole.WriteLine($"Logged in as {user.Name}");
+        await LoginAsync(ct);
 
         if (_ansiConsole.Confirm("Do you want to start a migration?", false))
         {
@@ -74,7 +75,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
                         .Title("Which affiliation type do you want to backup?")
                         .PageSize(20)
                         .AddChoices(Enum.GetValues<RepositoryAffiliation>()));
-                
+
                     visibility = _ansiConsole.Prompt(new SelectionPrompt<RepositoryVisibility>()
                         .Title("Which visibility type do you want to backup?")
                         .PageSize(20)
@@ -83,7 +84,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
             }
 
             var repositoryOptions = new RepositoryOptions(type, affiliation, visibility);
-            
+
             var repositories = await _repositoryService.GetRepositoriesAsync(repositoryOptions, ct);
 
             if (!repositories.Any())
@@ -200,52 +201,50 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
         return selectedRepositories.Any() ? selectedRepositories.Select(r => r.FullName).ToArray() : repositories.Select(r => r.FullName).ToArray();
     }
 
-    private async Task<User> LoginAsync(CancellationToken ct)
+    private async Task LoginAsync(CancellationToken ct)
     {
         try
         {
             var token = await _persistentCredentialStore.LoadTokenAsync(ct);
 
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                await LoginAndStoreAsync(ct);
-            }
-            else
+            if (!string.IsNullOrWhiteSpace(token))
             {
                 var user = await _userService.WhoAmIAsync(ct);
+
                 if (_ansiConsole.Confirm($"Do you want to continue as {user.Name}?"))
                 {
-                    return user;
+                    return;
                 }
-
-                await LoginAndStoreAsync(ct);
             }
+
+            await LoginInternAsync(ct);
         }
         catch (Exception)
         {
-            await LoginAndStoreAsync(ct);
+            await LoginInternAsync(ct);
+        }
+    }
+
+    private Task<User> LoginInternAsync(CancellationToken ct)
+    {
+        var useDeviceFlowAuth = _ansiConsole.Confirm("Do you want to login using device flow authentication?");
+
+        if (useDeviceFlowAuth)
+        {
+            return _loginService.LoginAsync(
+                new GlobalArgs(_globalArgs.Verbosity, false, _globalArgs.LogFile),
+                new LoginArgs(null, true),
+                (t, _) => _persistentCredentialStore.StoreTokenAsync(t, ct),
+                ct
+            );
         }
 
-        return await _userService.WhoAmIAsync(ct);
-    }
-
-    private async Task LoginAndStoreAsync(CancellationToken ct)
-    {
-        var token = await GetOAuthTokenAsync(ct);
-        await _persistentCredentialStore.StoreTokenAsync(token, ct);
-    }
-
-    private async Task<string> GetOAuthTokenAsync(CancellationToken ct)
-    {
-        var deviceAndUserCodes = await _authenticationService.RequestDeviceAndUserCodesAsync(ct);
-        _ansiConsole.WriteLine(
-            $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}");
-        _ansiConsole.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
-        var accessToken = await _authenticationService.PollForAccessTokenAsync(
-            deviceAndUserCodes.DeviceCode,
-            deviceAndUserCodes.Interval,
+        var token = _ansiConsole.Ask<string>("Please enter your Github token:");
+        return _loginService.LoginAsync(
+            new GlobalArgs(_globalArgs.Verbosity, false, _globalArgs.LogFile),
+            new LoginArgs(token, false),
+            (t, _) => _persistentCredentialStore.StoreTokenAsync(t, ct),
             ct
         );
-        return accessToken.Token;
     }
 }

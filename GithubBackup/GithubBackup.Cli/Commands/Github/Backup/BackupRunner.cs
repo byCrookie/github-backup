@@ -40,7 +40,7 @@ internal sealed class BackupRunner : IBackupRunner
         await _loginService.LoginAsync(
             _globalArgs,
             _backupArgs.LoginArgs,
-            (token, _) => _githubTokenStore.SetAsync(token),
+            (_, _) => Task.CompletedTask, 
             ct
         );
 

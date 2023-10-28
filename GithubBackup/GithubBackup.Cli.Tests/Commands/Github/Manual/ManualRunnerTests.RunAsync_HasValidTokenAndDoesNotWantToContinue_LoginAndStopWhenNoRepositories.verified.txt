@@ -1,7 +1,5 @@
 ﻿Do you want to continue as test? [y/n] (y): n
-Go to uri
-and enter user
-You have 0 seconds to authenticate before the code expires.
-Logged in as test
+Do you want to login using device flow authentication? [y/n] (y): n
+Please enter your Github token: token1
 Do you want to start a migration? [y/n] (n): n
 No migrations found.

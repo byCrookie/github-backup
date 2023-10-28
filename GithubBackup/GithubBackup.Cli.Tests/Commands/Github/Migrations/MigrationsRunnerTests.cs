@@ -3,7 +3,6 @@ using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrations;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
@@ -294,8 +293,7 @@ public class MigrationsRunnerTests
             _migrationService,
             _loginService,
             _ansiConsole,
-            _dateTimeProvider,
-            Substitute.For<IGithubTokenStore>()
+            _dateTimeProvider
         );
     }
 }

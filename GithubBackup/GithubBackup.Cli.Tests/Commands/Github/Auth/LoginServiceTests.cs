@@ -3,6 +3,7 @@ using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Core.Github.Authentication;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Users;
 using GithubBackup.TestUtils.Configuration;
 using GithubBackup.TestUtils.Logging;
@@ -20,6 +21,7 @@ public class LoginServiceTests
     private readonly ILogger<LoginService> _logger = Substitute.For<ILogger<LoginService>>();
     private readonly IAuthenticationService _authenticationService = Substitute.For<IAuthenticationService>();
     private readonly IUserService _userService = Substitute.For<IUserService>();
+    private readonly IGithubTokenStore _githubTokenStore = Substitute.For<IGithubTokenStore>();
 
     [Fact]
     public async Task RunAsync_QuietAndToken_DoNotWriteToConsoleAndLoginUsingToken()
@@ -39,6 +41,8 @@ public class LoginServiceTests
         }, CancellationToken.None);
         
         onToken.Should().Be(token);
+        
+        await _githubTokenStore.Received(1).SetAsync(token);
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Using token from command line")
@@ -65,6 +69,8 @@ public class LoginServiceTests
         }, CancellationToken.None);
         
         onToken.Should().Be(token);
+        
+        await _githubTokenStore.Received(1).SetAsync(token);
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Using token from command line")
@@ -107,6 +113,8 @@ public class LoginServiceTests
         }, CancellationToken.None);
         
         onToken.Should().Be(token);
+        
+        await _githubTokenStore.Received(1).SetAsync(token);
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Using device flow authentication")
@@ -149,6 +157,8 @@ public class LoginServiceTests
         }, CancellationToken.None);
         
         onToken.Should().Be(token);
+        
+        await _githubTokenStore.Received(1).SetAsync(token);
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Using device flow authentication")
@@ -179,6 +189,8 @@ public class LoginServiceTests
         );
         
         onToken.Should().BeEmpty();
+        
+        await _githubTokenStore.Received(1).SetAsync(token);
 
         await Verify(_ansiConsole.Output);
     }
@@ -201,6 +213,8 @@ public class LoginServiceTests
         }, CancellationToken.None);
         
         onToken.Should().BeEmpty();
+        
+        await _githubTokenStore.Received(1).SetAsync(token);
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Using token from environment variable")
@@ -221,7 +235,8 @@ public class LoginServiceTests
             _userService,
             configuration,
             _authenticationService,
-            _ansiConsole
+            _ansiConsole,
+            _githubTokenStore
         );
         
         return (globalArgs, loginArgs, sut);

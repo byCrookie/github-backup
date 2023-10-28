@@ -44,7 +44,7 @@ internal sealed class DownloadRunner : IDownloadRunner
         await _loginService.LoginAsync(
             _globalArgs,
             _downloadArgs.LoginArgs,
-            (token, _) => _githubTokenStore.SetAsync(token),
+            (_, _) => Task.CompletedTask,
             ct
         );
 

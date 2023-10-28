@@ -1,6 +1,5 @@
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Repositories;
 using Spectre.Console;
 
@@ -13,22 +12,19 @@ internal sealed class RepositoriesRunner : IRepositoriesRunner
     private readonly IRepositoryService _repositoryService;
     private readonly ILoginService _loginService;
     private readonly IAnsiConsole _ansiConsole;
-    private readonly IGithubTokenStore _githubTokenStore;
 
     public RepositoriesRunner(
         GlobalArgs globalArgs,
         RepositoriesArgs repositoriesArgs,
         IRepositoryService repositoryService,
         ILoginService loginService,
-        IAnsiConsole ansiConsole,
-        IGithubTokenStore githubTokenStore)
+        IAnsiConsole ansiConsole)
     {
         _globalArgs = globalArgs;
         _repositoriesArgs = repositoriesArgs;
         _repositoryService = repositoryService;
         _loginService = loginService;
         _ansiConsole = ansiConsole;
-        _githubTokenStore = githubTokenStore;
     }
 
     public async Task RunAsync(CancellationToken ct)
@@ -36,7 +32,7 @@ internal sealed class RepositoriesRunner : IRepositoriesRunner
         await _loginService.LoginAsync(
             _globalArgs,
             _repositoriesArgs.LoginArgs,
-            (token, _) => _githubTokenStore.SetAsync(token),
+            (_, _) => Task.CompletedTask,
             ct
         );
 
