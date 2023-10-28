@@ -1,4 +1,4 @@
-﻿using GithubBackup.Cli.Commands.Github.Interval;
+﻿using GithubBackup.Cli.Commands.Interval;
 
 namespace GithubBackup.Cli.Commands.Services;
 

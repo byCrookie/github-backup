@@ -1,4 +1,4 @@
-﻿namespace GithubBackup.Cli.Commands.Github.Interval;
+﻿namespace GithubBackup.Cli.Commands.Interval;
 
 internal static class IntervalArgDescriptions
 {

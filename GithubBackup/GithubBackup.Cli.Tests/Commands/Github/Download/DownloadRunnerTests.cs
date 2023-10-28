@@ -2,8 +2,8 @@
 using System.IO.Abstractions.TestingHelpers;
 using GithubBackup.Cli.Commands.Github.Credentials;
 using GithubBackup.Cli.Commands.Github.Download;
-using GithubBackup.Cli.Commands.Github.Interval;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Commands.Interval;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Users;
 using GithubBackup.TestUtils.Logging;

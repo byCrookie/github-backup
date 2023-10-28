@@ -1,6 +1,6 @@
 ﻿using System.CommandLine;
 
-namespace GithubBackup.Cli.Commands.Github.Interval;
+namespace GithubBackup.Cli.Commands.Interval;
 
 public class IntervalArguments
 {

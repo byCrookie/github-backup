@@ -1,8 +1,8 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Parsing;
 using FluentAssertions;
-using GithubBackup.Cli.Commands.Github.Interval;
 using GithubBackup.Cli.Commands.Github.Migrate;
+using GithubBackup.Cli.Commands.Interval;
 using GithubBackup.Cli.Tests.Utils;
 using GithubBackup.Cli.Utils;
 

@@ -1,6 +1,6 @@
 ﻿using System.CommandLine.Binding;
 
-namespace GithubBackup.Cli.Commands.Github.Interval;
+namespace GithubBackup.Cli.Commands.Interval;
 
 internal sealed class IntervalArgsBinder : BinderBase<IntervalArgs>
 {

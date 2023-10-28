@@ -1,6 +1,6 @@
 ﻿using GithubBackup.Cli.Commands.Github.Download;
-using GithubBackup.Cli.Commands.Github.Interval;
 using GithubBackup.Cli.Commands.Github.Migrate;
+using GithubBackup.Cli.Commands.Interval;
 using GithubBackup.Cli.Commands.Services;
 
 namespace GithubBackup.Cli.Commands.Github.Backup;

@@ -1,5 +1,5 @@
 ﻿using System.CommandLine.Binding;
-using GithubBackup.Cli.Commands.Github.Interval;
+using GithubBackup.Cli.Commands.Interval;
 using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Migrate;
