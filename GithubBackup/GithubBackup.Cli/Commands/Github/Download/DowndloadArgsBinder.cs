@@ -27,6 +27,7 @@ internal sealed class DowndloadArgsBinder : BinderBase<DownloadArgs>
     {
         var migrations = bindingContext.ParseResult.GetRequiredValueForOption(_downloadArguments.MigrationsOption);
         var latest = bindingContext.ParseResult.GetRequiredValueForOption(_downloadArguments.LatestOption);
+        var poll = bindingContext.ParseResult.GetRequiredValueForOption(_downloadArguments.PollOption);
         var destination = bindingContext.ParseResult.GetRequiredValueForOption(_downloadArguments.DestinationOption);
         var numberOfBackups = bindingContext.ParseResult.GetValueForOption(_downloadArguments.NumberOfBackupsOption);
         var overwrite = bindingContext.ParseResult.GetRequiredValueForOption(_downloadArguments.OverwriteOption);
@@ -37,6 +38,7 @@ internal sealed class DowndloadArgsBinder : BinderBase<DownloadArgs>
         return new DownloadArgs(
             migrations,
             latest,
+            poll,
             destination,
             numberOfBackups,
             overwrite,

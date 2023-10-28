@@ -89,7 +89,7 @@ internal sealed partial class MigrationService : IMigrationService
                     .HandleResult(migration => migration.State != MigrationState.Exported),
                 BackoffType = DelayBackoffType.Exponential,
                 UseJitter = true,
-                MaxDelay = TimeSpan.FromDays(1),
+                MaxDelay = TimeSpan.FromHours(1),
                 Delay = options.MedianFirstRetryDelay
             })
             .Build();

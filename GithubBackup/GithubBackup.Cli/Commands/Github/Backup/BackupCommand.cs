@@ -25,6 +25,7 @@ internal static class BackupCommand
         
         var downloadOptions = downloadArguments.Options();
         downloadOptions.Remove(downloadArguments.MigrationsOption);
+        downloadOptions.Remove(downloadArguments.PollOption);
         command.AddOptions(downloadOptions);
         
         command.AddOptions(intervalArguments.Options());

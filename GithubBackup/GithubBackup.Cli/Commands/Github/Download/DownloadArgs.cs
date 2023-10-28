@@ -8,6 +8,7 @@ internal sealed class DownloadArgs : ICommandIntervalArgs
 {
     public long[] Migrations { get; }
     public bool Latest { get; }
+    public bool Poll { get; }
     public DirectoryInfo Destination { get; }
     public int? NumberOfBackups { get; }
     public bool Overwrite { get; }
@@ -17,6 +18,7 @@ internal sealed class DownloadArgs : ICommandIntervalArgs
     public DownloadArgs(
         long[] migrations,
         bool latest,
+        bool poll,
         DirectoryInfo destination,
         int? numberOfBackups,
         bool overwrite,
@@ -25,6 +27,7 @@ internal sealed class DownloadArgs : ICommandIntervalArgs
     {
         Migrations = migrations;
         Latest = latest;
+        Poll = poll;
         Destination = destination;
         NumberOfBackups = numberOfBackups;
         Overwrite = overwrite;

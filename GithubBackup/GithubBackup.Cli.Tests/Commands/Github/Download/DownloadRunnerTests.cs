@@ -25,7 +25,7 @@ public class DownloadRunnerTests
     [Fact]
     public async Task RunAsync_QuietAndLatest_DoNotWriteToConsoleAndDownloadLatest()
     {
-        var runner = CreateRunner(true, true);
+        var runner = CreateRunner(true, true, false);
 
         const int id = 1;
 
@@ -47,6 +47,7 @@ public class DownloadRunnerTests
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Downloading latest migration"),
             new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1"),
             new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
         );
 
@@ -56,7 +57,7 @@ public class DownloadRunnerTests
     [Fact]
     public async Task RunAsync_NotQuietAndLatest_DoWriteToConsoleAndDownloadLatest()
     {
-        var runner = CreateRunner(false, true);
+        var runner = CreateRunner(false, true, false);
 
         const int id = 1;
 
@@ -78,6 +79,7 @@ public class DownloadRunnerTests
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Downloading latest migration"),
             new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1"),
             new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
         );
 
@@ -87,7 +89,7 @@ public class DownloadRunnerTests
     [Fact]
     public async Task RunAsync_QuietAndNoMigrations_DoNotWriteToConsoleAndDownloadLatest()
     {
-        var runner = CreateRunner(true, false);
+        var runner = CreateRunner(true, false, false);
 
         const int id = 1;
 
@@ -109,6 +111,7 @@ public class DownloadRunnerTests
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "No migration ids specified, downloading latest migration"),
             new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1"),
             new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
         );
 
@@ -118,7 +121,7 @@ public class DownloadRunnerTests
     [Fact]
     public async Task RunAsync_NotQuietAndLatestAndNoMigrations_DoWriteToConsoleAndDownloadLatest()
     {
-        var runner = CreateRunner(false, false);
+        var runner = CreateRunner(false, false, false);
 
         const int id = 1;
 
@@ -140,6 +143,7 @@ public class DownloadRunnerTests
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "No migration ids specified, downloading latest migration"),
             new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1"),
             new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
         );
 
@@ -149,7 +153,7 @@ public class DownloadRunnerTests
     [Fact]
     public async Task RunAsync_QuietAndLatestAndNoExportedMigrations_DoNotWriteToConsoleAndDoNotDownload()
     {
-        var runner = CreateRunner(true, true);
+        var runner = CreateRunner(true, true, false);
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
@@ -177,7 +181,7 @@ public class DownloadRunnerTests
     [Fact]
     public async Task RunAsync_NotQuietAndLatestAndNoExportedMigrations_DoWriteToConsoleAndDoNotDownload()
     {
-        var runner = CreateRunner(false, true);
+        var runner = CreateRunner(false, true, false);
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
@@ -205,7 +209,7 @@ public class DownloadRunnerTests
     [Fact]
     public async Task RunAsync_QuietAndExportMigrations_DoNotWriteToConsoleAndDoDownload()
     {
-        var runner = CreateRunner(true, true, new[] { 1L, 2L });
+        var runner = CreateRunner(true, true, false, new[] { 1L, 2L });
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
@@ -228,10 +232,12 @@ public class DownloadRunnerTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Downloading migrations using ids"),
-            new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
-            new LogEntry(LogLevel.Information, "Downloaded migration 1 to test1"),
             new LogEntry(LogLevel.Information, "Downloading migration 2 to test"),
-            new LogEntry(LogLevel.Information, "Downloaded migration 2 to test2")
+            new LogEntry(LogLevel.Information, "Downloading migration 2"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 2 to test2"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 1 to test1")
         );
 
         await Verify(_ansiConsole.Output);
@@ -240,7 +246,7 @@ public class DownloadRunnerTests
     [Fact]
     public async Task RunAsync_NotQuietAndExportMigrations_DoWriteToConsoleAndDoDownload()
     {
-        var runner = CreateRunner(false, true, new[] { 1L, 2L });
+        var runner = CreateRunner(false, true, false, new[] { 1L, 2L });
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
@@ -263,21 +269,61 @@ public class DownloadRunnerTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Downloading migrations using ids"),
-            new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
-            new LogEntry(LogLevel.Information, "Downloaded migration 1 to test1"),
             new LogEntry(LogLevel.Information, "Downloading migration 2 to test"),
-            new LogEntry(LogLevel.Information, "Downloaded migration 2 to test2")
+            new LogEntry(LogLevel.Information, "Downloading migration 2"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 2 to test2"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 1 to test1")
+        );
+
+        await Verify(_ansiConsole.Output);
+    }
+    
+    [Fact]
+    public async Task RunAsync_NotQuietAndExportMigrationsAndUsePolling_DoWriteToConsoleAndDoDownload()
+    {
+        var runner = CreateRunner(false, true, true, new[] { 1L, 2L });
+
+        _migrationService
+            .GetMigrationsAsync(CancellationToken.None)
+            .Returns(new List<Migration>
+            {
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Exported, new DateTime(2020, 1, 1))
+            });
+
+        _migrationService
+            .PollAndDownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 1), _ => Task.CompletedTask, CancellationToken.None)
+            .Returns("test1");
+
+        _migrationService
+            .PollAndDownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 2), _ => Task.CompletedTask, CancellationToken.None)
+            .Returns("test2");
+
+        await runner.RunAsync(CancellationToken.None);
+
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Downloading migrations using ids"),
+            new LogEntry(LogLevel.Information, "Downloading migration 2 to test"),
+            new LogEntry(LogLevel.Information, "Polling migration 2"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 2 to "),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
+            new LogEntry(LogLevel.Information, "Polling migration 1"),
+            new LogEntry(LogLevel.Information, "Downloaded migration 1 to ")
         );
 
         await Verify(_ansiConsole.Output);
     }
 
-    private DownloadRunner CreateRunner(bool quiet, bool latest, long[]? ids = null)
+    private DownloadRunner CreateRunner(bool quiet, bool latest, bool poll, long[]? ids = null)
     {
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
         var downloadArgs = new DownloadArgs(
             ids ?? Array.Empty<long>(),
             latest,
+            poll,
             new DirectoryInfo("test"),
             null,
             true,

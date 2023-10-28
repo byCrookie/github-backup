@@ -70,7 +70,11 @@ internal sealed class BackupRunner : IBackupRunner
             downloadOptions,
             update =>
             {
-                _ansiConsole.WriteLine($"Migration {update.Id} is {update.State}...");
+                if (!_globalArgs.Quiet)
+                {
+                    _ansiConsole.WriteLine($"Migration {update.Id} is {update.State}...");
+                }
+
                 return Task.CompletedTask;
             },
             ct

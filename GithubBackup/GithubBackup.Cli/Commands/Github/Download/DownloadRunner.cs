@@ -102,7 +102,11 @@ internal sealed class DownloadRunner : IDownloadRunner
 
     private async Task DownloadUsingIdsAsync(CancellationToken ct)
     {
-        foreach (var id in _downloadArgs.Migrations)
+        var migrations = (await _migrationService.GetMigrationsAsync(ct))
+            .OrderBy(m => m.CreatedAt)
+            .ToList();
+
+        foreach (var id in _downloadArgs.Migrations.OrderBy(m => migrations.FindIndex(e => e.Id == m)))
         {
             await DownloadMigrationUsingIdAsync(id, ct);
         }
@@ -133,8 +137,28 @@ internal sealed class DownloadRunner : IDownloadRunner
             _downloadArgs.Overwrite
         );
 
-        var path = await _migrationService.DownloadMigrationAsync(options, ct);
+        var path = await DownloadAsync(options, ct);
         _logger.LogInformation("Downloaded migration {Id} to {Path}", id, path);
         _ansiConsole.WriteLine(!_globalArgs.Quiet ? $"Downloaded migration {id} to {path}" : path);
+    }
+
+    private Task<string> DownloadAsync(DownloadMigrationOptions options, CancellationToken ct)
+    {
+        if (_downloadArgs.Poll)
+        {
+            _logger.LogInformation("Polling migration {Id}", options.Id);
+            return _migrationService.PollAndDownloadMigrationAsync(options, update =>
+            {
+                if (!_globalArgs.Quiet)
+                {
+                    _ansiConsole.WriteLine($"Migration {update.Id} is {update.State}...");
+                }
+
+                return Task.CompletedTask;
+            }, ct);
+        }
+
+        _logger.LogInformation("Downloading migration {Id}", options.Id);
+        return _migrationService.DownloadMigrationAsync(options, ct);
     }
 }

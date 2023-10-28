@@ -3,7 +3,6 @@ using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Cli.Utils;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
@@ -145,17 +144,13 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
                 return;
             }
 
-            var migrationStatus = await migrations
-                .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
-                .ToListAsync(cancellationToken: ct);
-
-            _ansiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
-            foreach (var migration in migrationStatus)
+            _ansiConsole.WriteLine($"Found {migrations.Count} migrations:");
+            foreach (var migration in migrations)
             {
                 _ansiConsole.WriteLine($"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)");
             }
 
-            if (!migrationStatus.Any(m => m.State == MigrationState.Exported && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
+            if (!migrations.Any(m => m.State == MigrationState.Exported && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
             {
                 _ansiConsole.WriteLine("No exported migrations found in the last 7 days.");
                 return;
@@ -170,7 +165,7 @@ internal sealed class ManualBackupRunner : IManualBackupRunner
                     .InstructionsText(
                         "(Press [blue]<space>[/] to toggle a migration, " +
                         "[green]<enter>[/] to accept)")
-                    .AddChoices(migrationStatus.Where(m => m.State == MigrationState.Exported && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
+                    .AddChoices(migrations.Where(m => m.State == MigrationState.Exported && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
                     .UseConverter(m => $"{m.Id} {m.State} {m.CreatedAt} ({(_dateTimeProvider.Now - m.CreatedAt).Days}d)")
             );
 

@@ -7,6 +7,7 @@ public class DownloadArguments
 {
     public Option<long[]> MigrationsOption { get; }
     public Option<bool> LatestOption { get; }
+    public Option<bool> PollOption { get; }
     public Option<DirectoryInfo> DestinationOption { get; }
     public Option<int?> NumberOfBackupsOption { get; }
     public Option<bool> OverwriteOption { get; }
@@ -27,6 +28,12 @@ public class DownloadArguments
             aliases: new[] { "-l", "--latest" },
             getDefaultValue: () => false,
             description: DownloadArgDescriptions.Latest.Long
+        ) { IsRequired = false };
+        
+        PollOption = new Option<bool>(
+            aliases: new[] { "-p", "--poll" },
+            getDefaultValue: () => false,
+            description: DownloadArgDescriptions.Poll.Long
         ) { IsRequired = false };
 
         DestinationOption = new Option<DirectoryInfo>(
@@ -52,6 +59,7 @@ public class DownloadArguments
         {
             MigrationsOption,
             LatestOption,
+            PollOption,
             DestinationOption,
             NumberOfBackupsOption,
             OverwriteOption

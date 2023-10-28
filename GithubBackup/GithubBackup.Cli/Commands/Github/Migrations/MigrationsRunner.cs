@@ -53,12 +53,11 @@ internal sealed class MigrationsRunner : IMigrationsRunner
             return;
         }
 
-        var filteredMigrations = await migrations
-            .SelectAsync(m => _migrationsArgs.Export ? _migrationService.GetMigrationAsync(m.Id, ct) : Task.FromResult(m))
+        var filteredMigrations = migrations
             .Where(m => !_migrationsArgs.Export || (m.State == MigrationState.Exported && (_dateTimeProvider.Now - m.CreatedAt).Days <= 7))
             .Where(m => _migrationsArgs.DaysOld is null || (_dateTimeProvider.Now - m.CreatedAt).Days <= _migrationsArgs.DaysOld)
             .Where(m => _migrationsArgs.Since is null || m.CreatedAt >= _migrationsArgs.Since)
-            .ToListAsync(cancellationToken: ct);
+            .ToList();
 
         if (!filteredMigrations.Any())
         {
@@ -72,12 +71,8 @@ internal sealed class MigrationsRunner : IMigrationsRunner
 
         if (!_globalArgs.Quiet)
         {
-            var migrationStatus = await filteredMigrations
-                .SelectAsync(m => _migrationService.GetMigrationAsync(m.Id, ct))
-                .ToListAsync(cancellationToken: ct);
-
-            _ansiConsole.WriteLine($"Found {migrationStatus.Count} migrations:");
-            foreach (var migration in migrationStatus)
+            _ansiConsole.WriteLine($"Found {filteredMigrations.Count} migrations:");
+            foreach (var migration in filteredMigrations)
             {
                 _ansiConsole.WriteLine($"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)");
             }

@@ -48,7 +48,7 @@
     },
     "GithubBackup.Cli Download": {
       "commandName": "Project",
-      "commandLineArgs": "download --destination M:\\Development\\Temp\\github-backup --latest --interval 120",
+      "commandLineArgs": "download --destination M:\\Development\\Temp\\github-backup --migrations 4019118 4019095",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Manual Backup": {

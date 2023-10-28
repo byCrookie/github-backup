@@ -19,6 +19,10 @@ internal static class DownloadArgDescriptions
         If id's are specified, this flag will be ignored.
         """
     );
+    
+    public static readonly Description Poll = new("Poll", "Poll",
+        "Poll the latest migration until it is ready to be downloaded."
+    );
 
     public static readonly Description Destination = new("Destination", "Destination",
         "The destination directory to download the migrations to.");
