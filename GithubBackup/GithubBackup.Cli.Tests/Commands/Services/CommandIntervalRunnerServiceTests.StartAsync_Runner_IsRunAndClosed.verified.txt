@@ -1,3 +1,3 @@
 ﻿Running command. Interval: 00:00:02
 Command finished. Duration: 00:00:00
-Waiting until 01.01.0001 00:00:02 for next run
+Waiting until 01.01.0001 12:00:02 for next run
