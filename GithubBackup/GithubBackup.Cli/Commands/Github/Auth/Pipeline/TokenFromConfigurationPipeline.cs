@@ -41,14 +41,15 @@ internal class TokenFromConfigurationPipeline : ITokenFromConfigurationPipeline
         {
             return await Next!.LoginAsync(globalArgs, args, persist, ct);
         }
-
+        
         _logger.LogInformation("Using token from environment variable");
         var token = _configuration.GetValue<string>("TOKEN");
-        await _githubTokenStore.SetAsync(token);
 
         try
         {
-            return await _userService.WhoAmIAsync(ct);
+            var user = await _userService.WhoAmIAsync(ct);
+            await _githubTokenStore.SetAsync(token);
+            return user;
         }
         catch (Exception e)
         {

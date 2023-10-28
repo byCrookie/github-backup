@@ -42,10 +42,10 @@ internal class LoginPipelineBuilder : ILoginPipelineBuilder
         var tokenArgPipeline = _tokenArgPipelineFactory.Create();
         var deviceFlowAuthPipeline = _deviceFlowAuthPipelineFactory.Create();
         
-        persistedPipeline.Next = tokenArgPipeline;
         tokenArgPipeline.Next = tokenFromConfigurationPipeline;
         tokenFromConfigurationPipeline.Next = deviceFlowAuthPipeline;
-        deviceFlowAuthPipeline.Next = defaultPipeline;
+        deviceFlowAuthPipeline.Next = persistedPipeline;
+        persistedPipeline.Next = defaultPipeline;
         return persistedPipeline;
     }
 

@@ -54,6 +54,7 @@ internal class PersistedPipeline : IPersistedPipeline
     {
         try
         {
+            _logger.LogInformation("Using token from persistent store");
             var t = await _persistentCredentialStore.LoadTokenAsync(ct);
 
             if (string.IsNullOrWhiteSpace(t))
@@ -61,9 +62,10 @@ internal class PersistedPipeline : IPersistedPipeline
                 _logger.LogInformation("Persistent token not found");
                 return null;
             }
-
+            
+            var user = await _userService.WhoAmIAsync(ct);
             await _githubTokenStore.SetAsync(t);
-            return await _userService.WhoAmIAsync(ct);
+            return user;
         }
         catch (Exception e)
         {

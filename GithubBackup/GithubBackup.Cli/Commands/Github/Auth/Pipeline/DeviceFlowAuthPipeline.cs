@@ -45,19 +45,30 @@ internal class DeviceFlowAuthPipeline : IDeviceFlowAuthPipeline
     {
         if (!IsReponsible(args))
         {
-            throw new InvalidOperationException("This pipeline is not responsible for this login request");
+            return await Next!.LoginAsync(globalArgs, args, persist, ct);
         }
 
         _logger.LogInformation("Using device flow authentication");
         var oauthToken = await GetOAuthTokenAsync(globalArgs, ct);
-        await _githubTokenStore.SetAsync(oauthToken);
 
-        if (persist)
+        try
         {
-            await _persistentCredentialStore.StoreTokenAsync(oauthToken, ct);
-        }
+            var user = await _userService.WhoAmIAsync(ct);
 
-        return await _userService.WhoAmIAsync(ct);
+            await _githubTokenStore.SetAsync(oauthToken);
+
+            if (persist)
+            {
+                await _persistentCredentialStore.StoreTokenAsync(oauthToken, ct);
+            }
+
+            return user;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Token {Token} is invalid", args.Token);
+            throw new Exception($"Token {args.Token} is invalid");
+        }
     }
 
     private async Task<string> GetOAuthTokenAsync(GlobalArgs globalArgs, CancellationToken ct)
