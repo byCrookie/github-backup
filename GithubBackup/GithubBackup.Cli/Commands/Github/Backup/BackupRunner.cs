@@ -76,13 +76,6 @@ internal sealed class BackupRunner : IBackupRunner
             ct
         );
 
-        if (!_globalArgs.Quiet)
-        {
-            _ansiConsole.WriteLine(!_globalArgs.Quiet ? $"Downloaded migration {migration.Id} ({file})" : file);
-        }
-        else
-        {
-            _ansiConsole.WriteLine(file);
-        }
+        _ansiConsole.WriteLine(!_globalArgs.Quiet ? $"Downloaded migration {migration.Id} ({file})" : file);
     }
 }

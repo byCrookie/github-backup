@@ -117,18 +117,14 @@ internal sealed class DownloadRunner : IDownloadRunner
             _ansiConsole.WriteLine($"Downloading migration {id} to {_downloadArgs.Destination}...");
             var progress = _ansiConsole.Progress();
             progress.RefreshRate = TimeSpan.FromSeconds(5);
-            await progress.StartAsync(async _ =>
-            {
-                var path = await DownloadMigrationAsync(id, ct);
-                _ansiConsole.WriteLine($"Downloaded migration {id} to {path}");
-            });
+            await progress.StartAsync(_ => DownloadMigrationAsync(id, ct));
             return;
         }
 
         await DownloadMigrationAsync(id, ct);
     }
 
-    private async Task<string> DownloadMigrationAsync(long id, CancellationToken ct)
+    private async Task DownloadMigrationAsync(long id, CancellationToken ct)
     {
         var options = new DownloadMigrationOptions(
             id,
@@ -139,6 +135,6 @@ internal sealed class DownloadRunner : IDownloadRunner
 
         var path = await _migrationService.DownloadMigrationAsync(options, ct);
         _logger.LogInformation("Downloaded migration {Id} to {Path}", id, path);
-        return path;
+        _ansiConsole.WriteLine(!_globalArgs.Quiet ? $"Downloaded migration {id} to {path}" : path);
     }
 }

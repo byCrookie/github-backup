@@ -49,9 +49,6 @@ internal sealed class MigrateRunner : IMigrateRunner
         
         var migration = await _migrationService.StartMigrationAsync(options, ct);
 
-        if (!_globalArgs.Quiet)
-        {
-            _ansiConsole.WriteLine($"Migration started with id {migration.Id}");
-        }
+        _ansiConsole.WriteLine(!_globalArgs.Quiet ? $"Migration started with id {migration.Id}" : $"{migration.Id}");
     }
 }
