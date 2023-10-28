@@ -47,9 +47,8 @@ internal class TokenFromConfigurationPipeline : ITokenFromConfigurationPipeline
 
         try
         {
-            var user = await _userService.WhoAmIAsync(ct);
             await _githubTokenStore.SetAsync(token);
-            return user;
+            return await _userService.WhoAmIAsync(ct);
         }
         catch (Exception e)
         {

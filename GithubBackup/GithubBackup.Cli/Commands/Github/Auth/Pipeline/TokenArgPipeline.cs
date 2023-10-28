@@ -44,9 +44,8 @@ internal class TokenArgPipeline : ITokenArgPipeline
 
         try
         {
-            var user = await _userService.WhoAmIAsync(ct);
-            
             await _githubTokenStore.SetAsync(args.Token);
+            var user = await _userService.WhoAmIAsync(ct);
             
             if (persist)
             {

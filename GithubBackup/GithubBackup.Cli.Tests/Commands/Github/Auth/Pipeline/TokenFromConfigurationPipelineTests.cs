@@ -86,7 +86,7 @@ public class TokenFromConfigurationPipelineTests
 
         await action.Should().ThrowAsync<Exception>();
 
-        await _githubTokenStore.Received(0).SetAsync(token);
+        await _githubTokenStore.Received(1).SetAsync(token);
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Using token from environment variable"),

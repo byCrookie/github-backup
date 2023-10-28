@@ -91,7 +91,7 @@ public class PersistedPipelineTests
 
         await _sut.LoginAsync(globalArgs, loginArgs, true, ct);
 
-        await _githubTokenStore.Received(0).SetAsync(Arg.Any<string>());
+        await _githubTokenStore.Received(1).SetAsync(token);
         await _persistentCredentialStore.Received(0).StoreTokenAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
 
         await _next.Received(1).LoginAsync(globalArgs, loginArgs, true, ct);

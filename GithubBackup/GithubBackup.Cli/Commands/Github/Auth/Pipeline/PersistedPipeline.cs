@@ -63,8 +63,8 @@ internal class PersistedPipeline : IPersistedPipeline
                 return null;
             }
             
-            var user = await _userService.WhoAmIAsync(ct);
             await _githubTokenStore.SetAsync(t);
+            var user = await _userService.WhoAmIAsync(ct);
             return user;
         }
         catch (Exception e)

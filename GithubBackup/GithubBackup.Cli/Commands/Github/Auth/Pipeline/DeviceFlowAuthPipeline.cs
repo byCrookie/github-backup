@@ -53,9 +53,8 @@ internal class DeviceFlowAuthPipeline : IDeviceFlowAuthPipeline
 
         try
         {
-            var user = await _userService.WhoAmIAsync(ct);
-
             await _githubTokenStore.SetAsync(oauthToken);
+            var user = await _userService.WhoAmIAsync(ct);
 
             if (persist)
             {

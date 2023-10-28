@@ -133,7 +133,7 @@ public class DeviceFlowAuthPipelineTests
 
         await action.Should().ThrowAsync<Exception>();
 
-        await _githubTokenStore.Received(0).SetAsync(token);
+        await _githubTokenStore.Received(1).SetAsync(token);
         await _persistentCredentialStore.Received(0).StoreTokenAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
 
         _logger.VerifyLogs(
