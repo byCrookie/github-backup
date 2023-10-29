@@ -24,7 +24,6 @@ public class CommandRunnerServiceTests
     private readonly ILogger<CommandRunnerService> _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifeTime;
     private readonly ICommandRunner _commandRunner;
-    private readonly IEnvironment _environment;
     private readonly TestConsole _ansiConsole;
 
     public CommandRunnerServiceTests()
@@ -32,7 +31,6 @@ public class CommandRunnerServiceTests
         _logger = Substitute.For<ILogger<CommandRunnerService>>();
         _hostApplicationLifeTime = Substitute.For<IHostApplicationLifetime>();
         _commandRunner = Substitute.For<ICommandRunner>();
-        _environment = Substitute.For<IEnvironment>();
         _ansiConsole = new TestConsole();
         var stopwatch = Substitute.For<IStopwatch>();
 
@@ -44,7 +42,6 @@ public class CommandRunnerServiceTests
             _logger,
             _hostApplicationLifeTime,
             _commandRunner,
-            _environment,
             _ansiConsole,
             stopwatch
         );
@@ -65,8 +62,6 @@ public class CommandRunnerServiceTests
         );
 
         await Verify(_ansiConsole.Output);
-
-        _environment.ExitCode.Should().Be(0);
     }
 
     [Fact]
@@ -75,7 +70,9 @@ public class CommandRunnerServiceTests
         const string errorMessage = "Test";
         _commandRunner.RunAsync(CancellationToken.None).ThrowsAsync(new Exception(errorMessage));
 
-        await _sut.StartAsync(CancellationToken.None);
+        var action = () => _sut.StartAsync(CancellationToken.None);
+        
+        await action.Should().ThrowAsync<Exception>().WithMessage(errorMessage);
 
         _hostApplicationLifeTime.Received(1).StopApplication();
         await _commandRunner.Received(1).RunAsync(CancellationToken.None);
@@ -88,8 +85,6 @@ public class CommandRunnerServiceTests
         );
         
         await Verify(_ansiConsole.Output);
-
-        _environment.ExitCode.Should().Be(1);
     }
 
     [Fact]
@@ -98,7 +93,9 @@ public class CommandRunnerServiceTests
         const string errorMessage = "Test";
         _commandRunner.RunAsync(CancellationToken.None).ThrowsAsync(CreateFlurlHttpException(errorMessage));
 
-        await _sut.StartAsync(CancellationToken.None);
+        var action = () => _sut.StartAsync(CancellationToken.None);
+        
+        await action.Should().ThrowAsync<Exception>().WithMessage(errorMessage);
 
         _hostApplicationLifeTime.Received(1).StopApplication();
         await _commandRunner.Received(1).RunAsync(CancellationToken.None);
@@ -111,8 +108,6 @@ public class CommandRunnerServiceTests
         );
         
         await Verify(_ansiConsole.Output);
-
-        _environment.ExitCode.Should().Be(1);
     }
 
     private static FlurlHttpException CreateFlurlHttpException(string errorMessage)

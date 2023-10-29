@@ -18,7 +18,7 @@ public class MigrateArguments
     {
         RepositoriesOption = new Option<string[]>(
             aliases: new[] { "-r", "--repositories" },
-            getDefaultValue: () => Piping.ReadStrings(Console.In, piping, false),
+            getDefaultValue: () => Piping.ReadStrings(System.Console.In, piping, false),
             description: MigrateArgDescriptions.Repositories.Long
         ) { IsRequired = false, Arity = ArgumentArity.ZeroOrMore, AllowMultipleArgumentsPerToken = true };
 

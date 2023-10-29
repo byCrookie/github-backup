@@ -4,33 +4,34 @@ using System.CommandLine.Parsing;
 using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Commands.Github.Cli;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Console;
 using GithubBackup.Cli.Logging;
 using GithubBackup.Cli.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using Spectre.Console;
 
 namespace GithubBackup.Cli;
 
 internal static class Cli
 {
-    public static async Task<int> RunAsync(string[] args, IConsole? console = null)
+    public static Task<int> RunAsync(string[] args, ICliConsole? console = null)
     {
         var rootCommand = new RootCommand("Github Backup");
         var globalArguments = new GlobalArguments();
         rootCommand.AddGlobalOptions(globalArguments.Options());
         GithubCommands.AddCommands(args, rootCommand, globalArguments);
 
-        var commandLineBuilder = new CommandLineBuilder(rootCommand);
-        commandLineBuilder.UseDefaults();
-        commandLineBuilder.UseExceptionHandler((exception, _) =>
-        {
-            Console.Error.WriteLine(exception.Message);
-            Environment.ExitCode = 1;
-        });
-        var parser = commandLineBuilder.Build();
-        await parser.InvokeAsync(args, console);
-        return Environment.ExitCode;
+        return new CommandLineBuilder(rootCommand)
+            .UseDefaults()
+            .UseExceptionHandler((exception, ic) =>
+            {
+                ((ICliConsole)ic.Console).WriteException(exception);
+                ic.ExitCode = 1;
+            })
+            .Build()
+            .InvokeAsync(args, console ?? new CliConsole(AnsiConsole.Console));
     }
 
     /// <summary>Configures the host and runs the CLI.</summary>

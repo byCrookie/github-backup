@@ -1,19 +1,18 @@
 ﻿using System.CommandLine.IO;
 using System.Text;
-using GithubBackup.Cli.Console;
 using Spectre.Console;
 
-namespace GithubBackup.Cli.Tests.Integration;
+namespace GithubBackup.Cli.Console;
 
-public class TestConsole : ICliConsole
+public class CliConsole : ICliConsole
 {
-    private readonly Spectre.Console.Testing.TestConsole _testConsole;
+    private readonly IAnsiConsole _ansiConsole;
 
-    public TestConsole(Spectre.Console.Testing.TestConsole testConsole)
+    public CliConsole(IAnsiConsole ansiConsole)
     {
-        _testConsole = testConsole;
+        _ansiConsole = ansiConsole;
         
-        var writer = new StandardStreamWriter(testConsole);
+        var writer = new StandardStreamWriter(ansiConsole);
         
         Out = writer;
         Error = writer;
@@ -28,9 +27,9 @@ public class TestConsole : ICliConsole
 
     private class StandardStreamWriter : TextWriter, IStandardStreamWriter
     {
-        private readonly Spectre.Console.Testing.TestConsole _ansiConsole;
+        private readonly IAnsiConsole _ansiConsole;
 
-        public StandardStreamWriter(Spectre.Console.Testing.TestConsole ansiConsole)
+        public StandardStreamWriter(IAnsiConsole ansiConsole)
         {
             _ansiConsole = ansiConsole;
         }
@@ -47,11 +46,11 @@ public class TestConsole : ICliConsole
 
         public override Encoding Encoding { get; } = Encoding.UTF8;
 
-        public override string ToString() => _ansiConsole.Output;
+        public override string ToString() => _ansiConsole.Profile.Out.ToString() ?? string.Empty;
     }
 
     public void WriteException(Exception exception)
     {
-        _testConsole.Markup($"[red]{exception.Message}[/]");
+        _ansiConsole.Markup($"[red]{exception.Message}[/]");
     }
 }

@@ -5,9 +5,10 @@ public class LoginTests
 {
     [Theory]
     [InlineData("login --help")]
-    [InlineData("login")]
-    public async Task RunAsync__(string args)
+    [InlineData("login", 1)]
+    [InlineData("login --token test_token", 1)]
+    public async Task RunAsync__(string args, int exitCode = 0)
     {
-        await TestCli.RunAsync(args);
+        await TestCli.RunAsync(args, exitCode, _ => {});
     }
 }

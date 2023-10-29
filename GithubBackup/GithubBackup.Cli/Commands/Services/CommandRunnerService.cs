@@ -1,6 +1,5 @@
 using Flurl.Http;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Core.Environment;
 using GithubBackup.Core.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,7 +13,6 @@ internal sealed class CommandRunnerService : IHostedService
     private readonly ILogger<CommandRunnerService> _logger;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly ICommandRunner _commandRunner;
-    private readonly IEnvironment _environment;
     private readonly IAnsiConsole _ansiConsole;
     private readonly IStopwatch _stopwatch;
 
@@ -23,7 +21,6 @@ internal sealed class CommandRunnerService : IHostedService
         ILogger<CommandRunnerService> logger,
         IHostApplicationLifetime hostApplicationLifetime,
         ICommandRunner commandRunner,
-        IEnvironment environment,
         IAnsiConsole ansiConsole,
         IStopwatch stopwatch)
     {
@@ -31,7 +28,6 @@ internal sealed class CommandRunnerService : IHostedService
         _logger = logger;
         _hostApplicationLifetime = hostApplicationLifetime;
         _commandRunner = commandRunner;
-        _environment = environment;
         _ansiConsole = ansiConsole;
         _stopwatch = stopwatch;
     }
@@ -57,15 +53,13 @@ internal sealed class CommandRunnerService : IHostedService
             var error = await e.GetResponseStringAsync();
             _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}",
                 _commandRunner.GetType().Name, error);
-            await Console.Error.WriteLineAsync(e.Message);
-            _environment.ExitCode = 1;
+            throw new Exception(error, e);
         }
         catch (Exception e)
         {
             _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}",
                 _commandRunner.GetType().Name, e.Message);
-            await Console.Error.WriteLineAsync(e.Message);
-            _environment.ExitCode = 1;
+            throw;
         }
         finally
         {
@@ -76,9 +70,9 @@ internal sealed class CommandRunnerService : IHostedService
             {
                 _ansiConsole.WriteLine($"Command finished. Duration: {stopWatch.Elapsed}");
             }
+            
+            _hostApplicationLifetime.StopApplication();
         }
-
-        _hostApplicationLifetime.StopApplication();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

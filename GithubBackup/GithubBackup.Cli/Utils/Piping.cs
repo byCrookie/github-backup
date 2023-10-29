@@ -51,7 +51,7 @@ public static partial class Piping
     {
         try
         {
-            _ = Console.KeyAvailable;
+            _ = System.Console.KeyAvailable;
             return false;
         }
         catch

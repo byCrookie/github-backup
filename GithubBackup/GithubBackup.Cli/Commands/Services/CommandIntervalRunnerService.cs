@@ -64,13 +64,13 @@ internal sealed class CommandIntervalRunnerService : IHostedService
                 var error = await e.GetResponseStringAsync();
                 _logger.LogError(e, "Unhandled exception (Command: {Type}): {Message}",
                     _commandRunner.GetType().Name, error);
-                await Console.Error.WriteLineAsync(e.Message);
+                _ansiConsole.MarkupLine($"[red]{error}[/]");
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Unhandled exception (Command: {Type}): {Message}",
                     _commandRunner.GetType().Name, e.Message);
-                await Console.Error.WriteLineAsync(e.Message);
+                _ansiConsole.MarkupLine($"[red]{e.Message}[/]");
             }
             finally
             {
