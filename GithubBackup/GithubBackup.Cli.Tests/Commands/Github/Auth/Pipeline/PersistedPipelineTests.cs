@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using GithubBackup.Cli.Commands.Github.Auth;
+﻿using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Auth.Pipeline;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;

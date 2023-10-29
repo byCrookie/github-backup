@@ -1,6 +1,5 @@
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Cli.Utils;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Utils;
 using Spectre.Console;

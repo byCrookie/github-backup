@@ -14,8 +14,8 @@
         <PackageReference Include="NSubstitute"/>
         <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
         <PackageReference Include="Spectre.Console.Testing"/>
-        <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers"/>
-        <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers"/>
+        <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
+        <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
         <PackageReference Include="Testcontainers" />
         <PackageReference Include="Verify.Xunit"/>
         <PackageReference Include="xunit"/>

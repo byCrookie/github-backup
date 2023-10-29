@@ -10,18 +10,30 @@ using GithubBackup.Cli.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Spectre.Console;
 
 namespace GithubBackup.Cli;
 
 internal static class Cli
 {
-    public static Task<int> RunAsync(string[] args, ICliConsole? console = null)
+    public static Task<int> RunAsync(string[] args, CliOptions? options = null)
     {
+        var cliOptions = options ?? new CliOptions();
+
         var rootCommand = new RootCommand("Github Backup");
+
         var globalArguments = new GlobalArguments();
         rootCommand.AddGlobalOptions(globalArguments.Options());
-        GithubCommands.AddCommands(args, rootCommand, globalArguments);
+
+        GithubCommands.AddCommands(
+            args,
+            rootCommand,
+            new CommandOptions
+            {
+                GlobalArguments = globalArguments,
+                AfterConfiguration = cliOptions.AfterConfiguration,
+                AfterServices = cliOptions.AfterServices
+            }
+        );
 
         return new CommandLineBuilder(rootCommand)
             .UseDefaults()
@@ -31,18 +43,15 @@ internal static class Cli
                 ic.ExitCode = 1;
             })
             .Build()
-            .InvokeAsync(args, console ?? new CliConsole(AnsiConsole.Console));
+            .InvokeAsync(args, cliOptions.Console);
     }
 
-    /// <summary>Configures the host and runs the CLI.</summary>
-    /// <param name="args">The original arguments passed to the application.</param>
-    /// <param name="globalArgs">The global CLI arguments.</param>
-    /// <param name="commandArgs">The command-specific CLI arguments.</param>
-    /// <typeparam name="TCliCommand">The implementation type of the CLI command.</typeparam>
-    /// <typeparam name="TCommandArgs">The type of the CLI command arguments.</typeparam>
-    /// <returns>The task that will complete when the CLI is done.</returns>
-    public static Task RunAsync<TCliCommand, TCommandArgs>(string[] args, GlobalArgs globalArgs,
-        TCommandArgs commandArgs)
+    public static Task RunAsync<TCliCommand, TCommandArgs>(
+        string[] args,
+        GlobalArgs globalArgs,
+        TCommandArgs commandArgs,
+        RunOptions options
+    )
         where TCommandArgs : class
         where TCliCommand : class, ICommandRunner
     {
@@ -53,8 +62,10 @@ internal static class Cli
         var builder = Host.CreateApplicationBuilder(args);
 
         builder.Configuration.AddEnvironmentVariables("GITHUB_BACKUP_");
+        options.AfterConfiguration.Invoke(builder);
 
         builder.Services.AddCli<TCliCommand, TCommandArgs>(globalArgs, commandArgs);
+        options.AfterServices.Invoke(builder);
 
         var host = builder.Build();
         return host.RunAsync();

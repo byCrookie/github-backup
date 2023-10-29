@@ -6,7 +6,6 @@ using Flurl.Http;
 using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Services;
-using GithubBackup.Core.Environment;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Hosting;

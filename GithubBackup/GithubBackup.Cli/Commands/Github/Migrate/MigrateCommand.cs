@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using GithubBackup.Cli.Commands.Github.Cli;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Interval;
@@ -10,8 +11,8 @@ internal static class MigrateCommand
 {
     private const string CommandName = "migrate";
     private const string CommandDescription = "Migrate a Github user.";
-    
-    public static Command Create(string[] args, GlobalArguments globalArguments)
+
+    public static Command Create(string[] args, CommandOptions options)
     {
         var command = new Command(CommandName, CommandDescription);
         var migrateArguments = new MigrateArguments(true);
@@ -20,10 +21,15 @@ internal static class MigrateCommand
         command.AddOptions(migrateArguments.Options());
         command.AddOptions(intervalArguments.Options());
         command.AddOptions(loginArguments.Options());
-        
+
         command.SetHandler(
-            (globalArgs, migrateArgs) => GithubBackup.Cli.Cli.RunAsync<MigrateRunner, MigrateArgs>(args, globalArgs, migrateArgs),
-            new GlobalArgsBinder(globalArguments),
+            (globalArgs, migrateArgs) => GithubBackup.Cli.Cli
+                .RunAsync<MigrateRunner, MigrateArgs>(args, globalArgs, migrateArgs, new RunOptions
+                {
+                    AfterConfiguration = options.AfterConfiguration,
+                    AfterServices = options.AfterServices
+                }),
+            new GlobalArgsBinder(options.GlobalArguments),
             new MigrateArgsBinder(migrateArguments, intervalArguments, loginArguments)
         );
 

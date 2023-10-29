@@ -13,9 +13,12 @@ public class GithubCommandsTests
         var args = Array.Empty<string>();
         var rootCommand = new RootCommand();
         var globalArguments = new GlobalArguments();
-        GithubCommands.AddCommands(args, rootCommand, globalArguments);
+        GithubCommands.AddCommands(args, rootCommand, new CommandOptions
+        {
+            AfterConfiguration = _ => { },
+            AfterServices = _ => { },
+            GlobalArguments = globalArguments
+        });
         rootCommand.Subcommands.Should().HaveCount(7);
     }
 }
-
-	
