@@ -1,5 +1,4 @@
-﻿using System.CommandLine.IO;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using FluentAssertions;
 
 namespace GithubBackup.Cli.Tests.Integration;
@@ -13,7 +12,7 @@ public static class TestCli
         var exitCode = await Cli.RunAsync(args.Split(" "), testConsole);
 
         exitCode.Should().Be(0);
-        
+
         var settings = new VerifySettings();
         settings.AddScrubber(sb => sb.Replace("ReSharperTestRunner", "ghb"));
 

@@ -1,5 +1,8 @@
 ﻿'' was not matched. Did you mean one of the following?
 -h
+Required command was not provided.
+Unrecognized command or argument ''.
+
 Description:
   Github Backup
 

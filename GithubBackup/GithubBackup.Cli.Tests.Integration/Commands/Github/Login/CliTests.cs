@@ -4,8 +4,8 @@
 public class LoginTests
 {
     [Theory]
-    [InlineData("login")]
     [InlineData("login --help")]
+    [InlineData("login")]
     public async Task RunAsync__(string args)
     {
         await TestCli.RunAsync(args);
