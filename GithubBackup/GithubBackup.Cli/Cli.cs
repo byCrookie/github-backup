@@ -14,7 +14,7 @@ namespace GithubBackup.Cli;
 
 internal static class Cli
 {
-    public static async Task<int> RunAsync(string[] args)
+    public static async Task<int> RunAsync(string[] args, IConsole? console = null)
     {
         var rootCommand = new RootCommand("Github Backup");
         var globalArguments = new GlobalArguments();
@@ -29,7 +29,7 @@ internal static class Cli
             Environment.ExitCode = 1;
         });
         var parser = commandLineBuilder.Build();
-        await parser.InvokeAsync(args);
+        await parser.InvokeAsync(args, console);
         return Environment.ExitCode;
     }
 
