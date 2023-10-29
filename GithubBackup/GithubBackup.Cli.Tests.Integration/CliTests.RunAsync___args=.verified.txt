@@ -1,0 +1,25 @@
+﻿'' was not matched. Did you mean one of the following?
+-h
+Description:
+  Github Backup
+
+Usage:
+  ghb [command] [options]
+
+Options:
+  --quiet                                                            Do not print logs to console. [default: True]
+  --log-file <log-file>                                              Path to the log file.
+  --verbosity <Critical|Debug|Error|Information|None|Trace|Warning>  Set the verbosity level of the log file. [default: Information]
+  --version                                                          Show version information
+  -?, -h, --help                                                     Show help and usage information
+
+Commands:
+  manual        Manually backup a Github user. This command is interactive.
+  migrate       Migrate a Github user.
+  login         Login to Github. Persists your login token to disk for future use.
+                Only one login token can be persisted at a time.
+  migrations    List migrations.
+  repositories  List repositories.
+  download      Download migrations.
+  backup        Backup a Github user.
+

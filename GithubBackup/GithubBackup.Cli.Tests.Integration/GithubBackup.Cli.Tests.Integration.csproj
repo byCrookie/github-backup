@@ -16,6 +16,7 @@
         <PackageReference Include="Spectre.Console.Testing"/>
         <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers"/>
         <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers"/>
+        <PackageReference Include="Testcontainers" />
         <PackageReference Include="Verify.Xunit"/>
         <PackageReference Include="xunit"/>
         <PackageReference Include="xunit.extensibility.core"/>

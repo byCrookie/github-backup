@@ -42,6 +42,7 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="GithubBackup.Cli.Tests" />
+        <InternalsVisibleTo Include="GithubBackup.Cli.Tests.Integration" />
         <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
     </ItemGroup>
 </Project>
