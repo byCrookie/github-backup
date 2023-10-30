@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using GithubBackup.Cli.Boot;
 using GithubBackup.Cli.Commands.Github.Cli;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
@@ -20,16 +21,24 @@ internal static class MigrationsCommand
         command.AddOptions(loginArguments.Options());
 
         command.SetHandler(
-            (globalArgs, migrationsArgs) => GithubBackup.Cli.Cli
-                .RunAsync<MigrationsRunner, MigrationsArgs>(args, globalArgs, migrationsArgs, new RunOptions
-                {
-                    AfterConfiguration = options.AfterConfiguration,
-                    AfterServices = options.AfterServices
-                }),
+            (globalArgs, migrationsArgs) => RunAsync(args, globalArgs, migrationsArgs, options),
             new GlobalArgsBinder(options.GlobalArguments),
             new MigrationsArgsBinder(migrationsArguments, loginArguments)
         );
 
         return command;
+    }
+
+    private static Task RunAsync(string[] args, GlobalArgs globalArgs, MigrationsArgs migrationsArgs,
+        CommandOptions options)
+    {
+        var runner = new CliRunner<MigrationsRunner, MigrationsArgs>(
+            args, globalArgs, migrationsArgs,
+            new RunOptions
+            {
+                AfterServices = options.AfterServices
+            });
+
+        return runner.RunAsync();
     }
 }

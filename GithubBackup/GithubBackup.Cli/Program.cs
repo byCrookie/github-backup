@@ -1,3 +1,3 @@
-﻿using GithubBackup.Cli;
+﻿using GithubBackup.Cli.Boot;
 
 return await Cli.RunAsync(args);

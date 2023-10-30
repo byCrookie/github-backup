@@ -15,7 +15,6 @@ public class GithubCommandsTests
         var globalArguments = new GlobalArguments();
         GithubCommands.AddCommands(args, rootCommand, new CommandOptions
         {
-            AfterConfiguration = _ => { },
             AfterServices = _ => { },
             GlobalArguments = globalArguments
         });

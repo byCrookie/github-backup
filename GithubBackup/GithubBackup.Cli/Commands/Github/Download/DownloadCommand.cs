@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using GithubBackup.Cli.Boot;
 using GithubBackup.Cli.Commands.Github.Cli;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
@@ -23,16 +24,23 @@ internal static class DownloadCommand
         command.AddOptions(loginArguments.Options());
         
         command.SetHandler(
-            (globalArgs, migrateArgs) => GithubBackup.Cli.Cli
-                .RunAsync<DownloadRunner, DownloadArgs>(args, globalArgs, migrateArgs, new RunOptions
-                {
-                    AfterConfiguration = options.AfterConfiguration,
-                    AfterServices = options.AfterServices
-                }),
+            (globalArgs, downloadArgs) => RunAsync(args, globalArgs, downloadArgs, options),
             new GlobalArgsBinder(options.GlobalArguments),
             new DowndloadArgsBinder(downloadArguments, intervalArguments, loginArguments)
         );
 
         return command;
+    }
+    
+    private static Task RunAsync(string[] args, GlobalArgs globalArgs, DownloadArgs downloadArgs, CommandOptions options)
+    {
+        var runner = new CliRunner<DownloadRunner, DownloadArgs>(
+            args, globalArgs, downloadArgs,
+            new RunOptions
+            {
+                AfterServices = options.AfterServices
+            });
+
+        return runner.RunAsync();
     }
 }

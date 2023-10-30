@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using GithubBackup.Cli.Boot;
 using GithubBackup.Cli.Commands.Github.Cli;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
@@ -25,17 +26,24 @@ internal static class LoginCommand
         command.AddOptions(loginArguments.Options());
 
         command.SetHandler(
-            (globalArgs, loginArgs) => GithubBackup.Cli.Cli
-                .RunAsync<LoginRunner, LoginArgs>(args, globalArgs, loginArgs, new RunOptions
-                {
-                    AfterConfiguration = options.AfterConfiguration,
-                    AfterServices = options.AfterServices
-                }),
+            (globalArgs, loginArgs) => RunAsync(args, globalArgs, loginArgs, options),
             new GlobalArgsBinder(options.GlobalArguments),
             new LoginArgsBinder(loginArguments)
         );
 
         return command;
+    }
+
+    private static Task RunAsync(string[] args, GlobalArgs globalArgs, LoginArgs loginArgs, CommandOptions options)
+    {
+        var runner = new CliRunner<LoginRunner, LoginArgs>(
+            args, globalArgs, loginArgs,
+            new RunOptions
+            {
+                AfterServices = options.AfterServices
+            });
+
+        return runner.RunAsync();
     }
 
     private static string GetHomeDirectoryDescription()

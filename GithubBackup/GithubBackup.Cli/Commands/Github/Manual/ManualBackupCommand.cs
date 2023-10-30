@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using GithubBackup.Cli.Boot;
 using GithubBackup.Cli.Commands.Github.Cli;
 using GithubBackup.Cli.Commands.Global;
 
@@ -14,16 +15,24 @@ internal static class ManualBackupCommand
         var command = new Command(CommandName, CommandDescription);
 
         command.SetHandler(
-            (globalArgs, manualBackupArgs) => GithubBackup.Cli.Cli
-                .RunAsync<ManualBackupRunner, ManualBackupArgs>(args, globalArgs, manualBackupArgs, new RunOptions
-                {
-                    AfterConfiguration = options.AfterConfiguration,
-                    AfterServices = options.AfterServices
-                }),
+            (globalArgs, manualBackupArgs) => RunAsync(args, globalArgs, manualBackupArgs, options),
             new GlobalArgsBinder(options.GlobalArguments),
             new ManualBackupArgsBinder()
         );
 
         return command;
+    }
+
+    private static Task RunAsync(string[] args, GlobalArgs globalArgs, ManualBackupArgs manualBackupArgs,
+        CommandOptions options)
+    {
+        var runner = new CliRunner<ManualBackupRunner, ManualBackupArgs>(
+            args, globalArgs, manualBackupArgs,
+            new RunOptions
+            {
+                AfterServices = options.AfterServices
+            });
+
+        return runner.RunAsync();
     }
 }

@@ -4,7 +4,7 @@ using Serilog;
 
 namespace GithubBackup.Cli.Logging;
 
-internal static class CliLoggerConfiguration
+internal static class CliLogger
 {
     public static LoggerConfiguration Create(GlobalArgs globalArgs)
     {

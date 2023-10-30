@@ -3,6 +3,7 @@ using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.CompilerServices;
 using FluentAssertions;
 using Flurl.Http.Testing;
+using GithubBackup.Cli.Boot;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GithubBackup.Cli.Tests.Integration;
@@ -30,7 +31,7 @@ public static class TestCli
         using var httpTest = new HttpTest();
         configureHttp?.Invoke(httpTest);
 
-        var exitCode = await Cli.RunAsync(args.Split(" "), new CliOptions
+        var exitCode = await Boot.Cli.RunAsync(args.Split(" "), new CliOptions
         {
             Console = testConsole,
             AfterServices = hb => hb.Services.AddSingleton<IFileSystem>(mockFileSystem)

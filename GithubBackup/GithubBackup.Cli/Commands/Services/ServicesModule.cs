@@ -6,13 +6,6 @@ namespace GithubBackup.Cli.Commands.Services;
 
 internal static class ServicesModule
 {
-    /// <summary>
-    /// Registers all hosted services which are executed by the application host
-    /// during startup.
-    /// </summary>
-    /// <param name="services">Dependencies are registered on this service collection</param>
-    /// <param name="globalArgs">The global arguments of the application</param>
-    /// <param name="commandArgs">The arguments for the specific command</param>
     public static void AddServices<TCommandArgs>(this IServiceCollection services, GlobalArgs globalArgs, TCommandArgs commandArgs)
         where TCommandArgs : class
     {
