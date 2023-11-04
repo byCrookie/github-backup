@@ -5,13 +5,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{B58CB078-54A4-4083-B6DA-B2D1C6E8CE68}"
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
-		..\.gitignore = ..\.gitignore
-		..\LICENSE = ..\LICENSE
-		..\README.md = ..\README.md
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		nuget.config = nuget.config
 		version.json = version.json
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubBackup.Core", "GithubBackup.Core\GithubBackup.Core.csproj", "{94CE06B8-7742-4A37-93CD-662FF98D6DD1}"
@@ -28,10 +28,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{2320
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{0130B520-705C-4BF2-A919-C4FBF31D40BF}"
 	ProjectSection(SolutionItems) = preProject
-		..\.github\workflows\test_linux_x64.yml = ..\.github\workflows\test_linux_x64.yml
-		..\.github\workflows\test_osx_x64.yml = ..\.github\workflows\test_osx_x64.yml
-		..\.github\workflows\test_win_x64.yml = ..\.github\workflows\test_win_x64.yml
-		..\.github\workflows\release.yml = ..\.github\workflows\release.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
+		.github\workflows\test_linux_x64.yml = .github\workflows\test_linux_x64.yml
+		.github\workflows\test_osx_x64.yml = .github\workflows\test_osx_x64.yml
+		.github\workflows\test_win_x64.yml = .github\workflows\test_win_x64.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubBackup.Cli.Tests.Integration", "GithubBackup.Cli.Tests.Integration\GithubBackup.Cli.Tests.Integration.csproj", "{4FBAC08D-72CD-4662-AA1A-7229AD7A85C7}"

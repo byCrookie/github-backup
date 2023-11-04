@@ -25,12 +25,9 @@ jobs:
         
       - name: Restore
         run: dotnet restore
-        working-directory: ./GithubBackup
         
       - name: Build
         run: dotnet build GithubBackup.sln --configuration Release --no-restore
-        working-directory: ./GithubBackup
         
       - name: Test
         run: dotnet test GithubBackup.sln --configuration Release --no-restore
-        working-directory: ./GithubBackup
