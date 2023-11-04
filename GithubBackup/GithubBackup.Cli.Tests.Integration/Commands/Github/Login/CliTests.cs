@@ -12,7 +12,7 @@ public class LoginTests
     }
     
     [Fact]
-    public async Task RunAsync_LoginUsing_()
+    public async Task RunAsync_LoginUsingToken_ThrowsException()
     {
         var args = "login";
         
