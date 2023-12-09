@@ -1,7 +1,6 @@
 using GithubBackup.Cli.Commands.Github;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Services;
-using GithubBackup.Core.DependencyInjection.Factory;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GithubBackup.Cli.Commands;
@@ -27,10 +26,12 @@ internal static class CommandsModule
         where TCliCommand : class, ICommandRunner
     {
         services.AddGithub();
+        
+        services.AddTransient(s => ActivatorUtilities
+            .CreateInstance<TCliCommand>(s, globalArgs));
 
-        services.AddTransient<ICommandRunner>(s => s
-            .GetRequiredService<IFactory<GlobalArgs, TCommandArgs, TCliCommand>>()
-            .Create(globalArgs, commandArgs));
+        services.AddTransient<ICommandRunner>(s => ActivatorUtilities
+            .CreateInstance<TCliCommand>(s, globalArgs, commandArgs));
 
         services.AddServices(globalArgs, commandArgs);
     }
