@@ -6,7 +6,7 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Backup;
 
-internal sealed class BackupRunner : IBackupRunner
+internal sealed class BackupRunner : ICommandRunner
 {
     private readonly GlobalArgs _globalArgs;
     private readonly BackupArgs _backupArgs;

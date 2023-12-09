@@ -7,7 +7,7 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Download;
 
-internal sealed class DownloadRunner : IDownloadRunner
+internal sealed class DownloadRunner : ICommandRunner
 {
     private readonly GlobalArgs _globalArgs;
     private readonly DownloadArgs _downloadArgs;

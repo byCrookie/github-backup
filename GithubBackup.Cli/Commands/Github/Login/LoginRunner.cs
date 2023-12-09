@@ -3,7 +3,7 @@ using GithubBackup.Cli.Commands.Global;
 
 namespace GithubBackup.Cli.Commands.Github.Login;
 
-internal sealed class LoginRunner : ILoginRunner
+internal sealed class LoginRunner : ICommandRunner
 {
     private readonly GlobalArgs _globalArgs;
     private readonly LoginArgs _loginArgs;

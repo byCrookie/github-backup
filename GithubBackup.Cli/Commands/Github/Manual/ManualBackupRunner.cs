@@ -11,7 +11,7 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Manual;
 
-internal sealed class ManualBackupRunner : IManualBackupRunner
+internal sealed class ManualBackupRunner : ICommandRunner
 {
     private readonly GlobalArgs _globalArgs;
     private readonly IMigrationService _migrationService;
