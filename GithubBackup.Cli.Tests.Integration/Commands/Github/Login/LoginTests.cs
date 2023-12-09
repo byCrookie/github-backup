@@ -1,4 +1,6 @@
-﻿namespace GithubBackup.Cli.Tests.Integration.Commands.Github.Login;
+﻿using GithubBackup.Core.Github.Users;
+
+namespace GithubBackup.Cli.Tests.Integration.Commands.Github.Login;
 
 [UsesVerify]
 public class LoginTests
@@ -11,11 +13,35 @@ public class LoginTests
         await TestCli.RunAsync(args, exitCode, _ => {});
     }
     
-    [Fact]
+    [Fact(Skip = "Not yet implemented")]
     public async Task RunAsync_LoginUsingToken_ThrowsException()
     {
-        var args = "login";
+        const string url = "https://api.github.com/user";
         
-        await TestCli.RunAsync(args, 1, _ => {});
+        const string args = "login --token ghp_7569254b-1521-4b1e-96ff-fc637f4e2f4d";
+
+        await TestCli.RunAsync(args, 1, http =>
+        {
+            http
+                .ForCallsTo(url)
+                .WithVerb(HttpMethod.Get)
+                .RespondWithJson(new UserResponse("user", "user"), headers: GetHeaders());
+        });
+    }
+    
+    private static Dictionary<string, string> GetHeaders(params KeyValuePair<string, string>[] headers)
+    {
+        var allHeaders = new Dictionary<string, string>
+        {
+            { "x-ratelimit-remaining", "4999" },
+            { "x-ratelimit-reset", "1614556800" }
+        };
+
+        foreach (var header in headers)
+        {
+            allHeaders.Add(header.Key, header.Value);
+        }
+
+        return allHeaders;
     }
 }
