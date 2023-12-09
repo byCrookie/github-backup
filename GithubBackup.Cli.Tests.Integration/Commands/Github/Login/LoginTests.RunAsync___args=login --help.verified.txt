@@ -1,0 +1,18 @@
+﻿Description:
+  Login to Github. Persists your login token to disk for future use.
+  Only one login token can be persisted at a time. 
+
+Usage:
+  ghb login [options]
+
+Options:
+  --token <token>                                                    If not provided, the token will be aquired from the environment variable GITHUB_BACKUP_TOKEN.
+                                                                     If provided, device flow authentication will be ignored. Recommended for use on servers.");
+  --device-flow-auth                                                 Interactive authentication using the device flow.
+                                                                     Requires a browser. Recommended for use on clients. [default: False]
+  --quiet                                                            Do not print logs to console. [default: True]
+  --log-file <log-file>                                              Path to the log file.
+  --verbosity <Critical|Debug|Error|Information|None|Trace|Warning>  Set the verbosity level of the log file. [default: Information]
+  -?, -h, --help                                                     Show help and usage information
+
+

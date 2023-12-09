@@ -397,6 +397,7 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+.idea
 !Backup/
 !Github/Backup/
 !Github/Backup/*
