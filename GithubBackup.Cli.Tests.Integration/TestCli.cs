@@ -39,6 +39,7 @@ public static class TestCli
 
         var settings = new VerifySettings();
         settings.AddScrubber(sb => sb.Replace("ReSharperTestRunner", "ghb"));
+        settings.AddScrubber(sb => sb.Replace("testhost", "ghb"));
 
         // ReSharper disable once ExplicitCallerInfoArgument
         await Verify(testConsole.Out.ToString(), settings, sourceFile).UseParameters(args);
