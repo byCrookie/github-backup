@@ -55,6 +55,12 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
+          
+      - name: Install Nerdbank.GitVersioning
+        run: install --tool-path . nbgv
+        
+      - name: Nerdbank.GitVersioning SetVersion
+        run: nbgv cloud
 
       - name: Restore
         run: dotnet restore
@@ -94,6 +100,12 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Install Nerdbank.GitVersioning
+        run: install --tool-path . nbgv
+
+      - name: Nerdbank.GitVersioning SetVersion
+        run: nbgv cloud
+
       - name: Restore
         run: dotnet restore
 
@@ -132,6 +144,12 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
+
+      - name: Install Nerdbank.GitVersioning
+        run: install --tool-path . nbgv
+
+      - name: Nerdbank.GitVersioning SetVersion
+        run: nbgv cloud
 
       - name: Restore
         run: dotnet restore
