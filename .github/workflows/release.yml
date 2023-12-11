@@ -20,6 +20,12 @@ jobs:
           
       - name: Nerdbank.GitVersioning
         uses: dotnet/nbgv@master
+        
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build GithubBackup.sln --configuration Release --no-restore
 
       - name: Create Release
         id: create_release
