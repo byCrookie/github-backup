@@ -20,6 +20,9 @@ jobs:
           
       - name: Nerdbank.GitVersioning
         uses: dotnet/nbgv@master
+        with:
+          setCommonVars: true
+          setAllVars: true
         
       - name: Restore
         run: dotnet restore
@@ -51,9 +54,6 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-          
-      - name: Nerdbank.GitVersioning
-        uses: dotnet/nbgv@master
 
       - name: Restore
         run: dotnet restore
@@ -92,9 +92,6 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-          
-      - name: Nerdbank.GitVersioning
-        uses: dotnet/nbgv@master
 
       - name: Restore
         run: dotnet restore
@@ -134,9 +131,6 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-          
-      - name: Nerdbank.GitVersioning
-        uses: dotnet/nbgv@master
 
       - name: Restore
         run: dotnet restore
