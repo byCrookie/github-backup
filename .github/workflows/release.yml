@@ -22,7 +22,6 @@ jobs:
         uses: dotnet/nbgv@master
         with:
           setCommonVars: true
-          setAllVars: true
           
       - name: Create Release
         id: create_release
