@@ -18,14 +18,7 @@ jobs:
         with:
           fetch-depth: 0
           
-      - name: Restore
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build GithubBackup.sln --configuration Release --no-restore
-        
-      - name: Get Version
-        id: nerbank_gitversioning
+      - name: Nerdbank.GitVersioning
         uses: dotnet/nbgv@master
 
       - name: Create Release
@@ -52,9 +45,9 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-        
+          
       - name: Nerdbank.GitVersioning
-        run: nbgv cloud
+        uses: dotnet/nbgv@master
 
       - name: Restore
         run: dotnet restore
@@ -93,9 +86,9 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-
+          
       - name: Nerdbank.GitVersioning
-        run: nbgv cloud
+        uses: dotnet/nbgv@master
 
       - name: Restore
         run: dotnet restore
@@ -135,9 +128,9 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-
+          
       - name: Nerdbank.GitVersioning
-        run: nbgv cloud
+        uses: dotnet/nbgv@master
 
       - name: Restore
         run: dotnet restore
