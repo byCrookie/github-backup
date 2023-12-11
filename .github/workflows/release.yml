@@ -23,13 +23,7 @@ jobs:
         with:
           setCommonVars: true
           setAllVars: true
-        
-      - name: Restore
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build GithubBackup.sln --configuration Release --no-restore
-
+          
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
