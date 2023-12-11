@@ -11,7 +11,7 @@ namespace GithubBackup.Cli.Commands.Github.Migrate;
 internal static class MigrateCommand
 {
     private const string CommandName = "migrate";
-    private const string CommandDescription = "Migrate a Github user.";
+    private const string CommandDescription = "Migrate a Github user. This command will create a new migration for the given repositories.";
 
     public static Command Create(string[] args, CommandOptions options)
     {

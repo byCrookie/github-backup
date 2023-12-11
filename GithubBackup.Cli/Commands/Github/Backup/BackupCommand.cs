@@ -13,7 +13,12 @@ namespace GithubBackup.Cli.Commands.Github.Backup;
 internal static class BackupCommand
 {
     private const string CommandName = "backup";
-    private const string CommandDescription = "Backup a Github user.";
+
+    private const string CommandDescription =
+        """
+        Backup a Github user. This command will create a new migration
+        for the given repositories and download it when ready.
+        """;
 
     public static Command Create(string[] args, CommandOptions options)
     {
@@ -32,7 +37,7 @@ internal static class BackupCommand
 
         command.AddOptions(intervalArguments.Options());
         command.AddOptions(loginArguments.Options());
-        
+
         command.SetHandler(
             (globalArgs, backupArgs) => RunAsync(args, globalArgs, backupArgs, options),
             new GlobalArgsBinder(options.GlobalArguments),

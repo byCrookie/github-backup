@@ -11,7 +11,7 @@ namespace GithubBackup.Cli.Commands.Github.Download;
 internal static class DownloadCommand
 {
     private const string CommandName = "download";
-    private const string CommandDescription = "Download migrations.";
+    private const string CommandDescription = "Download migrations for a Github user.";
     
     public static Command Create(string[] args, CommandOptions options)
     {
