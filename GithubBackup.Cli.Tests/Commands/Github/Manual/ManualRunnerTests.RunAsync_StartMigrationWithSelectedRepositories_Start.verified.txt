@@ -43,13 +43,13 @@ backed up.
 (Press <space> to toggle a repository, <enter> to accept)                    Select options to start migration?                                              
                                                                                 
 > [ ] Lock Repositories - Lock the repositories being migrated at the start of  
-the migration                                                                   
+the migration.                                                                  
   [ ] Exclude Metadata - Indicates whether metadata should be excluded and only 
 git source should be included for the migration.                                
   [ ] Exclude Git Data - Indicates whether the repository git data should be    
 excluded from the migration.                                                    
-  [ ] Exclude Attachements - Do not include attachments in the migration        
-  [ ] Exclude Releases - Do not include releases in the migration               
+  [ ] Exclude Attachements - Do not include attachments in the migration.       
+  [ ] Exclude Releases - Do not include releases in the migration.              
   [ ] Exclude Owner Projects - Indicates whether projects owned by the          
 organization or users should be excluded.                                       
   [ ] Org Metadata Only - Indicates whether this should only include            
@@ -59,13 +59,13 @@ flags).
 (Press <space> to toggle a option, <enter> to accept)                           Select options to start migration?                                              
                                                                                 
   [ ] Lock Repositories - Lock the repositories being migrated at the start of  
-the migration                                                                   
+the migration.                                                                  
 > [ ] Exclude Metadata - Indicates whether metadata should be excluded and only 
 git source should be included for the migration.                                
   [ ] Exclude Git Data - Indicates whether the repository git data should be    
 excluded from the migration.                                                    
-  [ ] Exclude Attachements - Do not include attachments in the migration        
-  [ ] Exclude Releases - Do not include releases in the migration               
+  [ ] Exclude Attachements - Do not include attachments in the migration.       
+  [ ] Exclude Releases - Do not include releases in the migration.              
   [ ] Exclude Owner Projects - Indicates whether projects owned by the          
 organization or users should be excluded.                                       
   [ ] Org Metadata Only - Indicates whether this should only include            
@@ -75,13 +75,13 @@ flags).
 (Press <space> to toggle a option, <enter> to accept)                           Select options to start migration?                                              
                                                                                 
   [ ] Lock Repositories - Lock the repositories being migrated at the start of  
-the migration                                                                   
+the migration.                                                                  
 > [X] Exclude Metadata - Indicates whether metadata should be excluded and only 
 git source should be included for the migration.                                
   [ ] Exclude Git Data - Indicates whether the repository git data should be    
 excluded from the migration.                                                    
-  [ ] Exclude Attachements - Do not include attachments in the migration        
-  [ ] Exclude Releases - Do not include releases in the migration               
+  [ ] Exclude Attachements - Do not include attachments in the migration.       
+  [ ] Exclude Releases - Do not include releases in the migration.              
   [ ] Exclude Owner Projects - Indicates whether projects owned by the          
 organization or users should be excluded.                                       
   [ ] Org Metadata Only - Indicates whether this should only include            
@@ -91,13 +91,13 @@ flags).
 (Press <space> to toggle a option, <enter> to accept)                           Select options to start migration?                                              
                                                                                 
   [ ] Lock Repositories - Lock the repositories being migrated at the start of  
-the migration                                                                   
+the migration.                                                                  
   [X] Exclude Metadata - Indicates whether metadata should be excluded and only 
 git source should be included for the migration.                                
 > [ ] Exclude Git Data - Indicates whether the repository git data should be    
 excluded from the migration.                                                    
-  [ ] Exclude Attachements - Do not include attachments in the migration        
-  [ ] Exclude Releases - Do not include releases in the migration               
+  [ ] Exclude Attachements - Do not include attachments in the migration.       
+  [ ] Exclude Releases - Do not include releases in the migration.              
   [ ] Exclude Owner Projects - Indicates whether projects owned by the          
 organization or users should be excluded.                                       
   [ ] Org Metadata Only - Indicates whether this should only include            
@@ -107,13 +107,13 @@ flags).
 (Press <space> to toggle a option, <enter> to accept)                           Select options to start migration?                                              
                                                                                 
   [ ] Lock Repositories - Lock the repositories being migrated at the start of  
-the migration                                                                   
+the migration.                                                                  
   [X] Exclude Metadata - Indicates whether metadata should be excluded and only 
 git source should be included for the migration.                                
 > [X] Exclude Git Data - Indicates whether the repository git data should be    
 excluded from the migration.                                                    
-  [ ] Exclude Attachements - Do not include attachments in the migration        
-  [ ] Exclude Releases - Do not include releases in the migration               
+  [ ] Exclude Attachements - Do not include attachments in the migration.       
+  [ ] Exclude Releases - Do not include releases in the migration.              
   [ ] Exclude Owner Projects - Indicates whether projects owned by the          
 organization or users should be excluded.                                       
   [ ] Org Metadata Only - Indicates whether this should only include            
@@ -123,13 +123,13 @@ flags).
 (Press <space> to toggle a option, <enter> to accept)                           Select options to start migration?                                              
                                                                                 
   [ ] Lock Repositories - Lock the repositories being migrated at the start of  
-the migration                                                                   
+the migration.                                                                  
   [X] Exclude Metadata - Indicates whether metadata should be excluded and only 
 git source should be included for the migration.                                
   [X] Exclude Git Data - Indicates whether the repository git data should be    
 excluded from the migration.                                                    
-> [ ] Exclude Attachements - Do not include attachments in the migration        
-  [ ] Exclude Releases - Do not include releases in the migration               
+> [ ] Exclude Attachements - Do not include attachments in the migration.       
+  [ ] Exclude Releases - Do not include releases in the migration.              
   [ ] Exclude Owner Projects - Indicates whether projects owned by the          
 organization or users should be excluded.                                       
   [ ] Org Metadata Only - Indicates whether this should only include            
@@ -139,13 +139,13 @@ flags).
 (Press <space> to toggle a option, <enter> to accept)                           Select options to start migration?                                              
                                                                                 
   [ ] Lock Repositories - Lock the repositories being migrated at the start of  
-the migration                                                                   
+the migration.                                                                  
   [X] Exclude Metadata - Indicates whether metadata should be excluded and only 
 git source should be included for the migration.                                
   [X] Exclude Git Data - Indicates whether the repository git data should be    
 excluded from the migration.                                                    
-  [ ] Exclude Attachements - Do not include attachments in the migration        
-> [ ] Exclude Releases - Do not include releases in the migration               
+  [ ] Exclude Attachements - Do not include attachments in the migration.       
+> [ ] Exclude Releases - Do not include releases in the migration.              
   [ ] Exclude Owner Projects - Indicates whether projects owned by the          
 organization or users should be excluded.                                       
   [ ] Org Metadata Only - Indicates whether this should only include            
@@ -155,13 +155,13 @@ flags).
 (Press <space> to toggle a option, <enter> to accept)                           Select options to start migration?                                              
                                                                                 
   [ ] Lock Repositories - Lock the repositories being migrated at the start of  
-the migration                                                                   
+the migration.                                                                  
   [X] Exclude Metadata - Indicates whether metadata should be excluded and only 
 git source should be included for the migration.                                
   [X] Exclude Git Data - Indicates whether the repository git data should be    
 excluded from the migration.                                                    
-  [ ] Exclude Attachements - Do not include attachments in the migration        
-> [X] Exclude Releases - Do not include releases in the migration               
+  [ ] Exclude Attachements - Do not include attachments in the migration.       
+> [X] Exclude Releases - Do not include releases in the migration.              
   [ ] Exclude Owner Projects - Indicates whether projects owned by the          
 organization or users should be excluded.                                       
   [ ] Org Metadata Only - Indicates whether this should only include            

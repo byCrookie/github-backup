@@ -18,11 +18,12 @@ Options:
 
 Commands:
   manual        Manually backup a Github user. This command is interactive.
-  migrate       Migrate a Github user.
+  migrate       Migrate a Github user. This command will create a new migration for the given repositories.
   login         Login to Github. Persists your login token to disk for future use.
                 Only one login token can be persisted at a time.
-  migrations    List migrations.
-  repositories  List repositories.
-  download      Download migrations.
-  backup        Backup a Github user.
+  migrations    List migrations for a Github user.
+  repositories  List repositories for a Github user.
+  download      Download migrations for a Github user.
+  backup        Backup a Github user. This command will create a new migration
+                for the given repositories and download it when ready.
 
