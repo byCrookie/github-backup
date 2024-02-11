@@ -26,8 +26,9 @@
 
     <ItemGroup>
         <ProjectReference Include="..\GithubBackup.Cli\GithubBackup.Cli.csproj"/>
+        <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj" />
         <ProjectReference Include="..\GithubBackup.TestUtils.Tests\GithubBackup.TestUtils.Tests.csproj"/>
         <ProjectReference Include="..\GithubBackup.TestUtils\GithubBackup.TestUtils.csproj"/>
     </ItemGroup>
-    
+
 </Project>

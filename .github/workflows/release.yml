@@ -12,28 +12,27 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
-      version: ${{ env.GitBuildVersion }}
+      version: ${{ env.GitBuildVersionSimple }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
       - name: Nerdbank.GitVersioning
         uses: dotnet/nbgv@master
         with:
           setCommonVars: true
-      
+
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.GitBuildVersion }}
-          release_name: Release ${{ env.GitBuildVersion }}
-          body: |
-          draft: false
-          prerelease: false
+          name: Release ${{ env.GitBuildVersionSimple }}
+          tag_name: ${{ env.GitBuildVersionSimple }}
+          body_path: CHANGELOG.md
+          files: |
+            CHANGELOG.md
+            LICENSE
   
   windows:
     needs: release
@@ -58,21 +57,47 @@ jobs:
         run: dotnet test GithubBackup.sln --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x64 --runtime win-x64 --self-contained
+        run: |
+          dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x64 --runtime win-x64
+          dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-x86 --runtime win-x86
+          dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/win-arm64 --runtime win-arm64
 
       - name: Zip
-        run: Compress-Archive -Path ./publish/win-x64/* -DestinationPath ./publish/ghb_win_x64_${{ needs.release.outputs.version }}.zip
+        run: |
+          Compress-Archive -Path ./publish/win-x64/* -DestinationPath ./publish/dm_win_x64_${{ needs.release.outputs.version }}.zip
+          Compress-Archive -Path ./publish/win-x86/* -DestinationPath ./publish/dm_win_x86_${{ needs.release.outputs.version }}.zip
+          Compress-Archive -Path ./publish/win-arm64/* -DestinationPath ./publish/dm_win_arm64_${{ needs.release.outputs.version }}.zip
 
-      - name: Upload Release Assets
+      - name: Upload Release Assets win-x64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/ghb_win_x64_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_win_x64_${{ needs.release.outputs.version }}.zip
+          asset_path: ./publish/dm_win_x64_${{ needs.release.outputs.version }}.zip
+          asset_name: dm_win_x64_${{ needs.release.outputs.version }}.zip
           asset_content_type: application/zip
-          
+
+      - name: Upload Release Assets win-x86
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./publish/dm_win_x86_${{ needs.release.outputs.version }}.zip
+          asset_name: dm_win_x86_${{ needs.release.outputs.version }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Assets win-arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./publish/dm_win_arm64_${{ needs.release.outputs.version }}.zip
+          asset_name: dm_win_arm64_${{ needs.release.outputs.version }}.zip
+          asset_content_type: application/zip
+  
   linux:
     needs: release
     runs-on: ubuntu-latest
@@ -96,20 +121,70 @@ jobs:
         run: dotnet test GithubBackup.sln --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/linux-x64 --runtime linux-x64 --self-contained
-        
-      - name: Zip
-        run: zip -r ghb_linux_x64_${{ needs.release.outputs.version }}.zip ./*
-        working-directory: ./publish/linux-x64/
+        run: |
+          dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/linux-x64 --runtime linux-x64
+          dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/linux-musl-x64 --runtime linux-musl-x64
+          dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/linux-musl-arm64 --runtime linux-musl-arm64
+          dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/linux-arm --runtime linux-arm
+          dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/linux-arm64 --runtime linux-arm64
 
-      - name: Upload Release Assets
+      - name: Zip
+        run: |
+          (cd linux-x64 && zip -r ../linux-x64/dm_linux_x64_${{ needs.release.outputs.version }}.zip .)
+          (cd linux-musl-x64 && zip -r ../linux-musl-x64/dm_linux_musl_x64_${{ needs.release.outputs.version }}.zip .)
+          (cd linux-musl-arm64 && zip -r ../linux-musl-arm64/dm_linux_musl_arm64_${{ needs.release.outputs.version }}.zip .)
+          (cd linux-arm && zip -r ../linux-arm/dm_linux_arm_${{ needs.release.outputs.version }}.zip .)
+          (cd linux-arm64 && zip -r ../linux-arm64/dm_linux_arm64_${{ needs.release.outputs.version }}.zip .)
+        working-directory: ./publish/
+
+      - name: Upload Release Assets linux-x64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/linux-x64/ghb_linux_x64_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_linux_x64_${{ needs.release.outputs.version }}.zip
+          asset_path: ./publish/linux-x64/dm_linux_x64_${{ needs.release.outputs.version }}.zip
+          asset_name: dm_linux_x64_${{ needs.release.outputs.version }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Assets linux-musl-x64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./publish/linux-musl-x64/dm_linux_musl_x64_${{ needs.release.outputs.version }}.zip
+          asset_name: dm_linux_musl_x64_${{ needs.release.outputs.version }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Assets linux-musl-arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./publish/linux-musl-arm64/dm_linux_musl_arm64_${{ needs.release.outputs.version }}.zip
+          asset_name: dm_linux_musl_arm64_${{ needs.release.outputs.version }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Assets linux-arm
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./publish/linux-arm/dm_linux_arm_${{ needs.release.outputs.version }}.zip
+          asset_name: dm_linux_arm_${{ needs.release.outputs.version }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Assets linux-arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./publish/linux-arm64/dm_linux_arm64_${{ needs.release.outputs.version }}.zip
+          asset_name: dm_linux_arm64_${{ needs.release.outputs.version }}.zip
           asset_content_type: application/zip
   
   macos:
@@ -135,18 +210,32 @@ jobs:
         run: dotnet test GithubBackup.sln --configuration Release --no-restore
 
       - name: Publish
-        run: dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/osx-x64 --runtime osx-x64 --self-contained
+        run: |
+          dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/osx-x64 --runtime osx-x64
+          dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/osx-arm64 --runtime osx-arm64
 
-      - name: Zip
-        run: zip -r ghb_osx_x64_${{ needs.release.outputs.version }}.zip ./*
-        working-directory: ./publish/osx-x64/
+      - name: Zip osx-x64
+        run: |
+          (cd osx-x64 && zip -r ../osx-x64/dm_osx_x64_${{ needs.release.outputs.version }}.zip .)
+          (cd osx-arm64 && zip -r ../osx-arm64/dm_osx_arm64_${{ needs.release.outputs.version }}.zip .)
+        working-directory: ./publish/
 
-      - name: Upload Release Assets
+      - name: Upload Release Assets osx-x64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/osx-x64/ghb_osx_x64_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_osx_x64_${{ needs.release.outputs.version }}.zip
+          asset_path: ./publish/osx-x64/dm_osx_x64_${{ needs.release.outputs.version }}.zip
+          asset_name: dm_osx_x64_${{ needs.release.outputs.version }}.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Assets osx-arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./publish/osx-arm64/dm_osx_arm64_${{ needs.release.outputs.version }}.zip
+          asset_name: dm_osx_arm64_${{ needs.release.outputs.version }}.zip
           asset_content_type: application/zip
