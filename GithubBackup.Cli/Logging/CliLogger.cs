@@ -1,3 +1,4 @@
+using ByteSizeLib;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Utils;
 using Serilog;
@@ -17,9 +18,8 @@ internal static class CliLogger
             configuration.WriteTo.File(
                 globalArgs.LogFile.FullName,
                 rollOnFileSizeLimit: true,
-                fileSizeLimitBytes: 100_000_000,
-                retainedFileCountLimit: 10,
-                rollingInterval: RollingInterval.Infinite
+                fileSizeLimitBytes: (long)ByteSize.FromMegaBytes(50).Bytes,
+                retainedFileCountLimit: 2
             ).MinimumLevel.Is(logEventLevel);
         }
         
