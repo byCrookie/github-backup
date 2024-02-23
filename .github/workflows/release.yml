@@ -68,35 +68,17 @@ jobs:
           Compress-Archive -Path ./publish/win-x86/* -DestinationPath ./publish/ghb_win_x86_${{ needs.release.outputs.version }}.zip
           Compress-Archive -Path ./publish/win-arm64/* -DestinationPath ./publish/ghb_win_arm64_${{ needs.release.outputs.version }}.zip
 
-      - name: Upload Release Assets win-x64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Release Assets
+        id: upload_release
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/ghb_win_x64_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_win_x64_${{ needs.release.outputs.version }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Release Assets win-x86
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/ghb_win_x86_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_win_x86_${{ needs.release.outputs.version }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Release Assets win-arm64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/ghb_win_arm64_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_win_arm64_${{ needs.release.outputs.version }}.zip
-          asset_content_type: application/zip
+          name: Release ${{ needs.release.outputs.version }}
+          tag_name: ${{ needs.release.outputs.version }}
+          fail_on_unmatched_files: true
+          files: |
+            ./publish/ghb_win_x64_${{ needs.release.outputs.version }}.zip
+            ./publish/ghb_win_x86_${{ needs.release.outputs.version }}.zip
+            ./publish/ghb_win_arm64_${{ needs.release.outputs.version }}.zip
   
   linux:
     needs: release
@@ -137,55 +119,19 @@ jobs:
           (cd linux-arm64 && zip -r ../linux-arm64/ghb_linux_arm64_${{ needs.release.outputs.version }}.zip .)
         working-directory: ./publish/
 
-      - name: Upload Release Assets linux-x64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Release Assets
+        id: upload_release
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/linux-x64/ghb_linux_x64_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_linux_x64_${{ needs.release.outputs.version }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Release Assets linux-musl-x64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/linux-musl-x64/ghb_linux_musl_x64_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_linux_musl_x64_${{ needs.release.outputs.version }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Release Assets linux-musl-arm64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/linux-musl-arm64/ghb_linux_musl_arm64_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_linux_musl_arm64_${{ needs.release.outputs.version }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Release Assets linux-arm
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/linux-arm/ghb_linux_arm_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_linux_arm_${{ needs.release.outputs.version }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Release Assets linux-arm64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/linux-arm64/ghb_linux_arm64_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_linux_arm64_${{ needs.release.outputs.version }}.zip
-          asset_content_type: application/zip
+          name: Release ${{ needs.release.outputs.version }}
+          tag_name: ${{ needs.release.outputs.version }}
+          fail_on_unmatched_files: true
+          files: |
+            ./publish/linux-x64/ghb_linux_x64_${{ needs.release.outputs.version }}.zip
+            ./publish/linux-musl-x64/ghb_linux_musl_x64_${{ needs.release.outputs.version }}.zip
+            ./publish/linux-musl-arm64/ghb_linux_musl_arm64_${{ needs.release.outputs.version }}.zip
+            ./publish/linux-arm/ghb_linux_arm_${{ needs.release.outputs.version }}.zip
+            ./publish/linux-arm64/ghb_linux_arm64_${{ needs.release.outputs.version }}.zip
   
   macos:
     needs: release
@@ -214,28 +160,19 @@ jobs:
           dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/osx-x64 --runtime osx-x64
           dotnet publish GithubBackup.Cli/GithubBackup.Cli.csproj --configuration Release --output publish/osx-arm64 --runtime osx-arm64
 
-      - name: Zip osx-x64
+      - name: Zip
         run: |
           (cd osx-x64 && zip -r ../osx-x64/ghb_osx_x64_${{ needs.release.outputs.version }}.zip .)
           (cd osx-arm64 && zip -r ../osx-arm64/ghb_osx_arm64_${{ needs.release.outputs.version }}.zip .)
         working-directory: ./publish/
-
-      - name: Upload Release Assets osx-x64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+      - name: Upload Release Assets
+        id: upload_release
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/osx-x64/ghb_osx_x64_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_osx_x64_${{ needs.release.outputs.version }}.zip
-          asset_content_type: application/zip
-
-      - name: Upload Release Assets osx-arm64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ./publish/osx-arm64/ghb_osx_arm64_${{ needs.release.outputs.version }}.zip
-          asset_name: ghb_osx_arm64_${{ needs.release.outputs.version }}.zip
-          asset_content_type: application/zip
+          name: Release ${{ needs.release.outputs.version }}
+          tag_name: ${{ needs.release.outputs.version }}
+          fail_on_unmatched_files: true
+          files: |
+            ./publish/osx-x64/ghb_osx_x64_${{ needs.release.outputs.version }}.zip
+            ./publish/osx-arm64/ghb_osx_arm64_${{ needs.release.outputs.version }}.zip
