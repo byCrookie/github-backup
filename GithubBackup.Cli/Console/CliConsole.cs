@@ -25,32 +25,25 @@ public class CliConsole : ICliConsole
     public bool IsErrorRedirected => false;
     public bool IsInputRedirected => false;
 
-    private class StandardStreamWriter : TextWriter, IStandardStreamWriter
+    private class StandardStreamWriter(IAnsiConsole ansiConsole) : TextWriter, IStandardStreamWriter
     {
-        private readonly IAnsiConsole _ansiConsole;
-
-        public StandardStreamWriter(IAnsiConsole ansiConsole)
-        {
-            _ansiConsole = ansiConsole;
-        }
-
         public override void Write(char value)
         {
-            _ansiConsole.Profile.Out.Writer.Write(value);
+            ansiConsole.Profile.Out.Writer.Write(value);
         }
 
         public override void Write(string? value)
         {
-            _ansiConsole.Profile.Out.Writer.Write(value);
+            ansiConsole.Profile.Out.Writer.Write(value);
         }
 
         public override Encoding Encoding { get; } = Encoding.UTF8;
 
-        public override string ToString() => _ansiConsole.Profile.Out.ToString() ?? string.Empty;
+        public override string ToString() => ansiConsole.Profile.Out.ToString() ?? string.Empty;
     }
 
     public void WriteException(Exception exception)
     {
-        _ansiConsole.Markup($"[red]{exception.Message}[/]");
+        _ansiConsole.Markup("[red]{0}[/]", Markup.Escape(exception.Message));
     }
 }

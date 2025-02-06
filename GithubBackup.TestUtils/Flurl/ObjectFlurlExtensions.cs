@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using Flurl.Http;
 using Flurl.Http.Configuration;
 using Flurl.Http.Content;
@@ -21,7 +22,10 @@ public static class ObjectFlurlExtensions
             {
                 Settings =
                 {
-                    JsonSerializer = new TextJsonSerializer()
+                    JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
+                    {
+                        Converters = { new JsonStringEnumConverter() }
+                    })
                 }
             }
         });

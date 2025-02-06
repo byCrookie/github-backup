@@ -1,6 +1,5 @@
 using GithubBackup.Core.DependencyInjection;
 using GithubBackup.Core.Environment;
-using GithubBackup.Core.Flurl;
 using GithubBackup.Core.Github;
 using GithubBackup.Core.Utils;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +12,6 @@ public static class CoreModule
     {
         services.AddDependencyInjection();
         services.AddGithub();
-        services.AddFlurl();
         services.AddUtils();
         services.AddEnvironment();
     }
