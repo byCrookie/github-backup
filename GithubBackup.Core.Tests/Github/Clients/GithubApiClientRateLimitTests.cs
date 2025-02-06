@@ -60,7 +60,7 @@ public class GithubApiClientRateLimitTests
             new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
             new LogEntry(LogLevel.Debug, "RetryAfter - Delaying for 00:00:01 before retrying request to GET - https://api.github.com/test"),
             new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"Items":\[]}""")
+            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}""")
         );
     }
 
@@ -88,7 +88,7 @@ public class GithubApiClientRateLimitTests
             new LogEntry(LogLevel.Trace, "Received 200 response from https://api.github.com/test with content "),
             new LogEntry(LogLevel.Debug, "RateLimit - Delaying for (.*) before retrying request to GET - https://api.github.com/test"),
             new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"Items":\[]}""")
+            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}""")
         );
     }
 
@@ -121,7 +121,7 @@ public class GithubApiClientRateLimitTests
             new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
             new LogEntry(LogLevel.Debug, "Retry Attempt 2 - Delaying for (.*) before retrying request to GET - https://api.github.com/test"),
             new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"Items":\[]}""")
+            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}""")
         );
     }
 

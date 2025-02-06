@@ -4,7 +4,6 @@ using GithubBackup.Core.Utils;
 
 namespace GithubBackup.Core.Tests.Flurl;
 
-[UsesVerify]
 public class TextJsonSerializerTests
 {
     private readonly TextJsonSerializer _sut = new();

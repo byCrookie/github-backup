@@ -14,7 +14,7 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Backup;
 
-[UsesVerify]
+
 public class BackupRunnerTests
 {
     private readonly IMigrationService _migrationService = Substitute.For<IMigrationService>();

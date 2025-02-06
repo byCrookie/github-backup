@@ -16,7 +16,7 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Services;
 
-[UsesVerify]
+
 public class CommandRunnerServiceTests
 {
     private readonly CommandRunnerService _sut;
@@ -114,11 +114,14 @@ public class CommandRunnerServiceTests
         return new FlurlHttpException(new FlurlCall
         {
             Exception = new Exception(errorMessage),
-            Response = new FlurlResponse(new HttpResponseMessage
+            Response = new FlurlResponse(new FlurlCall
             {
-                ReasonPhrase = errorMessage,
-                Content = new StringContent(errorMessage),
-                StatusCode = HttpStatusCode.BadRequest
+                HttpResponseMessage = new HttpResponseMessage
+                {
+                    ReasonPhrase = errorMessage,
+                    Content = new StringContent(errorMessage),
+                    StatusCode = HttpStatusCode.BadRequest
+                }
             }),
             Request = new FlurlRequest(new Url("https://example.com")),
             HttpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.com"),

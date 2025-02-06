@@ -31,6 +31,11 @@
       "commandLineArgs": "repositories --help",
       "environmentVariables": {}
     },
+    "GithubBackup.Cli Repositories": {
+      "commandName": "Project",
+      "commandLineArgs": "repositories",
+      "environmentVariables": {}
+    },
     "GithubBackup.Cli Download Help": {
       "commandName": "Project",
       "commandLineArgs": "download --help",
@@ -43,7 +48,7 @@
     },
     "GithubBackup.Cli Backup": {
       "commandName": "Project",
-      "commandLineArgs": "backup --destination M:\\Development\\Temp\\github-backup",
+      "commandLineArgs": "backup --destination D:\\Backup -r byCrookie/.dotfiles byCrookie/adventofcode byCrookie/algos byCrookie/any-api byCrookie/bachelor-zhaw byCrookie/BitWise byCrookie/BuildSdk byCrookie/byCrookie byCrookie/chnopfboerse byCrookie/clippy byCrookie/collabstory byCrookie/connect4 byCrookie/Crypter byCrookie/DependencyInjection byCrookie/discord-music byCrookie/Experiment byCrookie/Framework \nbyCrookie/GameOfLife byCrookie/github-backup byCrookie/github-stats byCrookie/google-calendar-export byCrookie/idpa byCrookie/jdiff byCrookie/lowlawn byCrookie/nextact-angular byCrookie/nextact-backend byCrookie/nextact-next byCrookie/nonic-bot byCrookie/PayoutR byCrookie/PoemWriter byCrookie/port byCrookie/portfolio byCrookie/proton-vpn-watch \nbyCrookie/PythonExperiment byCrookie/reverb byCrookie/rust-explorer byCrookie/rusty-tic byCrookie/Skripts byCrookie/tiny-tools byCrookie/Toodo byCrookie/ToPdfConverter byCrookie/TypeCode byCrookie/TypeCode.Rider byCrookie/view-cache byCrookie/Workflow byCrookie/Xotiz byCrookie/xraze byCrookie/yt-dl",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Download": {

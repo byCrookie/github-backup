@@ -10,22 +10,20 @@ public static class ObjectFlurlExtensions
 {
     public static IFlurlResponse ToFlurlJsonResponse(this object obj)
     {
-        var requestMessage = new HttpRequestMessage();
-        requestMessage.Options.TryAdd("FlurlHttpCall", new FlurlCall
+        return new FlurlResponse(new FlurlCall
         {
+            HttpResponseMessage = new HttpResponseMessage
+            {
+                Content = new CapturedJsonContent(JsonSerializer.Serialize(obj)),
+                RequestMessage = new HttpRequestMessage()
+            },
             Request = new FlurlRequest
             {
-                Settings = new TestFlurlHttpSettings
+                Settings =
                 {
                     JsonSerializer = new TextJsonSerializer()
                 }
             }
-        });
-            
-        return new FlurlResponse(new HttpResponseMessage
-        {
-            Content = new CapturedJsonContent(JsonSerializer.Serialize(obj)),
-            RequestMessage = requestMessage
         });
     }
 }

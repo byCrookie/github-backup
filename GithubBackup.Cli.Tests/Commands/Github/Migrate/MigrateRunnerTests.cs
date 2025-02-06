@@ -11,7 +11,7 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Migrate;
 
-[UsesVerify]
+
 public class MigrateRunnerTests
 {
     private readonly TestConsole _ansiConsole = new();

@@ -11,7 +11,7 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Auth;
 
-[UsesVerify]
+
 public class LoginServiceTests
 {
     private readonly LoginService _sut;

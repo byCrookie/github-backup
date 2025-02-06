@@ -29,7 +29,7 @@ public class FlurlExtensionsTests
                 r => r.Items,
                 (_, _, it) => it.Count == pageSize,
                 (r, i) => r.SetQueryParam(pageParam, i + 1),
-                (r, c) => r.SendAsync(HttpMethod.Get, null, c),
+                (r, c) => r.SendAsync(HttpMethod.Get, null, cancellationToken: c),
                 CancellationToken.None
             );
         
@@ -77,7 +77,7 @@ public class FlurlExtensionsTests
                 r => r.Items,
                 (_, _, it) => it.Count == pageSize,
                 (r, i) => r.SetQueryParam(pageParam, i + 1),
-                (r, c) => r.SendAsync(HttpMethod.Get, null, c),
+                (r, c) => r.SendAsync(HttpMethod.Get, null, cancellationToken: c),
                 CancellationToken.None
             );
         

@@ -30,7 +30,7 @@ internal class GithubWebClient : IGithubWebClient
         var json = request.Settings.JsonSerializer.Serialize(data);
         _logger.LogTrace("Sending {Verb} request to {Url} with content {Content}", HttpMethod.Post, request.Url, json);
         var content = new CapturedJsonContent(json);
-        var response = await request.SendAsync(HttpMethod.Post, content, ct ?? CancellationToken.None);
+        var response = await request.SendAsync(HttpMethod.Post, content, cancellationToken: ct ?? CancellationToken.None);
         _logger.LogTrace("Received {StatusCode} response from {Url} with content {Content}", response.StatusCode, request.Url, await response.GetStringAsync());
         return response;
     }

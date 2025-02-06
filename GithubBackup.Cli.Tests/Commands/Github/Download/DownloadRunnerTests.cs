@@ -13,7 +13,7 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Download;
 
-[UsesVerify]
+
 public class DownloadRunnerTests
 {
     private readonly IMigrationService _migrationService = Substitute.For<IMigrationService>();

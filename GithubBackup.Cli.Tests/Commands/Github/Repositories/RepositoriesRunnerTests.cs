@@ -10,7 +10,7 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Repositories;
 
-[UsesVerify]
+
 public class RepositoriesRunnerTests
 {
     private readonly TestConsole _ansiConsole = new();
