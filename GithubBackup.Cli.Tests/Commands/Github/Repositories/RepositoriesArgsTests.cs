@@ -9,7 +9,7 @@ using GithubBackup.Core.Github.Repositories;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Repositories;
 
-[UsesVerify]
+
 public class RepositoriesArgsTests
 {
     private readonly RepositoriesArguments _repositoriesArguments = new();

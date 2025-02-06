@@ -12,7 +12,7 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Migrations;
 
-[UsesVerify]
+
 public class MigrationsRunnerTests
 {
     private readonly TestConsole _ansiConsole = new();

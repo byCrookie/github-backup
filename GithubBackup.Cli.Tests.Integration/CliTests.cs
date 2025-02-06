@@ -1,6 +1,6 @@
 ﻿namespace GithubBackup.Cli.Tests.Integration;
 
-[UsesVerify]
+
 public class CliTests
 {
     [Theory]

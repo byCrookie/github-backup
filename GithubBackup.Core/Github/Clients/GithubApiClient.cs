@@ -84,7 +84,7 @@ internal class GithubApiClient : IGithubApiClient
             .WithOAuthBearerToken(await _githubTokenStore.GetAsync());
         configure?.Invoke(request);
         _logger.LogDebug("Downloading {Url}", request.Url);
-        var file = await request.DownloadFileAsync(path, fileName, 4096, ct ?? CancellationToken.None);
+        var file = await request.DownloadFileAsync(path, fileName, cancellationToken: ct ?? CancellationToken.None);
         _logger.LogInformation("Downloaded {Url} to {Path}", request.Url, file);
         return file;
     }
@@ -172,7 +172,7 @@ internal class GithubApiClient : IGithubApiClient
         {
             var modifiedResponse = await request
                 .WithHeader(IfNoneMatchHeader, cachedResponse!.Headers.GetRequired(ETagHeader))
-                .SendAsync(verb, content, ct ?? CancellationToken.None, HttpCompletionOption.ResponseHeadersRead);
+                .SendAsync(verb, content, HttpCompletionOption.ResponseHeadersRead, ct ?? CancellationToken.None);
 
             if (modifiedResponse.StatusCode == (int)HttpStatusCode.NotModified)
             {
@@ -184,7 +184,7 @@ internal class GithubApiClient : IGithubApiClient
         }
         
         _logger.LogTrace("Sending {Verb} request to {Url} with content {Content}", verb, request.Url, content is not null ? await content.ReadAsStringAsync() : string.Empty);
-        var response = await request.SendAsync(verb, content, ct ?? CancellationToken.None, HttpCompletionOption.ResponseHeadersRead);
+        var response = await request.SendAsync(verb, content, HttpCompletionOption.ResponseHeadersRead, ct ?? CancellationToken.None);
         _logger.LogTrace("Received {StatusCode} response from {Url} with content {Content}", response.StatusCode, request.Url, await response.GetStringAsync());
 
         if (verb == HttpMethod.Get && response.StatusCode == (int)HttpStatusCode.OK && !string.IsNullOrWhiteSpace(response.Headers.Get(ETagHeader)))

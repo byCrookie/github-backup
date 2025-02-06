@@ -17,7 +17,7 @@ using Environment = GithubBackup.Core.Environment.Environment;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Manual;
 
-[UsesVerify]
+
 public class ManualRunnerTests
 {
     private readonly TestConsole _ansiConsole = new();

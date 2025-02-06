@@ -2,7 +2,7 @@
 
 namespace GithubBackup.Cli.Tests.Integration.Commands.Github.Login;
 
-[UsesVerify]
+
 public class LoginTests
 {
     [Theory]

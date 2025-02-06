@@ -8,7 +8,7 @@ using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Migrations;
 
-[UsesVerify]
+
 public class MigrationsArgsTests
 {
     private readonly MigrationsArguments _migrationsArguments = new();

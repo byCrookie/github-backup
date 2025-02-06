@@ -7,6 +7,6 @@ internal static class FlurlModule
 {
     public static void AddFlurl(this IServiceCollection _)
     {
-        FlurlHttp.Configure(settings => settings.JsonSerializer = new TextJsonSerializer());
+        FlurlHttp.Clients.WithDefaults(b => b.Settings.JsonSerializer  = new TextJsonSerializer());
     }
 }
