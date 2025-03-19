@@ -11,7 +11,7 @@ public static class CommandExtensions
             command.AddOption(option);
         }
     }
-    
+
     public static void AddGlobalOptions(this Command command, IEnumerable<Option> options)
     {
         foreach (var option in options)
@@ -19,7 +19,7 @@ public static class CommandExtensions
             command.AddGlobalOption(option);
         }
     }
-    
+
     public static void AddCommands(this Command command, IEnumerable<Command> subCommands)
     {
         foreach (var subCommand in subCommands)

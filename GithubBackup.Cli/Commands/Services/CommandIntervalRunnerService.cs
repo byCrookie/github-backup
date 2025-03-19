@@ -26,7 +26,8 @@ internal sealed class CommandIntervalRunnerService : IHostedService
         ICommandRunner commandRunner,
         IAnsiConsole ansiConsole,
         IDateTimeProvider dateTimeProvider,
-        IStopwatch stopwatch)
+        IStopwatch stopwatch
+    )
     {
         _globalArgs = globalArgs;
         _interval = interval;
@@ -62,14 +63,22 @@ internal sealed class CommandIntervalRunnerService : IHostedService
             catch (FlurlHttpException e)
             {
                 var error = await e.GetResponseStringAsync();
-                _logger.LogError(e, "Unhandled exception (Command: {Type}): {Message}",
-                    _commandRunner.GetType().Name, error);
+                _logger.LogError(
+                    e,
+                    "Unhandled exception (Command: {Type}): {Message}",
+                    _commandRunner.GetType().Name,
+                    error
+                );
                 _ansiConsole.MarkupLine($"[red]{error}[/]");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Unhandled exception (Command: {Type}): {Message}",
-                    _commandRunner.GetType().Name, e.Message);
+                _logger.LogError(
+                    e,
+                    "Unhandled exception (Command: {Type}): {Message}",
+                    _commandRunner.GetType().Name,
+                    e.Message
+                );
                 _ansiConsole.MarkupLine($"[red]{e.Message}[/]");
             }
             finally
@@ -91,7 +100,10 @@ internal sealed class CommandIntervalRunnerService : IHostedService
         _hostApplicationLifetime.StopApplication();
     }
 
-    private static Task<bool> WaitForNextTickAsync(PeriodicTimer periodicTimer, CancellationToken ct)
+    private static Task<bool> WaitForNextTickAsync(
+        PeriodicTimer periodicTimer,
+        CancellationToken ct
+    )
     {
         var wait = periodicTimer.WaitForNextTickAsync(ct);
         return wait.BoolOrCanceledAsFalseAsync();

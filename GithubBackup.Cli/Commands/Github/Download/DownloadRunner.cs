@@ -24,7 +24,8 @@ internal sealed class DownloadRunner : ICommandRunner
         ILoginService loginService,
         IFileSystem fileSystem,
         ILogger<DownloadRunner> logger,
-        IAnsiConsole ansiConsole)
+        IAnsiConsole ansiConsole
+    )
     {
         _globalArgs = globalArgs;
         _downloadArgs = downloadArgs;
@@ -37,12 +38,7 @@ internal sealed class DownloadRunner : ICommandRunner
 
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.WithPersistentAsync(
-            _globalArgs,
-            _downloadArgs.LoginArgs,
-            false,
-            ct
-        );
+        await _loginService.WithPersistentAsync(_globalArgs, _downloadArgs.LoginArgs, false, ct);
 
         if (_downloadArgs.Migrations.Any())
         {
@@ -106,7 +102,9 @@ internal sealed class DownloadRunner : ICommandRunner
             .OrderBy(m => m.CreatedAt)
             .ToList();
 
-        foreach (var id in _downloadArgs.Migrations.OrderBy(m => migrations.FindIndex(e => e.Id == m)))
+        foreach (
+            var id in _downloadArgs.Migrations.OrderBy(m => migrations.FindIndex(e => e.Id == m))
+        )
         {
             await DownloadMigrationUsingIdAsync(id, ct);
         }
@@ -114,7 +112,11 @@ internal sealed class DownloadRunner : ICommandRunner
 
     private async Task DownloadMigrationUsingIdAsync(long id, CancellationToken ct)
     {
-        _logger.LogInformation("Downloading migration {Id} to {Destination}", id, _downloadArgs.Destination);
+        _logger.LogInformation(
+            "Downloading migration {Id} to {Destination}",
+            id,
+            _downloadArgs.Destination
+        );
 
         if (!_globalArgs.Quiet)
         {
@@ -147,15 +149,19 @@ internal sealed class DownloadRunner : ICommandRunner
         if (_downloadArgs.Poll)
         {
             _logger.LogInformation("Polling migration {Id}", options.Id);
-            return _migrationService.PollAndDownloadMigrationAsync(options, update =>
-            {
-                if (!_globalArgs.Quiet)
+            return _migrationService.PollAndDownloadMigrationAsync(
+                options,
+                update =>
                 {
-                    _ansiConsole.WriteLine($"Migration {update.Id} is {update.State}...");
-                }
+                    if (!_globalArgs.Quiet)
+                    {
+                        _ansiConsole.WriteLine($"Migration {update.Id} is {update.State}...");
+                    }
 
-                return Task.CompletedTask;
-            }, ct);
+                    return Task.CompletedTask;
+                },
+                ct
+            );
         }
 
         _logger.LogInformation("Downloading migration {Id}", options.Id);

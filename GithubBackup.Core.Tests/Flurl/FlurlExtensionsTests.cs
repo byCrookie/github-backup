@@ -18,24 +18,23 @@ public class FlurlExtensionsTests
         var itemsBatch = new List<Item>();
 
         using var httpTest = new HttpTest();
-        
+
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .RespondWithJson(new ItemResponse(itemsBatch));
 
-        var items = await new FlurlRequest(url)
-            .GetPagedJsonAsync<ItemResponse, Item>(
-                r => r.Items,
-                (_, _, it) => it.Count == pageSize,
-                (r, i) => r.SetQueryParam(pageParam, i + 1),
-                (r, c) => r.SendAsync(HttpMethod.Get, null, cancellationToken: c),
-                CancellationToken.None
-            );
-        
+        var items = await new FlurlRequest(url).GetPagedJsonAsync<ItemResponse, Item>(
+            r => r.Items,
+            (_, _, it) => it.Count == pageSize,
+            (r, i) => r.SetQueryParam(pageParam, i + 1),
+            (r, c) => r.SendAsync(HttpMethod.Get, null, cancellationToken: c),
+            CancellationToken.None
+        );
+
         items.Should().BeEmpty();
     }
-    
+
     [Fact]
     public async Task GetPagedJsonAsync_WhenHasPages_ThenReturnAllItems()
     {
@@ -53,7 +52,7 @@ public class FlurlExtensionsTests
         expectedItems.AddRange(itemsBatch3);
 
         using var httpTest = new HttpTest();
-        
+
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
@@ -72,15 +71,14 @@ public class FlurlExtensionsTests
             .WithQueryParam(pageParam, 3)
             .RespondWithJson(new ItemResponse(itemsBatch3));
 
-        var items = await new FlurlRequest(url)
-            .GetPagedJsonAsync<ItemResponse, Item>(
-                r => r.Items,
-                (_, _, it) => it.Count == pageSize,
-                (r, i) => r.SetQueryParam(pageParam, i + 1),
-                (r, c) => r.SendAsync(HttpMethod.Get, null, cancellationToken: c),
-                CancellationToken.None
-            );
-        
+        var items = await new FlurlRequest(url).GetPagedJsonAsync<ItemResponse, Item>(
+            r => r.Items,
+            (_, _, it) => it.Count == pageSize,
+            (r, i) => r.SetQueryParam(pageParam, i + 1),
+            (r, c) => r.SendAsync(HttpMethod.Get, null, cancellationToken: c),
+            CancellationToken.None
+        );
+
         items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
     }
 }

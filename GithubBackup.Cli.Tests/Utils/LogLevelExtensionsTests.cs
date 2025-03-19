@@ -15,7 +15,10 @@ public class LogLevelExtensionsTests
     [InlineData(LogLevel.Information, LogEventLevel.Information)]
     [InlineData(LogLevel.Debug, LogEventLevel.Debug)]
     [InlineData(LogLevel.Trace, LogEventLevel.Verbose)]
-    public void MicrosoftToSerilogLevel_LogLevel_LogEventLevel(LogLevel logLevel, LogEventLevel expected)
+    public void MicrosoftToSerilogLevel_LogLevel_LogEventLevel(
+        LogLevel logLevel,
+        LogEventLevel expected
+    )
     {
         var result = logLevel.MicrosoftToSerilogLevel();
         result.Should().Be(expected);

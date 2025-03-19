@@ -15,7 +15,8 @@ public sealed class DownloadMigrationOptions
         IDirectoryInfo destination,
         int? numberOfBackups = null,
         bool overwrite = true,
-        TimeSpan? medianFirstRetryDelay = null)
+        TimeSpan? medianFirstRetryDelay = null
+    )
     {
         Id = id;
         Destination = destination;

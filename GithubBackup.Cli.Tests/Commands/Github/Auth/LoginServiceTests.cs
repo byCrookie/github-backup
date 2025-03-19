@@ -11,7 +11,6 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Auth;
 
-
 public class LoginServiceTests
 {
     private readonly LoginService _sut;
@@ -25,11 +24,7 @@ public class LoginServiceTests
         _ansiConsole = new TestConsole();
         _loginPipelineBuilder = Substitute.For<ILoginPipelineBuilder>();
 
-        _sut = new LoginService(
-            _logger,
-            _ansiConsole,
-            _loginPipelineBuilder
-        );
+        _sut = new LoginService(_logger, _ansiConsole, _loginPipelineBuilder);
     }
 
     [Fact]
@@ -98,7 +93,8 @@ public class LoginServiceTests
         _loginPipelineBuilder.WithoutPersistent().Returns(pipeline);
         pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns((User?)null);
 
-        var action = () => _sut.WithoutPersistentAsync(globalArgs, args, false, CancellationToken.None);
+        var action = () =>
+            _sut.WithoutPersistentAsync(globalArgs, args, false, CancellationToken.None);
 
         await action.Should().ThrowAsync<Exception>();
 
@@ -117,7 +113,12 @@ public class LoginServiceTests
         _loginPipelineBuilder.WithoutPersistent().Returns(pipeline);
         pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns(user);
 
-        var result = await _sut.WithoutPersistentAsync(globalArgs, args, false, CancellationToken.None);
+        var result = await _sut.WithoutPersistentAsync(
+            globalArgs,
+            args,
+            false,
+            CancellationToken.None
+        );
 
         result.Should().Be(user);
 
@@ -136,14 +137,19 @@ public class LoginServiceTests
         _loginPipelineBuilder.WithoutPersistent().Returns(pipeline);
         pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns(user);
 
-        var result = await _sut.WithoutPersistentAsync(globalArgs, args, false, CancellationToken.None);
+        var result = await _sut.WithoutPersistentAsync(
+            globalArgs,
+            args,
+            false,
+            CancellationToken.None
+        );
 
         result.Should().Be(user);
 
         _logger.VerifyLogs();
         await Verify(_ansiConsole.Output);
     }
-    
+
     [Fact]
     public async Task WithPersistentAsync_NotQuietAndNoUser_ReturnNullAndNotPrint()
     {
@@ -154,7 +160,8 @@ public class LoginServiceTests
         _loginPipelineBuilder.WithPersistent().Returns(pipeline);
         pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns((User?)null);
 
-        var action = () => _sut.WithPersistentAsync(globalArgs, args, false, CancellationToken.None);
+        var action = () =>
+            _sut.WithPersistentAsync(globalArgs, args, false, CancellationToken.None);
 
         await action.Should().ThrowAsync<Exception>();
 
@@ -173,7 +180,12 @@ public class LoginServiceTests
         _loginPipelineBuilder.WithPersistent().Returns(pipeline);
         pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns(user);
 
-        var result = await _sut.WithPersistentAsync(globalArgs, args, false, CancellationToken.None);
+        var result = await _sut.WithPersistentAsync(
+            globalArgs,
+            args,
+            false,
+            CancellationToken.None
+        );
 
         result.Should().Be(user);
 
@@ -192,7 +204,12 @@ public class LoginServiceTests
         _loginPipelineBuilder.WithPersistent().Returns(pipeline);
         pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns(user);
 
-        var result = await _sut.WithPersistentAsync(globalArgs, args, false, CancellationToken.None);
+        var result = await _sut.WithPersistentAsync(
+            globalArgs,
+            args,
+            false,
+            CancellationToken.None
+        );
 
         result.Should().Be(user);
 

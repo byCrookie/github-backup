@@ -7,16 +7,19 @@ namespace GithubBackup.Core.Tests.Flurl;
 
 public class TextJsonSerializerTests
 {
-    private readonly JsonSerializerOptions _options = new() { Converters = { new JsonStringEnumConverter() } };
+    private readonly JsonSerializerOptions _options = new()
+    {
+        Converters = { new JsonStringEnumConverter() },
+    };
 
     [Fact]
     public async Task Serialize_WhenSerializing_ThenIsJson()
     {
         var item = new Item("test", ItemEnum.Test2);
-        var json = JsonSerializer.Serialize(item,_options );
+        var json = JsonSerializer.Serialize(item, _options);
         await Verify(json);
     }
-    
+
     [Fact]
     public void Deserialize_WhenDeserializing_ThenIsObject()
     {

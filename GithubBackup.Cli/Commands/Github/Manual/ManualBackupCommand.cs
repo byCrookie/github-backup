@@ -8,7 +8,8 @@ namespace GithubBackup.Cli.Commands.Github.Manual;
 internal static class ManualBackupCommand
 {
     private const string CommandName = "manual";
-    private const string CommandDescription = "Manually backup a Github user. This command is interactive.";
+    private const string CommandDescription =
+        "Manually backup a Github user. This command is interactive.";
 
     public static Command Create(string[] args, CommandOptions options)
     {
@@ -23,15 +24,19 @@ internal static class ManualBackupCommand
         return command;
     }
 
-    private static Task RunAsync(string[] args, GlobalArgs globalArgs, ManualBackupArgs manualBackupArgs,
-        CommandOptions options)
+    private static Task RunAsync(
+        string[] args,
+        GlobalArgs globalArgs,
+        ManualBackupArgs manualBackupArgs,
+        CommandOptions options
+    )
     {
         var runner = new CliRunner<ManualBackupRunner, ManualBackupArgs>(
-            args, globalArgs, manualBackupArgs,
-            new RunOptions
-            {
-                AfterServices = options.AfterServices
-            });
+            args,
+            globalArgs,
+            manualBackupArgs,
+            new RunOptions { AfterServices = options.AfterServices }
+        );
 
         return runner.RunAsync();
     }

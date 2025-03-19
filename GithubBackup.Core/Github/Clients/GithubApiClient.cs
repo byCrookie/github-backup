@@ -21,18 +21,18 @@ internal class GithubApiClient(
     IMemoryCache memoryCache,
     IGithubTokenStore githubTokenStore,
     IDateTimeOffsetProvider dateTimeOffsetProvider,
-    ILogger<GithubApiClient> logger)
-    : IGithubApiClient
+    ILogger<GithubApiClient> logger
+) : IGithubApiClient
 {
     private static IEnumerable<HttpStatusCode> RetryHttpCodes =>
-    [
-        HttpStatusCode.RequestTimeout,
-        HttpStatusCode.TooManyRequests,
-        HttpStatusCode.InternalServerError,
-        HttpStatusCode.BadGateway,
-        HttpStatusCode.ServiceUnavailable,
-        HttpStatusCode.GatewayTimeout
-    ];
+        [
+            HttpStatusCode.RequestTimeout,
+            HttpStatusCode.TooManyRequests,
+            HttpStatusCode.InternalServerError,
+            HttpStatusCode.BadGateway,
+            HttpStatusCode.ServiceUnavailable,
+            HttpStatusCode.GatewayTimeout,
+        ];
 
     private const string RemainingRateLimitHeader = "x-ratelimit-remaining";
     private const string RateLimitResetHeader = "x-ratelimit-reset";
@@ -45,14 +45,26 @@ internal class GithubApiClient(
     private const string ApiVersionHeader = "X-GitHub-Api-Version";
     private const string ApiVersion = "2022-11-28";
 
-    private readonly Lazy<IFlurlClient> _client = new(() => new FlurlClient(BaseUrl)
-        .WithSettings(s => s.JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions{Converters = { new JsonStringEnumConverter() }}))
-        .WithHeader(HeaderNames.Accept, Accept)
-        .WithHeader(HeaderNames.UserAgent, UserAgent)
-        .WithHeader(ApiVersionHeader, ApiVersion));
+    private readonly Lazy<IFlurlClient> _client = new(
+        () =>
+            new FlurlClient(BaseUrl)
+                .WithSettings(s =>
+                    s.JsonSerializer = new DefaultJsonSerializer(
+                        new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }
+                    )
+                )
+                .WithHeader(HeaderNames.Accept, Accept)
+                .WithHeader(HeaderNames.UserAgent, UserAgent)
+                .WithHeader(ApiVersionHeader, ApiVersion)
+    );
 
-    public async Task<List<TItem>> ReceiveJsonPagedAsync<TReponse, TItem>(Url url, int perPage,
-        Func<TReponse, List<TItem>> getItems, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
+    public async Task<List<TItem>> ReceiveJsonPagedAsync<TReponse, TItem>(
+        Url url,
+        int perPage,
+        Func<TReponse, List<TItem>> getItems,
+        Action<IFlurlRequest>? configure = null,
+        CancellationToken? ct = null
+    )
     {
         var request = _client.Value.Request(url);
         configure?.Invoke(request);
@@ -69,30 +81,51 @@ internal class GithubApiClient(
             );
     }
 
-    public async Task<string> DownloadFileAsync(Url url, string path, string? fileName = null, 
-        Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
+    public async Task<string> DownloadFileAsync(
+        Url url,
+        string path,
+        string? fileName = null,
+        Action<IFlurlRequest>? configure = null,
+        CancellationToken? ct = null
+    )
     {
-        var request = _client.Value.Request(url)
+        var request = _client
+            .Value.Request(url)
             .WithOAuthBearerToken(await githubTokenStore.GetAsync());
         configure?.Invoke(request);
         logger.LogDebug("Downloading {Url}", request.Url);
-        var file = await request.DownloadFileAsync(path, fileName, cancellationToken: ct ?? CancellationToken.None);
+        var file = await request.DownloadFileAsync(
+            path,
+            fileName,
+            cancellationToken: ct ?? CancellationToken.None
+        );
         logger.LogInformation("Downloaded {Url} to {Path}", request.Url, file);
         return file;
     }
 
-    public async Task<IFlurlResponse> GetAsync(Url url, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
+    public async Task<IFlurlResponse> GetAsync(
+        Url url,
+        Action<IFlurlRequest>? configure = null,
+        CancellationToken? ct = null
+    )
     {
-        var request = _client.Value.Request(url)
+        var request = _client
+            .Value.Request(url)
             .WithOAuthBearerToken(await githubTokenStore.GetAsync());
         configure?.Invoke(request);
         logger.LogDebug("Requesting {Url}", request.Url);
         return await SendAsync(request, HttpMethod.Get, null, ct ?? CancellationToken.None);
     }
 
-    public async Task<IFlurlResponse> PostJsonAsync(Url url, object data, Action<IFlurlRequest>? configure = null, CancellationToken? ct = null)
+    public async Task<IFlurlResponse> PostJsonAsync(
+        Url url,
+        object data,
+        Action<IFlurlRequest>? configure = null,
+        CancellationToken? ct = null
+    )
     {
-        var request = _client.Value.Request(url)
+        var request = _client
+            .Value.Request(url)
             .WithOAuthBearerToken(await githubTokenStore.GetAsync());
         configure?.Invoke(request);
         logger.LogDebug("Posting to {Url}", request.Url);
@@ -100,86 +133,174 @@ internal class GithubApiClient(
         return await SendAsync(request, HttpMethod.Post, content, ct ?? CancellationToken.None);
     }
 
-    private async Task<IFlurlResponse> SendAsync(IFlurlRequest request, HttpMethod verb,
-        HttpContent? content = null, CancellationToken? ct = null)
+    private async Task<IFlurlResponse> SendAsync(
+        IFlurlRequest request,
+        HttpMethod verb,
+        HttpContent? content = null,
+        CancellationToken? ct = null
+    )
     {
         const int maxRetries = 3;
-        var delays = Backoff.DecorrelatedJitterBackoffV2(medianFirstRetryDelay: TimeSpan.FromSeconds(1), retryCount: maxRetries).ToArray();
+        var delays = Backoff
+            .DecorrelatedJitterBackoffV2(
+                medianFirstRetryDelay: TimeSpan.FromSeconds(1),
+                retryCount: maxRetries
+            )
+            .ToArray();
 
         var resiliencePipeline = new ResiliencePipelineBuilder<IFlurlResponse>()
-            .AddRetry(new RetryStrategyOptions<IFlurlResponse>
-            {
-                ShouldHandle = new PredicateBuilder<IFlurlResponse>()
-                    .Handle<FlurlHttpException>(exception => exception.StatusCode is not null && RetryHttpCodes.Contains((HttpStatusCode)exception.StatusCode))
-                    .HandleResult(response => RetryHttpCodes.Contains((HttpStatusCode)response.StatusCode)),
-                DelayGenerator = arguments =>
+            .AddRetry(
+                new RetryStrategyOptions<IFlurlResponse>
                 {
-                    var delay = delays[arguments.AttemptNumber];
-                    logger.LogDebug("Retry Attempt {Attempt} - Delaying for {Delay} before retrying request to {Verb} - {Url}", arguments.AttemptNumber, delay, verb, request.Url);
-                    return ValueTask.FromResult<TimeSpan?>(delay);
-                },
-                MaxRetryAttempts = maxRetries
-            })
-            .AddRetry(new RetryStrategyOptions<IFlurlResponse>
-            {
-                ShouldHandle = new PredicateBuilder<IFlurlResponse>()
-                    .HandleResult(response => response.Headers.GetRequired(RemainingRateLimitHeader) == "0"),
-                DelayGenerator = arguments =>
-                {
-                    var rateLimitReset = arguments.Outcome.Result!.Headers.GetRequired(RateLimitResetHeader);
-                    var rateLimitResetDateTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(rateLimitReset));
-                    var now = dateTimeOffsetProvider.UtcNow;
-                    var delay = rateLimitResetDateTime - now;
-                    logger.LogDebug("RateLimit - Delaying for {Delay} before retrying request to {Verb} - {Url}", delay, verb, request.Url);
-                    return ValueTask.FromResult<TimeSpan?>(delay);
+                    ShouldHandle = new PredicateBuilder<IFlurlResponse>()
+                        .Handle<FlurlHttpException>(exception =>
+                            exception.StatusCode is not null
+                            && RetryHttpCodes.Contains((HttpStatusCode)exception.StatusCode)
+                        )
+                        .HandleResult(response =>
+                            RetryHttpCodes.Contains((HttpStatusCode)response.StatusCode)
+                        ),
+                    DelayGenerator = arguments =>
+                    {
+                        var delay = delays[arguments.AttemptNumber];
+                        logger.LogDebug(
+                            "Retry Attempt {Attempt} - Delaying for {Delay} before retrying request to {Verb} - {Url}",
+                            arguments.AttemptNumber,
+                            delay,
+                            verb,
+                            request.Url
+                        );
+                        return ValueTask.FromResult<TimeSpan?>(delay);
+                    },
+                    MaxRetryAttempts = maxRetries,
                 }
-            })
-            .AddRetry(new RetryStrategyOptions<IFlurlResponse>
-            {
-                ShouldHandle = new PredicateBuilder<IFlurlResponse>()
-                    .Handle<FlurlHttpException>(exception => !string.IsNullOrWhiteSpace(exception.Call.Response.Headers.Get(RetryAfterHeader))),
-                DelayGenerator = arguments =>
+            )
+            .AddRetry(
+                new RetryStrategyOptions<IFlurlResponse>
                 {
-                    var exception = (FlurlHttpException)arguments.Outcome.Exception!;
-                    var resetAfter = exception.Call.Response.Headers.GetRequired(RetryAfterHeader);
-                    var delay = TimeSpan.FromSeconds(int.Parse(resetAfter));
-                    logger.LogDebug("RetryAfter - Delaying for {Delay} before retrying request to {Verb} - {Url}", delay, verb, request.Url);
-                    return ValueTask.FromResult<TimeSpan?>(delay);
+                    ShouldHandle = new PredicateBuilder<IFlurlResponse>().HandleResult(response =>
+                        response.Headers.GetRequired(RemainingRateLimitHeader) == "0"
+                    ),
+                    DelayGenerator = arguments =>
+                    {
+                        var rateLimitReset = arguments.Outcome.Result!.Headers.GetRequired(
+                            RateLimitResetHeader
+                        );
+                        var rateLimitResetDateTime = DateTimeOffset.FromUnixTimeSeconds(
+                            long.Parse(rateLimitReset)
+                        );
+                        var now = dateTimeOffsetProvider.UtcNow;
+                        var delay = rateLimitResetDateTime - now;
+                        logger.LogDebug(
+                            "RateLimit - Delaying for {Delay} before retrying request to {Verb} - {Url}",
+                            delay,
+                            verb,
+                            request.Url
+                        );
+                        return ValueTask.FromResult<TimeSpan?>(delay);
+                    },
                 }
-            })
+            )
+            .AddRetry(
+                new RetryStrategyOptions<IFlurlResponse>
+                {
+                    ShouldHandle =
+                        new PredicateBuilder<IFlurlResponse>().Handle<FlurlHttpException>(
+                            exception =>
+                                !string.IsNullOrWhiteSpace(
+                                    exception.Call.Response.Headers.Get(RetryAfterHeader)
+                                )
+                        ),
+                    DelayGenerator = arguments =>
+                    {
+                        var exception = (FlurlHttpException)arguments.Outcome.Exception!;
+                        var resetAfter = exception.Call.Response.Headers.GetRequired(
+                            RetryAfterHeader
+                        );
+                        var delay = TimeSpan.FromSeconds(int.Parse(resetAfter));
+                        logger.LogDebug(
+                            "RetryAfter - Delaying for {Delay} before retrying request to {Verb} - {Url}",
+                            delay,
+                            verb,
+                            request.Url
+                        );
+                        return ValueTask.FromResult<TimeSpan?>(delay);
+                    },
+                }
+            )
             .Build();
 
         return await resiliencePipeline.ExecuteAsync(
-            async cancellationToken => await SendGithubApiCachedAsync(request, verb, content, cancellationToken),
+            async cancellationToken =>
+                await SendGithubApiCachedAsync(request, verb, content, cancellationToken),
             ct ?? CancellationToken.None
         );
     }
 
-    private async Task<IFlurlResponse> SendGithubApiCachedAsync(IFlurlRequest request, HttpMethod verb,
-        HttpContent? content = null, CancellationToken? ct = null)
+    private async Task<IFlurlResponse> SendGithubApiCachedAsync(
+        IFlurlRequest request,
+        HttpMethod verb,
+        HttpContent? content = null,
+        CancellationToken? ct = null
+    )
     {
         var cacheKey = await GetCacheKeyAsync(request, verb, content);
 
-        if (verb == HttpMethod.Get && memoryCache.TryGetValue(cacheKey, out IFlurlResponse? cachedResponse))
+        if (
+            verb == HttpMethod.Get
+            && memoryCache.TryGetValue(cacheKey, out IFlurlResponse? cachedResponse)
+        )
         {
             var modifiedResponse = await request
                 .WithHeader(IfNoneMatchHeader, cachedResponse!.Headers.GetRequired(ETagHeader))
-                .SendAsync(verb, content, HttpCompletionOption.ResponseHeadersRead, ct ?? CancellationToken.None);
+                .SendAsync(
+                    verb,
+                    content,
+                    HttpCompletionOption.ResponseHeadersRead,
+                    ct ?? CancellationToken.None
+                );
 
             if (modifiedResponse.StatusCode == (int)HttpStatusCode.NotModified)
             {
-                logger.LogDebug("Cache - Returning cached response for {Verb} - {Url}", verb, request.Url);
+                logger.LogDebug(
+                    "Cache - Returning cached response for {Verb} - {Url}",
+                    verb,
+                    request.Url
+                );
                 return cachedResponse;
             }
 
-            logger.LogDebug("Cache - Resource has changed, returning new response for {Verb} - {Url}", verb, request.Url);
+            logger.LogDebug(
+                "Cache - Resource has changed, returning new response for {Verb} - {Url}",
+                verb,
+                request.Url
+            );
         }
-        
-        logger.LogTrace("Sending {Verb} request to {Url} with content {Content}", verb, request.Url, content is not null ? await content.ReadAsStringAsync() : string.Empty);
-        var response = await request.SendAsync(verb, content, HttpCompletionOption.ResponseHeadersRead, ct ?? CancellationToken.None);
-        logger.LogTrace("Received {StatusCode} response from {Url} with content {Content}", response.StatusCode, request.Url, await response.GetStringAsync());
 
-        if (verb == HttpMethod.Get && response.StatusCode == (int)HttpStatusCode.OK && !string.IsNullOrWhiteSpace(response.Headers.Get(ETagHeader)))
+        logger.LogTrace(
+            "Sending {Verb} request to {Url} with content {Content}",
+            verb,
+            request.Url,
+            content is not null ? await content.ReadAsStringAsync() : string.Empty
+        );
+        var response = await request.SendAsync(
+            verb,
+            content,
+            HttpCompletionOption.ResponseHeadersRead,
+            ct ?? CancellationToken.None
+        );
+        logger.LogTrace(
+            "Received {StatusCode} response from {Url} with content {Content}",
+            response.StatusCode,
+            request.Url,
+            await response.GetStringAsync()
+        );
+
+        if (
+            verb == HttpMethod.Get
+            && response.StatusCode == (int)HttpStatusCode.OK
+            && !string.IsNullOrWhiteSpace(response.Headers.Get(ETagHeader))
+        )
         {
             logger.LogDebug("Cache - Caching response for {Verb} - {Url}", verb, request.Url);
             memoryCache.Set(cacheKey, response);
@@ -188,7 +309,11 @@ internal class GithubApiClient(
         return response;
     }
 
-    private static async Task<string> GetCacheKeyAsync(IFlurlRequest request, HttpMethod verb, HttpContent? content)
+    private static async Task<string> GetCacheKeyAsync(
+        IFlurlRequest request,
+        HttpMethod verb,
+        HttpContent? content
+    )
     {
         var body = content is null ? string.Empty : await content.ReadAsStringAsync();
         return $"{request.Url}{verb}{body}";

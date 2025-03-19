@@ -29,15 +29,19 @@ internal static class RepositoriesCommand
         return command;
     }
 
-    private static Task RunAsync(string[] args, GlobalArgs globalArgs, RepositoriesArgs repositoriesArgs,
-        CommandOptions options)
+    private static Task RunAsync(
+        string[] args,
+        GlobalArgs globalArgs,
+        RepositoriesArgs repositoriesArgs,
+        CommandOptions options
+    )
     {
         var runner = new CliRunner<RepositoriesRunner, RepositoriesArgs>(
-            args, globalArgs, repositoriesArgs,
-            new RunOptions
-            {
-                AfterServices = options.AfterServices
-            });
+            args,
+            globalArgs,
+            repositoriesArgs,
+            new RunOptions { AfterServices = options.AfterServices }
+        );
 
         return runner.RunAsync();
     }

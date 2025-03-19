@@ -11,14 +11,14 @@ namespace GithubBackup.Cli.Tests.Commands.Global;
 public class GlobalArgsTests
 {
     private readonly GlobalArguments _globalArguments = new();
-    
+
     [Fact]
     public async Task InvokeAsync_FlagsArePassed_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_globalArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             globalArgs =>
             {
@@ -29,18 +29,20 @@ public class GlobalArgsTests
             },
             new GlobalArgsBinder(_globalArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub --quiet --verbosity debug --log-file ./log.txt");
+        await TestCommandline
+            .Build(rootCommand)
+            .InvokeAsync("sub --quiet --verbosity debug --log-file ./log.txt");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_ShortFlagsArePassed_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_globalArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             globalArgs =>
             {
@@ -51,18 +53,18 @@ public class GlobalArgsTests
             },
             new GlobalArgsBinder(_globalArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         await TestCommandline.Build(rootCommand).InvokeAsync("sub -q -v debug -l ./log.txt");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_NoFlagsArePassed_DefaultsAreUsed()
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_globalArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             globalArgs =>
             {
@@ -73,10 +75,8 @@ public class GlobalArgsTests
             },
             new GlobalArgsBinder(_globalArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         await TestCommandline.Build(rootCommand).InvokeAsync("sub");
     }
 }
-
-	

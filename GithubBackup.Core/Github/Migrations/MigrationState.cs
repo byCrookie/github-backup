@@ -6,10 +6,13 @@ public enum MigrationState
 {
     [EnumMember(Value = "pending")]
     Pending,
+
     [EnumMember(Value = "exporting")]
     Exporting,
+
     [EnumMember(Value = "failed")]
     Failed,
+
     [EnumMember(Value = "exported")]
-    Exported
+    Exported,
 }

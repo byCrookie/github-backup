@@ -23,7 +23,7 @@ public class DownloadArgsTests
         rootCommand.AddGlobalOptions(_intervalArguments.Options());
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             downloadArgs =>
             {
@@ -39,14 +39,17 @@ public class DownloadArgsTests
             },
             new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand)
-            .InvokeAsync("sub --destination ./migrations --latest --migrations 1 2 3" +
-                         " --number-of-backups 5 --overwrite --interval 100" +
-                         " --token test --device-flow-auth");
+        await TestCommandline
+            .Build(rootCommand)
+            .InvokeAsync(
+                "sub --destination ./migrations --latest --migrations 1 2 3"
+                    + " --number-of-backups 5 --overwrite --interval 100"
+                    + " --token test --device-flow-auth"
+            );
     }
-    
+
     [Fact]
     public async Task InvokeAsync_ShortFlagsArePassed_FlagsGetParsed()
     {
@@ -55,7 +58,7 @@ public class DownloadArgsTests
         rootCommand.AddGlobalOptions(_intervalArguments.Options());
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             downloadArgs =>
             {
@@ -71,24 +74,27 @@ public class DownloadArgsTests
             },
             new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand)
+        await TestCommandline
+            .Build(rootCommand)
             .InvokeAsync("sub -d ./migrations -l -m 1 2 3 -n 5 -o -i 100");
     }
-    
+
     [Theory]
     [InlineData("-m 1 -m 2 -m 3")]
     [InlineData("-m 1 2 3")]
     [InlineData("--migrations 1 --migrations 2 --migrations 3")]
     [InlineData("--migrations 1 2 3")]
-    public async Task InvokeAsync_MigrationIsPassedMultipleTimes_FlagsGetParsed(string migrationArgs)
+    public async Task InvokeAsync_MigrationIsPassedMultipleTimes_FlagsGetParsed(
+        string migrationArgs
+    )
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_downloadArguments.Options());
         rootCommand.AddGlobalOptions(_intervalArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             downloadArgs =>
             {
@@ -104,11 +110,13 @@ public class DownloadArgsTests
             },
             new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub -d ./migrations -l -o -n 5 " + migrationArgs);
+        await TestCommandline
+            .Build(rootCommand)
+            .InvokeAsync("sub -d ./migrations -l -o -n 5 " + migrationArgs);
     }
-    
+
     [Fact]
     public async Task InvokeAsync_OnlyRequiredArePassed_FlagsGetParsedWithDefaults()
     {
@@ -116,7 +124,7 @@ public class DownloadArgsTests
         rootCommand.AddGlobalOptions(_downloadArguments.Options());
         rootCommand.AddGlobalOptions(_intervalArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             downloadArgs =>
             {
@@ -132,10 +140,8 @@ public class DownloadArgsTests
             },
             new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         await TestCommandline.Build(rootCommand).InvokeAsync("sub -d ./migrations");
     }
 }
-
-	

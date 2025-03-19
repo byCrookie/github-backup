@@ -13,7 +13,12 @@ internal sealed class BackupArgs : ICommandIntervalArgs
     public IntervalArgs IntervalArgs { get; }
     public LoginArgs LoginArgs { get; }
 
-    public BackupArgs(MigrateArgs migrateArgs, DownloadArgs downloadArgs, IntervalArgs intervalArgs, LoginArgs loginArgs)
+    public BackupArgs(
+        MigrateArgs migrateArgs,
+        DownloadArgs downloadArgs,
+        IntervalArgs intervalArgs,
+        LoginArgs loginArgs
+    )
     {
         MigrateArgs = migrateArgs;
         DownloadArgs = downloadArgs;

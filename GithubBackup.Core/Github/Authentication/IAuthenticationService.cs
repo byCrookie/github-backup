@@ -3,5 +3,9 @@
 public interface IAuthenticationService
 {
     Task<DeviceAndUserCodes> RequestDeviceAndUserCodesAsync(CancellationToken ct);
-    Task<AccessToken> PollForAccessTokenAsync(string deviceCode, int interval, CancellationToken ct);
+    Task<AccessToken> PollForAccessTokenAsync(
+        string deviceCode,
+        int interval,
+        CancellationToken ct
+    );
 }

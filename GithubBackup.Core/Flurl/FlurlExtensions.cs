@@ -10,7 +10,8 @@ internal static class FlurlExtensions
         Func<TReponse, int, List<TItem>, bool> hasNextPage,
         Action<IFlurlRequest, int> getNextPageRequest,
         Func<IFlurlRequest, CancellationToken, Task<IFlurlResponse>> sendRequest,
-        CancellationToken ct)
+        CancellationToken ct
+    )
     {
         var allItems = new List<TItem>();
         var index = 0;

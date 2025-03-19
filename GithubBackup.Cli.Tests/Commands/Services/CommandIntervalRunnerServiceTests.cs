@@ -18,7 +18,6 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Services;
 
-
 public class CommandIntervalRunnerServiceTests
 {
     private readonly CommandIntervalRunnerService _sut;
@@ -31,7 +30,7 @@ public class CommandIntervalRunnerServiceTests
     public CommandIntervalRunnerServiceTests()
     {
         CultureInfo.CurrentCulture = new CultureInfo("de-CH");
-        
+
         _logger = Substitute.For<ILogger<CommandIntervalRunnerService>>();
         _hostApplicationLifeTime = Substitute.For<IHostApplicationLifetime>();
         _commandRunner = Substitute.For<ICommandRunner>();
@@ -42,12 +41,12 @@ public class CommandIntervalRunnerServiceTests
 
         var fakeStopWatch = new Stopwatch();
         stopwatch.StartNew().Returns(fakeStopWatch);
-        
+
         dateTimeProvider.Now.Returns(new DateTime(1, 1, 1, 12, 0, 0));
 
         _sut = new CommandIntervalRunnerService(
             new GlobalArgs(LogLevel.Debug, false, new FileInfo("test")),
-            TimeSpan.FromSeconds(2), 
+            TimeSpan.FromSeconds(2),
             _logger,
             _hostApplicationLifeTime,
             _commandRunner,
@@ -62,7 +61,7 @@ public class CommandIntervalRunnerServiceTests
     {
         var cts = new CancellationTokenSource();
         cts.Cancel();
-        
+
         await _sut.StartAsync(cts.Token);
 
         _hostApplicationLifeTime.Received(1).StopApplication();
@@ -85,7 +84,7 @@ public class CommandIntervalRunnerServiceTests
     {
         var cts = new CancellationTokenSource();
         cts.Cancel();
-        
+
         const string errorMessage = "Test";
         _commandRunner.RunAsync(cts.Token).ThrowsAsync(new Exception(errorMessage));
 
@@ -101,7 +100,7 @@ public class CommandIntervalRunnerServiceTests
             new LogEntry(LogLevel.Information, "Command finished. Duration: 00:00:00"),
             new LogEntry(LogLevel.Information, "Waiting until 01.01.0001 12:00:02 for next run")
         );
-        
+
         await Verify(_ansiConsole.Output);
 
         _environment.ExitCode.Should().Be(0);
@@ -112,7 +111,7 @@ public class CommandIntervalRunnerServiceTests
     {
         var cts = new CancellationTokenSource();
         cts.Cancel();
-        
+
         const string errorMessage = "Test";
         _commandRunner.RunAsync(cts.Token).ThrowsAsync(CreateFlurlHttpException(errorMessage));
 
@@ -128,7 +127,7 @@ public class CommandIntervalRunnerServiceTests
             new LogEntry(LogLevel.Information, "Command finished. Duration: 00:00:00"),
             new LogEntry(LogLevel.Information, "Waiting until 01.01.0001 12:00:02 for next run")
         );
-        
+
         await Verify(_ansiConsole.Output);
 
         _environment.ExitCode.Should().Be(0);
@@ -136,26 +135,30 @@ public class CommandIntervalRunnerServiceTests
 
     private static FlurlHttpException CreateFlurlHttpException(string errorMessage)
     {
-        return new FlurlHttpException(new FlurlCall
-        {
-            Exception = new Exception(errorMessage),
-            Response = new FlurlResponse(new FlurlCall
+        return new FlurlHttpException(
+            new FlurlCall
             {
+                Exception = new Exception(errorMessage),
+                Response = new FlurlResponse(
+                    new FlurlCall
+                    {
+                        HttpResponseMessage = new HttpResponseMessage
+                        {
+                            ReasonPhrase = errorMessage,
+                            Content = new StringContent(errorMessage),
+                            StatusCode = HttpStatusCode.BadRequest,
+                        },
+                    }
+                ),
+                Request = new FlurlRequest(new Url("https://example.com")),
+                HttpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.com"),
                 HttpResponseMessage = new HttpResponseMessage
                 {
                     ReasonPhrase = errorMessage,
-                    Content = new StringContent(errorMessage),
-                    StatusCode = HttpStatusCode.BadRequest
-                }
-            }),
-            Request = new FlurlRequest(new Url("https://example.com")),
-            HttpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.com"),
-            HttpResponseMessage = new HttpResponseMessage
-            {
-                ReasonPhrase = errorMessage,
-                Content = new StringContent("error"),
-                StatusCode = HttpStatusCode.BadRequest
+                    Content = new StringContent("error"),
+                    StatusCode = HttpStatusCode.BadRequest,
+                },
             }
-        });
+        );
     }
 }

@@ -33,20 +33,25 @@ internal class TokenArgPipeline : ITokenArgPipeline
         return !string.IsNullOrWhiteSpace(args.Token);
     }
 
-    public async Task<User?> LoginAsync(GlobalArgs globalArgs, LoginArgs args, bool persist, CancellationToken ct)
+    public async Task<User?> LoginAsync(
+        GlobalArgs globalArgs,
+        LoginArgs args,
+        bool persist,
+        CancellationToken ct
+    )
     {
         if (!IsReponsible(args))
         {
             return await Next!.LoginAsync(globalArgs, args, persist, ct);
         }
-        
+
         _logger.LogInformation("Using token from command line");
 
         try
         {
             await _githubTokenStore.SetAsync(args.Token);
             var user = await _userService.WhoAmIAsync(ct);
-            
+
             if (persist)
             {
                 await _persistentCredentialStore.StoreTokenAsync(args.Token!, ct);

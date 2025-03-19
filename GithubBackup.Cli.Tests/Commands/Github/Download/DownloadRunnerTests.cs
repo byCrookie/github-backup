@@ -13,7 +13,6 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Download;
 
-
 public class DownloadRunnerTests
 {
     private readonly IMigrationService _migrationService = Substitute.For<IMigrationService>();
@@ -31,15 +30,20 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(new List<Migration>
-            {
-                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
-            });
+            .Returns(
+                new List<Migration>
+                {
+                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                    new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+                }
+            );
 
         _migrationService
-            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), CancellationToken.None)
+            .DownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == id),
+                CancellationToken.None
+            )
             .Returns("test");
 
         await runner.RunAsync(CancellationToken.None);
@@ -63,15 +67,20 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(new List<Migration>
-            {
-                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
-            });
+            .Returns(
+                new List<Migration>
+                {
+                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                    new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+                }
+            );
 
         _migrationService
-            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), CancellationToken.None)
+            .DownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == id),
+                CancellationToken.None
+            )
             .Returns("test");
 
         await runner.RunAsync(CancellationToken.None);
@@ -95,21 +104,29 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(new List<Migration>
-            {
-                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
-            });
+            .Returns(
+                new List<Migration>
+                {
+                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                    new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+                }
+            );
 
         _migrationService
-            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), CancellationToken.None)
+            .DownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == id),
+                CancellationToken.None
+            )
             .Returns("test");
 
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs(
-            new LogEntry(LogLevel.Information, "No migration ids specified, downloading latest migration"),
+            new LogEntry(
+                LogLevel.Information,
+                "No migration ids specified, downloading latest migration"
+            ),
             new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
             new LogEntry(LogLevel.Information, "Downloading migration 1"),
             new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
@@ -127,21 +144,29 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(new List<Migration>
-            {
-                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
-            });
+            .Returns(
+                new List<Migration>
+                {
+                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                    new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+                }
+            );
 
         _migrationService
-            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), CancellationToken.None)
+            .DownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == id),
+                CancellationToken.None
+            )
             .Returns("test");
 
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs(
-            new LogEntry(LogLevel.Information, "No migration ids specified, downloading latest migration"),
+            new LogEntry(
+                LogLevel.Information,
+                "No migration ids specified, downloading latest migration"
+            ),
             new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
             new LogEntry(LogLevel.Information, "Downloading migration 1"),
             new LogEntry(LogLevel.Information, "Downloaded migration 1 to test")
@@ -157,12 +182,14 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(new List<Migration>
-            {
-                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                new(1, MigrationState.Exporting, new DateTime(2021, 1, 1)),
-                new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
-            });
+            .Returns(
+                new List<Migration>
+                {
+                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                    new(1, MigrationState.Exporting, new DateTime(2021, 1, 1)),
+                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+                }
+            );
 
         await runner.RunAsync(CancellationToken.None);
 
@@ -175,7 +202,10 @@ public class DownloadRunnerTests
 
         await _migrationService
             .DidNotReceiveWithAnyArgs()
-            .DownloadMigrationAsync(Arg.Any<DownloadMigrationOptions>(), Arg.Any<CancellationToken>());
+            .DownloadMigrationAsync(
+                Arg.Any<DownloadMigrationOptions>(),
+                Arg.Any<CancellationToken>()
+            );
     }
 
     [Fact]
@@ -185,12 +215,14 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(new List<Migration>
-            {
-                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                new(1, MigrationState.Exporting, new DateTime(2021, 1, 1)),
-                new(2, MigrationState.Pending, new DateTime(2020, 1, 1))
-            });
+            .Returns(
+                new List<Migration>
+                {
+                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                    new(1, MigrationState.Exporting, new DateTime(2021, 1, 1)),
+                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+                }
+            );
 
         await runner.RunAsync(CancellationToken.None);
 
@@ -201,7 +233,10 @@ public class DownloadRunnerTests
 
         await _migrationService
             .DidNotReceiveWithAnyArgs()
-            .DownloadMigrationAsync(Arg.Any<DownloadMigrationOptions>(), Arg.Any<CancellationToken>());
+            .DownloadMigrationAsync(
+                Arg.Any<DownloadMigrationOptions>(),
+                Arg.Any<CancellationToken>()
+            );
 
         await Verify(_ansiConsole.Output);
     }
@@ -213,19 +248,27 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(new List<Migration>
-            {
-                new(0, MigrationState.Pending, new DateTime(2022, 1, 1)),
-                new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                new(2, MigrationState.Exported, new DateTime(2020, 1, 1))
-            });
+            .Returns(
+                new List<Migration>
+                {
+                    new(0, MigrationState.Pending, new DateTime(2022, 1, 1)),
+                    new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                    new(2, MigrationState.Exported, new DateTime(2020, 1, 1)),
+                }
+            );
 
         _migrationService
-            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 1), CancellationToken.None)
+            .DownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == 1),
+                CancellationToken.None
+            )
             .Returns("test1");
 
         _migrationService
-            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 2), CancellationToken.None)
+            .DownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == 2),
+                CancellationToken.None
+            )
             .Returns("test2");
 
         await runner.RunAsync(CancellationToken.None);
@@ -250,19 +293,27 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(new List<Migration>
-            {
-                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                new(2, MigrationState.Exported, new DateTime(2020, 1, 1))
-            });
+            .Returns(
+                new List<Migration>
+                {
+                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                    new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                    new(2, MigrationState.Exported, new DateTime(2020, 1, 1)),
+                }
+            );
 
         _migrationService
-            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 1), CancellationToken.None)
+            .DownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == 1),
+                CancellationToken.None
+            )
             .Returns("test1");
 
         _migrationService
-            .DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 2), CancellationToken.None)
+            .DownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == 2),
+                CancellationToken.None
+            )
             .Returns("test2");
 
         await runner.RunAsync(CancellationToken.None);
@@ -279,7 +330,7 @@ public class DownloadRunnerTests
 
         await Verify(_ansiConsole.Output);
     }
-    
+
     [Fact]
     public async Task RunAsync_NotQuietAndExportMigrationsAndUsePolling_DoWriteToConsoleAndDoDownload()
     {
@@ -287,19 +338,29 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(new List<Migration>
-            {
-                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                new(2, MigrationState.Exported, new DateTime(2020, 1, 1))
-            });
+            .Returns(
+                new List<Migration>
+                {
+                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                    new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                    new(2, MigrationState.Exported, new DateTime(2020, 1, 1)),
+                }
+            );
 
         _migrationService
-            .PollAndDownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 1), _ => Task.CompletedTask, CancellationToken.None)
+            .PollAndDownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == 1),
+                _ => Task.CompletedTask,
+                CancellationToken.None
+            )
             .Returns("test1");
 
         _migrationService
-            .PollAndDownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == 2), _ => Task.CompletedTask, CancellationToken.None)
+            .PollAndDownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == 2),
+                _ => Task.CompletedTask,
+                CancellationToken.None
+            )
             .Returns("test2");
 
         await runner.RunAsync(CancellationToken.None);

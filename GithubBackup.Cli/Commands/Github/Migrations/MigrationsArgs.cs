@@ -10,12 +10,7 @@ internal sealed class MigrationsArgs
     public DateTime? Since { get; }
     public LoginArgs LoginArgs { get; }
 
-    public MigrationsArgs(
-        bool export,
-        long? daysOld,
-        DateTime? since,
-        LoginArgs loginArgs
-    )
+    public MigrationsArgs(bool export, long? daysOld, DateTime? since, LoginArgs loginArgs)
     {
         Export = export;
         DaysOld = daysOld;

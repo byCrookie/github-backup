@@ -4,35 +4,50 @@ namespace GithubBackup.Cli.Commands.Github.Download;
 
 internal static class DownloadArgDescriptions
 {
-    public static readonly Description Migrations = new("Migrations", "Migrations",
+    public static readonly Description Migrations = new(
+        "Migrations",
+        "Migrations",
         $"""
-         Id's of the migrations to download.
-         Instead piping can be used to provide the id's. Supported separators: {Piping.Separators}.
-         If not specified, the latest migration will be downloaded.
-         """
+        Id's of the migrations to download.
+        Instead piping can be used to provide the id's. Supported separators: {Piping.Separators}.
+        If not specified, the latest migration will be downloaded.
+        """
     );
 
-    public static readonly Description Latest = new("Latest", "Latest",
+    public static readonly Description Latest = new(
+        "Latest",
+        "Latest",
         """
         Only download the latest migration.
         If the migration is not yet completed, it will be skipped.
         If id's are specified, this flag will be ignored.
         """
     );
-    
-    public static readonly Description Poll = new("Poll", "Poll",
+
+    public static readonly Description Poll = new(
+        "Poll",
+        "Poll",
         "Poll the latest migration until it is ready to be downloaded."
     );
 
-    public static readonly Description Destination = new("Destination", "Destination",
-        "The destination directory to download the migrations to.");
+    public static readonly Description Destination = new(
+        "Destination",
+        "Destination",
+        "The destination directory to download the migrations to."
+    );
 
-    public static readonly Description NumberOfBackups = new("NumberOfBackups", "NumberOfBackups",
+    public static readonly Description NumberOfBackups = new(
+        "NumberOfBackups",
+        "NumberOfBackups",
         """
         The number of backups to keep.
         If not specified, all backups will be kept.
         """
     );
 
-    public static readonly Description Overwrite = new("Overwrite", "Overwrite", "Overwrite existing backups.");
+    public static readonly Description Overwrite = new(
+        "Overwrite",
+        "Overwrite",
+        "Overwrite existing backups."
+    );
 }

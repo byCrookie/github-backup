@@ -11,7 +11,7 @@ public class EnumExtensionsTests
         var result = TestEnum.Test1.GetEnumMemberValue();
         result.Should().Be("test1");
     }
-    
+
     [Fact]
     public void GetEnumMemberValue_WhenHasNoAttribute_ThenReturnEnumValueName()
     {

@@ -22,15 +22,17 @@ internal static class GithubCommands
         var downloadCommand = DownloadCommand.Create(args, commandOptions);
         var backupCommand = BackupCommand.Create(args, commandOptions);
 
-        command.AddCommands(new List<Command>
-        {
-            manualBackupCommand,
-            migrateCommand,
-            loginCommand,
-            migrationsCommand,
-            repositoriesCommand,
-            downloadCommand,
-            backupCommand
-        });
+        command.AddCommands(
+            new List<Command>
+            {
+                manualBackupCommand,
+                migrateCommand,
+                loginCommand,
+                migrationsCommand,
+                repositoriesCommand,
+                downloadCommand,
+                backupCommand,
+            }
+        );
     }
 }

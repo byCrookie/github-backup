@@ -11,7 +11,6 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Migrate;
 
-
 public class MigrateRunnerTests
 {
     private readonly TestConsole _ansiConsole = new();
@@ -23,8 +22,9 @@ public class MigrateRunnerTests
     public async Task RunAsync_Quiet_DoNotWriteToConsoleAndMigrate()
     {
         var runner = CreateRunner(true);
-        
-        _migrationService.StartMigrationAsync(Arg.Any<StartMigrationOptions>(), CancellationToken.None)
+
+        _migrationService
+            .StartMigrationAsync(Arg.Any<StartMigrationOptions>(), CancellationToken.None)
             .Returns(new Migration(1, MigrationState.Pending, DateTime.UtcNow));
 
         await runner.RunAsync(CancellationToken.None);
@@ -33,13 +33,14 @@ public class MigrateRunnerTests
 
         await Verify(_ansiConsole.Output);
     }
-    
+
     [Fact]
     public async Task RunAsync_NotQuiet_DoWriteToConsoleAndMigrate()
     {
         var runner = CreateRunner(false);
-        
-        _migrationService.StartMigrationAsync(Arg.Any<StartMigrationOptions>(), CancellationToken.None)
+
+        _migrationService
+            .StartMigrationAsync(Arg.Any<StartMigrationOptions>(), CancellationToken.None)
             .Returns(new Migration(1, MigrationState.Pending, DateTime.UtcNow));
 
         await runner.RunAsync(CancellationToken.None);
@@ -53,7 +54,7 @@ public class MigrateRunnerTests
     {
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
         var migrateArgs = new MigrateArgs(
-            new[] {"test"},
+            new[] { "test" },
             false,
             false,
             false,

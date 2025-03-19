@@ -21,7 +21,8 @@ internal sealed class MigrationsRunner : ICommandRunner
         IMigrationService migrationService,
         ILoginService loginService,
         IAnsiConsole ansiConsole,
-        IDateTimeProvider dateTimeProvider)
+        IDateTimeProvider dateTimeProvider
+    )
     {
         _globalArgs = globalArgs;
         _migrationsArgs = migrationsArgs;
@@ -33,12 +34,7 @@ internal sealed class MigrationsRunner : ICommandRunner
 
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.WithPersistentAsync(
-            _globalArgs,
-            _migrationsArgs.LoginArgs,
-            false,
-            ct
-        );
+        await _loginService.WithPersistentAsync(_globalArgs, _migrationsArgs.LoginArgs, false, ct);
 
         var migrations = await _migrationService.GetMigrationsAsync(ct);
 
@@ -53,8 +49,17 @@ internal sealed class MigrationsRunner : ICommandRunner
         }
 
         var filteredMigrations = migrations
-            .Where(m => !_migrationsArgs.Export || (m.State == MigrationState.Exported && (_dateTimeProvider.Now - m.CreatedAt).Days <= 7))
-            .Where(m => _migrationsArgs.DaysOld is null || (_dateTimeProvider.Now - m.CreatedAt).Days <= _migrationsArgs.DaysOld)
+            .Where(m =>
+                !_migrationsArgs.Export
+                || (
+                    m.State == MigrationState.Exported
+                    && (_dateTimeProvider.Now - m.CreatedAt).Days <= 7
+                )
+            )
+            .Where(m =>
+                _migrationsArgs.DaysOld is null
+                || (_dateTimeProvider.Now - m.CreatedAt).Days <= _migrationsArgs.DaysOld
+            )
             .Where(m => _migrationsArgs.Since is null || m.CreatedAt >= _migrationsArgs.Since)
             .ToList();
 
@@ -73,7 +78,9 @@ internal sealed class MigrationsRunner : ICommandRunner
             _ansiConsole.WriteLine($"Found {filteredMigrations.Count} migrations:");
             foreach (var migration in filteredMigrations)
             {
-                _ansiConsole.WriteLine($"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)");
+                _ansiConsole.WriteLine(
+                    $"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)"
+                );
             }
         }
 

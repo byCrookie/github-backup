@@ -4,8 +4,8 @@ using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using IEnvironment = GithubBackup.Core.Environment.IEnvironment;
 using Environment = GithubBackup.Core.Environment.Environment;
+using IEnvironment = GithubBackup.Core.Environment.IEnvironment;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Auth;
 
@@ -36,8 +36,7 @@ public class PersistentCredentialStoreTests
     {
         var path = new Environment(_fileSystem).Root(AppDataDirectory);
 
-        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData)
-            .Returns(path);
+        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData).Returns(path);
 
         var result = await _sut.LoadTokenAsync(CancellationToken.None);
 
@@ -54,8 +53,7 @@ public class PersistentCredentialStoreTests
     {
         var path = new Environment(_fileSystem).Root(AppDataDirectory);
 
-        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData)
-            .Returns(path);
+        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData).Returns(path);
 
         var githubBackupPath = _fileSystem.Path.Combine(path.FullName, AppDirectory);
         _fileSystem.Directory.CreateDirectory(githubBackupPath);
@@ -77,8 +75,7 @@ public class PersistentCredentialStoreTests
     {
         var path = new Environment(_fileSystem).Root(AppDataDirectory);
 
-        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData)
-            .Returns(path);
+        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData).Returns(path);
 
         var githubBackupPath = _fileSystem.Path.Combine(path.FullName, AppDirectory);
         _fileSystem.Directory.CreateDirectory(githubBackupPath);
@@ -103,8 +100,7 @@ public class PersistentCredentialStoreTests
     {
         var path = new Environment(_fileSystem).Root(AppDataDirectory);
 
-        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData)
-            .Returns(path);
+        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData).Returns(path);
 
         var githubBackupPath = _fileSystem.Path.Combine(path.FullName, AppDirectory);
         _fileSystem.Directory.CreateDirectory(githubBackupPath);
@@ -128,8 +124,7 @@ public class PersistentCredentialStoreTests
     {
         var path = new Environment(_fileSystem).Root(AppDataDirectory);
 
-        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData)
-            .Returns(path);
+        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData).Returns(path);
 
         var githubBackupPath = _fileSystem.Path.Combine(path.FullName, AppDirectory);
         _fileSystem.Directory.CreateDirectory(githubBackupPath);
@@ -153,8 +148,7 @@ public class PersistentCredentialStoreTests
     {
         var path = new Environment(_fileSystem).Root(AppDataDirectory);
 
-        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData)
-            .Returns(path);
+        _environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData).Returns(path);
 
         var action = () => _sut.StoreTokenAsync(DecryptedToken, CancellationToken.None);
 

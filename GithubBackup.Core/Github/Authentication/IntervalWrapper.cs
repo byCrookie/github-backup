@@ -8,7 +8,7 @@ internal sealed class IntervalWrapper
     {
         Interval = interval;
     }
-    
+
     public void Update(TimeSpan interval)
     {
         Interval = interval;

@@ -7,7 +7,12 @@ public class TestClassWithParameters : ITestClassWithParameters
     public ITestDependency2 TestDependency2 { get; }
     public string Parameter2 { get; }
 
-    public TestClassWithParameters(string parameter1, ITestDependency1 testDependency1, ITestDependency2 testDependency2, string parameter2)
+    public TestClassWithParameters(
+        string parameter1,
+        ITestDependency1 testDependency1,
+        ITestDependency2 testDependency2,
+        string parameter2
+    )
     {
         Parameter1 = parameter1;
         TestDependency1 = testDependency1;

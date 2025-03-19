@@ -18,7 +18,8 @@ internal sealed class MigrateRunner : ICommandRunner
         MigrateArgs migrateArgs,
         IMigrationService migrationService,
         ILoginService loginService,
-        IAnsiConsole ansiConsole)
+        IAnsiConsole ansiConsole
+    )
     {
         _globalArgs = globalArgs;
         _migrateArgs = migrateArgs;
@@ -29,12 +30,7 @@ internal sealed class MigrateRunner : ICommandRunner
 
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.WithPersistentAsync(
-            _globalArgs,
-            _migrateArgs.LoginArgs,
-            false,
-            ct
-        );
+        await _loginService.WithPersistentAsync(_globalArgs, _migrateArgs.LoginArgs, false, ct);
 
         var options = new StartMigrationOptions(
             _migrateArgs.Repositories,
@@ -46,9 +42,11 @@ internal sealed class MigrateRunner : ICommandRunner
             _migrateArgs.ExcludeOwnerProjects,
             _migrateArgs.OrgMetadataOnly
         );
-        
+
         var migration = await _migrationService.StartMigrationAsync(options, ct);
 
-        _ansiConsole.WriteLine(!_globalArgs.Quiet ? $"Migration started with id {migration.Id}" : $"{migration.Id}");
+        _ansiConsole.WriteLine(
+            !_globalArgs.Quiet ? $"Migration started with id {migration.Id}" : $"{migration.Id}"
+        );
     }
 }

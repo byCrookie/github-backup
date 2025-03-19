@@ -6,5 +6,5 @@ public enum TestEnum
 {
     [EnumMember(Value = "test1")]
     Test1,
-    Test2
+    Test2,
 }

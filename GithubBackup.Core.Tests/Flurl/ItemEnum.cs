@@ -6,6 +6,7 @@ internal enum ItemEnum
 {
     [EnumMember(Value = "test1")]
     Test1,
+
     [EnumMember(Value = "test2")]
-    Test2
+    Test2,
 }

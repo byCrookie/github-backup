@@ -20,9 +20,9 @@ public class GithubTokenStoreTests
     public async Task GetAsync_TokenNotSet_ThrowException()
     {
         var result = _sut.GetAsync;
-       await result.Should().ThrowAsync<InvalidOperationException>();
+        await result.Should().ThrowAsync<InvalidOperationException>();
     }
-    
+
     [Fact]
     public async Task GetAsync_TokenSet_ReturnToken()
     {

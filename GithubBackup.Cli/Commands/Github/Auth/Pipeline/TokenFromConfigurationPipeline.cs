@@ -35,13 +35,18 @@ internal class TokenFromConfigurationPipeline : ITokenFromConfigurationPipeline
         return !string.IsNullOrWhiteSpace(token);
     }
 
-    public async Task<User?> LoginAsync(GlobalArgs globalArgs, LoginArgs args, bool persist, CancellationToken ct)
+    public async Task<User?> LoginAsync(
+        GlobalArgs globalArgs,
+        LoginArgs args,
+        bool persist,
+        CancellationToken ct
+    )
     {
         if (!IsReponsible())
         {
             return await Next!.LoginAsync(globalArgs, args, persist, ct);
         }
-        
+
         _logger.LogInformation("Using token from environment variable");
         var token = _configuration.GetValue<string>("TOKEN");
 

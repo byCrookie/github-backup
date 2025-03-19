@@ -26,12 +26,12 @@ internal static class CommandsModule
         where TCliCommand : class, ICommandRunner
     {
         services.AddGithub();
-        
-        services.AddTransient(s => ActivatorUtilities
-            .CreateInstance<TCliCommand>(s, globalArgs));
 
-        services.AddTransient<ICommandRunner>(s => ActivatorUtilities
-            .CreateInstance<TCliCommand>(s, globalArgs, commandArgs));
+        services.AddTransient(s => ActivatorUtilities.CreateInstance<TCliCommand>(s, globalArgs));
+
+        services.AddTransient<ICommandRunner>(s =>
+            ActivatorUtilities.CreateInstance<TCliCommand>(s, globalArgs, commandArgs)
+        );
 
         services.AddServices(globalArgs, commandArgs);
     }

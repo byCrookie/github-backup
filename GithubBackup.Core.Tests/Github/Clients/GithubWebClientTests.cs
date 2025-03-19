@@ -23,15 +23,9 @@ public class GithubWebClientTests
     {
         const string url = "https://github.com/test";
 
-        var items = new List<TestPageItem>
-        {
-            new(1, "name")
-        };
+        var items = new List<TestPageItem> { new(1, "name") };
 
-        var expectedItems = new List<TestPageItem>
-        {
-            new(1, "name")
-        };
+        var expectedItems = new List<TestPageItem> { new(1, "name") };
 
         using var httpTest = new HttpTest();
 
@@ -43,10 +37,10 @@ public class GithubWebClientTests
             .WithRequestJson(body)
             .RespondWithJson(new TestPageResponse(items));
 
-        var result = await _sut
-            .PostJsonAsync("/test", body)
-            .ReceiveJson<TestPageResponse>();
+        var result = await _sut.PostJsonAsync("/test", body).ReceiveJson<TestPageResponse>();
 
-        result.Items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
+        result
+            .Items.Should()
+            .BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
     }
 }

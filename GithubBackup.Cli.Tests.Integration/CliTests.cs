@@ -1,6 +1,5 @@
 ﻿namespace GithubBackup.Cli.Tests.Integration;
 
-
 public class CliTests
 {
     [Theory]
@@ -8,6 +7,6 @@ public class CliTests
     [InlineData("--help")]
     public async Task RunAsync__(string args, int exitCode = 0)
     {
-        await TestCli.RunAsync(args, exitCode, _ => {});
+        await TestCli.RunAsync(args, exitCode, _ => { });
     }
 }

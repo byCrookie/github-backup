@@ -24,12 +24,12 @@ internal class LoginPipelineBuilder : ILoginPipelineBuilder
         _persistedPipelineFactory = persistedPipelineFactory;
         _deviceFlowAuthPipelineFactory = deviceFlowAuthPipelineFactory;
     }
-    
+
     public ILoginPipeline PersistedOnly()
     {
         var persistedPipeline = _persistedPipelineFactory.Create();
         var defaultPipeline = _defaultPipelineFactory.Create();
-        
+
         persistedPipeline.Next = defaultPipeline;
         return persistedPipeline;
     }
@@ -41,7 +41,7 @@ internal class LoginPipelineBuilder : ILoginPipelineBuilder
         var tokenFromConfigurationPipeline = _tokenFromConfigurationPipelineFactory.Create();
         var tokenArgPipeline = _tokenArgPipelineFactory.Create();
         var deviceFlowAuthPipeline = _deviceFlowAuthPipelineFactory.Create();
-        
+
         tokenArgPipeline.Next = tokenFromConfigurationPipeline;
         tokenFromConfigurationPipeline.Next = deviceFlowAuthPipeline;
         deviceFlowAuthPipeline.Next = persistedPipeline;
@@ -55,7 +55,7 @@ internal class LoginPipelineBuilder : ILoginPipelineBuilder
         var tokenFromConfigurationPipeline = _tokenFromConfigurationPipelineFactory.Create();
         var tokenArgPipeline = _tokenArgPipelineFactory.Create();
         var deviceFlowAuthPipeline = _deviceFlowAuthPipelineFactory.Create();
-        
+
         tokenArgPipeline.Next = tokenFromConfigurationPipeline;
         tokenFromConfigurationPipeline.Next = deviceFlowAuthPipeline;
         deviceFlowAuthPipeline.Next = defaultPipeline;

@@ -11,23 +11,27 @@ public static class ObjectFlurlExtensions
 {
     public static IFlurlResponse ToFlurlJsonResponse(this object obj)
     {
-        return new FlurlResponse(new FlurlCall
-        {
-            HttpResponseMessage = new HttpResponseMessage
+        return new FlurlResponse(
+            new FlurlCall
             {
-                Content = new CapturedJsonContent(JsonSerializer.Serialize(obj)),
-                RequestMessage = new HttpRequestMessage()
-            },
-            Request = new FlurlRequest
-            {
-                Settings =
+                HttpResponseMessage = new HttpResponseMessage
                 {
-                    JsonSerializer = new DefaultJsonSerializer(new JsonSerializerOptions
+                    Content = new CapturedJsonContent(JsonSerializer.Serialize(obj)),
+                    RequestMessage = new HttpRequestMessage(),
+                },
+                Request = new FlurlRequest
+                {
+                    Settings =
                     {
-                        Converters = { new JsonStringEnumConverter() }
-                    })
-                }
+                        JsonSerializer = new DefaultJsonSerializer(
+                            new JsonSerializerOptions
+                            {
+                                Converters = { new JsonStringEnumConverter() },
+                            }
+                        ),
+                    },
+                },
             }
-        });
+        );
     }
 }

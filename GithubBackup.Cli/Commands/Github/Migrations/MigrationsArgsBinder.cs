@@ -20,9 +20,13 @@ internal sealed class MigrationsArgsBinder : BinderBase<MigrationsArgs>
 
     protected override MigrationsArgs GetBoundValue(BindingContext bindingContext)
     {
-        var export = bindingContext.ParseResult.GetRequiredValueForOption(_migrationsArguments.ExportOption);
+        var export = bindingContext.ParseResult.GetRequiredValueForOption(
+            _migrationsArguments.ExportOption
+        );
         var since = bindingContext.ParseResult.GetValueForOption(_migrationsArguments.SinceOption);
-        var daysOld = bindingContext.ParseResult.GetValueForOption(_migrationsArguments.DaysOldOption);
+        var daysOld = bindingContext.ParseResult.GetValueForOption(
+            _migrationsArguments.DaysOldOption
+        );
 
         var loginArgs = new LoginArgsBinder(_loginArguments).Get(bindingContext);
 

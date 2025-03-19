@@ -10,8 +10,7 @@ internal static class LoginCommand
 {
     private const string CommandName = "login";
 
-    private const string CommandDescription =
-        """
+    private const string CommandDescription = """
         Login to Github. Persists your login token to disk for future use.
         Only one login token can be persisted at a time. {0}
         """;
@@ -34,14 +33,19 @@ internal static class LoginCommand
         return command;
     }
 
-    private static Task RunAsync(string[] args, GlobalArgs globalArgs, LoginArgs loginArgs, CommandOptions options)
+    private static Task RunAsync(
+        string[] args,
+        GlobalArgs globalArgs,
+        LoginArgs loginArgs,
+        CommandOptions options
+    )
     {
         var runner = new CliRunner<LoginRunner, LoginArgs>(
-            args, globalArgs, loginArgs,
-            new RunOptions
-            {
-                AfterServices = options.AfterServices
-            });
+            args,
+            globalArgs,
+            loginArgs,
+            new RunOptions { AfterServices = options.AfterServices }
+        );
 
         return runner.RunAsync();
     }

@@ -15,7 +15,9 @@ namespace GithubBackup.Cli.Tests.Commands.Github.Auth.Pipeline;
 
 public class TokenFromConfigurationPipelineTests
 {
-    private readonly ILogger<TokenFromConfigurationPipeline> _logger = Substitute.For<ILogger<TokenFromConfigurationPipeline>>();
+    private readonly ILogger<TokenFromConfigurationPipeline> _logger = Substitute.For<
+        ILogger<TokenFromConfigurationPipeline>
+    >();
     private readonly IGithubTokenStore _githubTokenStore = Substitute.For<IGithubTokenStore>();
     private readonly IUserService _userService = Substitute.For<IUserService>();
     private readonly ILoginPipeline _next = Substitute.For<ILoginPipeline>();
@@ -48,9 +50,18 @@ public class TokenFromConfigurationPipelineTests
         await CreatePipeline(token).LoginAsync(globalArgs, loginArgs, true, ct);
 
         await _githubTokenStore.Received(1).SetAsync(token);
-        await _next.Received(0).LoginAsync(Arg.Any<GlobalArgs>(), Arg.Any<LoginArgs>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _next
+            .Received(0)
+            .LoginAsync(
+                Arg.Any<GlobalArgs>(),
+                Arg.Any<LoginArgs>(),
+                Arg.Any<bool>(),
+                Arg.Any<CancellationToken>()
+            );
 
-        _logger.VerifyLogs(new LogEntry(LogLevel.Information, "Using token from environment variable"));
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Using token from environment variable")
+        );
     }
 
     [Fact]
@@ -67,9 +78,18 @@ public class TokenFromConfigurationPipelineTests
         await CreatePipeline(token).LoginAsync(globalArgs, loginArgs, false, ct);
 
         await _githubTokenStore.Received(1).SetAsync(token);
-        await _next.Received(0).LoginAsync(Arg.Any<GlobalArgs>(), Arg.Any<LoginArgs>(), Arg.Any<bool>(), Arg.Any<CancellationToken>());
+        await _next
+            .Received(0)
+            .LoginAsync(
+                Arg.Any<GlobalArgs>(),
+                Arg.Any<LoginArgs>(),
+                Arg.Any<bool>(),
+                Arg.Any<CancellationToken>()
+            );
 
-        _logger.VerifyLogs(new LogEntry(LogLevel.Information, "Using token from environment variable"));
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Information, "Using token from environment variable")
+        );
     }
 
     [Fact]
@@ -105,7 +125,7 @@ public class TokenFromConfigurationPipelineTests
             _userService
         )
         {
-            Next = _next
+            Next = _next,
         };
     }
 
@@ -117,10 +137,11 @@ public class TokenFromConfigurationPipelineTests
         }
 
         return new ConfigurationBuilder()
-            .Add(new KeyValueConfigurationProvider(new Dictionary<string, string?>
-            {
-                { "TOKEN", envToken }
-            }))
+            .Add(
+                new KeyValueConfigurationProvider(
+                    new Dictionary<string, string?> { { "TOKEN", envToken } }
+                )
+            )
             .Build();
     }
 }

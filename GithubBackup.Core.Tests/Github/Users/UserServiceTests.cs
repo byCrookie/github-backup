@@ -10,7 +10,7 @@ namespace GithubBackup.Core.Tests.Github.Users;
 public class UserServiceTests
 {
     private readonly UserService _sut;
-    
+
     private readonly IGithubApiClient _githubApiClient;
 
     public UserServiceTests()
@@ -29,8 +29,7 @@ public class UserServiceTests
 
         var reponse = new UserResponse(login, name).ToFlurlJsonResponse();
 
-        _githubApiClient.GetAsync("/user", null, Arg.Any<CancellationToken>())
-            .Returns(reponse);
+        _githubApiClient.GetAsync("/user", null, Arg.Any<CancellationToken>()).Returns(reponse);
 
         var result = await _sut.WhoAmIAsync(CancellationToken.None);
 

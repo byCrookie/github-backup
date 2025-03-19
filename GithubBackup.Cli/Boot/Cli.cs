@@ -25,17 +25,19 @@ internal static class Cli
             new CommandOptions
             {
                 GlobalArguments = globalArguments,
-                AfterServices = cliOptions.AfterServices
+                AfterServices = cliOptions.AfterServices,
             }
         );
 
         return new CommandLineBuilder(rootCommand)
             .UseDefaults()
-            .UseExceptionHandler((exception, ic) =>
-            {
-                ((ICliConsole)ic.Console).WriteException(exception);
-                ic.ExitCode = 1;
-            })
+            .UseExceptionHandler(
+                (exception, ic) =>
+                {
+                    ((ICliConsole)ic.Console).WriteException(exception);
+                    ic.ExitCode = 1;
+                }
+            )
             .Build()
             .InvokeAsync(args, cliOptions.Console);
     }

@@ -11,7 +11,7 @@ public class KeyValueConfigurationProvider : IConfigurationProvider, IConfigurat
     {
         _data = data;
     }
-    
+
     public bool TryGet(string key, out string? value)
     {
         return _data.TryGetValue(key, out value);
@@ -27,9 +27,7 @@ public class KeyValueConfigurationProvider : IConfigurationProvider, IConfigurat
         return new CancellationChangeToken(CancellationToken.None);
     }
 
-    public void Load()
-    {
-    }
+    public void Load() { }
 
     public IEnumerable<string> GetChildKeys(IEnumerable<string> earlierKeys, string? parentPath)
     {

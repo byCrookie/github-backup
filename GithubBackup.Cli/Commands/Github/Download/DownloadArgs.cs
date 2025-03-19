@@ -23,7 +23,8 @@ internal sealed class DownloadArgs : ICommandIntervalArgs
         int? numberOfBackups,
         bool overwrite,
         IntervalArgs intervalArgs,
-        LoginArgs loginArgs)
+        LoginArgs loginArgs
+    )
     {
         Migrations = migrations;
         Latest = latest;

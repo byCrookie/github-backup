@@ -15,20 +15,20 @@ public class OptionExtensionsTests
 
         const string value = "value";
         const string args = $"--option {value}";
-        
+
         var parseResult = rootCommand.Parse(args);
         var result = parseResult.GetRequiredValueForOption(option);
-        
+
         result.Should().Be(value);
     }
-    
+
     [Fact]
     public void GetRequiredValueForOption_DoesNotHaveValue_ThrowException()
     {
         var rootCommand = new RootCommand();
         var option = new Option<string>("--option");
         rootCommand.AddOption(option);
-        
+
         var parseResult = rootCommand.Parse(string.Empty);
         var action = () => parseResult.GetRequiredValueForOption(option);
 

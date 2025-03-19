@@ -41,7 +41,12 @@ internal class DeviceFlowAuthPipeline : IDeviceFlowAuthPipeline
         return args.DeviceFlowAuth;
     }
 
-    public async Task<User?> LoginAsync(GlobalArgs globalArgs, LoginArgs args, bool persist, CancellationToken ct)
+    public async Task<User?> LoginAsync(
+        GlobalArgs globalArgs,
+        LoginArgs args,
+        bool persist,
+        CancellationToken ct
+    )
     {
         if (!IsReponsible(args))
         {
@@ -77,12 +82,17 @@ internal class DeviceFlowAuthPipeline : IDeviceFlowAuthPipeline
         if (!globalArgs.Quiet)
         {
             _ansiConsole.WriteLine(
-                $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}");
-            _ansiConsole.WriteLine($"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires.");
+                $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}"
+            );
+            _ansiConsole.WriteLine(
+                $"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires."
+            );
         }
         else
         {
-            _ansiConsole.WriteLine($"{deviceAndUserCodes.VerificationUri} - {deviceAndUserCodes.UserCode}");
+            _ansiConsole.WriteLine(
+                $"{deviceAndUserCodes.VerificationUri} - {deviceAndUserCodes.UserCode}"
+            );
         }
 
         var accessToken = await _authenticationService.PollForAccessTokenAsync(

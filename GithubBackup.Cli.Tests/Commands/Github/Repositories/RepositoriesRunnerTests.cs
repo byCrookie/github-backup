@@ -10,7 +10,6 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Repositories;
 
-
 public class RepositoriesRunnerTests
 {
     private readonly TestConsole _ansiConsole = new();
@@ -22,8 +21,9 @@ public class RepositoriesRunnerTests
     public async Task RunAsync_QuietAndNoRepositories_DoNotWriteToConsoleAndReadRepositories()
     {
         var runner = CreateRunner(true);
-        
-        _repositoryService.GetRepositoriesAsync(Arg.Any<RepositoryOptions>(), CancellationToken.None)
+
+        _repositoryService
+            .GetRepositoriesAsync(Arg.Any<RepositoryOptions>(), CancellationToken.None)
             .Returns(new List<Repository>());
 
         await runner.RunAsync(CancellationToken.None);
@@ -32,13 +32,14 @@ public class RepositoriesRunnerTests
 
         await Verify(_ansiConsole.Output);
     }
-    
+
     [Fact]
     public async Task RunAsync_NotQuietAndNoRepositories_DoWriteToConsoleAndReadRepositories()
     {
         var runner = CreateRunner(false);
-        
-        _repositoryService.GetRepositoriesAsync(Arg.Any<RepositoryOptions>(), CancellationToken.None)
+
+        _repositoryService
+            .GetRepositoriesAsync(Arg.Any<RepositoryOptions>(), CancellationToken.None)
             .Returns(new List<Repository>());
 
         await runner.RunAsync(CancellationToken.None);
@@ -47,19 +48,16 @@ public class RepositoriesRunnerTests
 
         await Verify(_ansiConsole.Output);
     }
-    
+
     [Fact]
     public async Task RunAsync_QuietAndRepositories_DoNotWriteToConsoleAndReadRepositories()
     {
         var runner = CreateRunner(true);
 
-        var repositories = new List<Repository>
-        {
-            new("test"),
-            new("test2")
-        };
-        
-        _repositoryService.GetRepositoriesAsync(Arg.Any<RepositoryOptions>(), CancellationToken.None)
+        var repositories = new List<Repository> { new("test"), new("test2") };
+
+        _repositoryService
+            .GetRepositoriesAsync(Arg.Any<RepositoryOptions>(), CancellationToken.None)
             .Returns(repositories);
 
         await runner.RunAsync(CancellationToken.None);
@@ -68,19 +66,16 @@ public class RepositoriesRunnerTests
 
         await Verify(_ansiConsole.Output);
     }
-    
+
     [Fact]
     public async Task RunAsync_NotQuietAndRepositories_DoWriteToConsoleAndReadRepositories()
     {
         var runner = CreateRunner(false);
-        
-        var repositories = new List<Repository>
-        {
-            new("test"),
-            new("test2")
-        };
-        
-        _repositoryService.GetRepositoriesAsync(Arg.Any<RepositoryOptions>(), CancellationToken.None)
+
+        var repositories = new List<Repository> { new("test"), new("test2") };
+
+        _repositoryService
+            .GetRepositoriesAsync(Arg.Any<RepositoryOptions>(), CancellationToken.None)
             .Returns(repositories);
 
         await runner.RunAsync(CancellationToken.None);

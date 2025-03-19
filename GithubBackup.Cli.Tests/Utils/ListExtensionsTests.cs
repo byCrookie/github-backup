@@ -8,19 +8,10 @@ public class ListExtensionsTests
     [Fact]
     public void AddAll_AddItems_ItemAreAdded()
     {
-        ICollection<string> list = new List<string>
-        {
-            "1"
-        };
+        ICollection<string> list = new List<string> { "1" };
 
         list.AddAll(new[] { "2", "3", "4" });
-        
-        list.Should().BeEquivalentTo(new List<string>
-        {
-            "1",
-            "2",
-            "3",
-            "4"
-        });
+
+        list.Should().BeEquivalentTo(new List<string> { "1", "2", "3", "4" });
     }
 }

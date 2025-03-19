@@ -41,22 +41,23 @@ public class AuthenticationServiceTests
         ).ToFlurlJsonResponse();
 
         _githubWebClient
-            .PostJsonAsync("/login/device/code", Arg.Any<object>(), null, Arg.Any<CancellationToken>())
+            .PostJsonAsync(
+                "/login/device/code",
+                Arg.Any<object>(),
+                null,
+                Arg.Any<CancellationToken>()
+            )
             .Returns(reponse);
 
         var result = await _sut.RequestDeviceAndUserCodesAsync(CancellationToken.None);
 
-        result.Should().BeEquivalentTo(new DeviceAndUserCodes(
-            deviceCode,
-            userCode,
-            verificationUri,
-            expiresIn,
-            interval)
-        );
+        result
+            .Should()
+            .BeEquivalentTo(
+                new DeviceAndUserCodes(deviceCode, userCode, verificationUri, expiresIn, interval)
+            );
 
-        _logger.VerifyLogs(
-            new LogEntry(LogLevel.Debug, "Requesting device and user codes")
-        );
+        _logger.VerifyLogs(new LogEntry(LogLevel.Debug, "Requesting device and user codes"));
     }
 
     [Fact]
@@ -75,7 +76,7 @@ public class AuthenticationServiceTests
             Scope = null,
             Error = "authorization_pending",
             ErrorDescription = null,
-            Interval = interval
+            Interval = interval,
         }.ToFlurlJsonResponse();
 
         var reponse2 = new AccessTokenResponse
@@ -85,7 +86,7 @@ public class AuthenticationServiceTests
             Scope = null,
             Error = "slow_down",
             ErrorDescription = null,
-            Interval = interval + 1
+            Interval = interval + 1,
         }.ToFlurlJsonResponse();
 
         var reponse3 = new AccessTokenResponse
@@ -95,14 +96,23 @@ public class AuthenticationServiceTests
             Scope = scope,
             Error = null,
             ErrorDescription = null,
-            Interval = null
+            Interval = null,
         }.ToFlurlJsonResponse();
 
         _githubWebClient
-            .PostJsonAsync("/login/oauth/access_token", Arg.Any<object>(), null, Arg.Any<CancellationToken>())
+            .PostJsonAsync(
+                "/login/oauth/access_token",
+                Arg.Any<object>(),
+                null,
+                Arg.Any<CancellationToken>()
+            )
             .Returns(reponse1, reponse2, reponse3);
 
-        var result = await _sut.PollForAccessTokenAsync(deviceCode, interval, CancellationToken.None);
+        var result = await _sut.PollForAccessTokenAsync(
+            deviceCode,
+            interval,
+            CancellationToken.None
+        );
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Polling for access token"),
@@ -126,14 +136,20 @@ public class AuthenticationServiceTests
             Scope = null,
             Error = "expired_token",
             ErrorDescription = null,
-            Interval = null
+            Interval = null,
         }.ToFlurlJsonResponse();
 
         _githubWebClient
-            .PostJsonAsync("/login/oauth/access_token", Arg.Any<object>(), null, Arg.Any<CancellationToken>())
+            .PostJsonAsync(
+                "/login/oauth/access_token",
+                Arg.Any<object>(),
+                null,
+                Arg.Any<CancellationToken>()
+            )
             .Returns(reponse);
 
-        var action = () => _sut.PollForAccessTokenAsync(deviceCode, interval, CancellationToken.None);
+        var action = () =>
+            _sut.PollForAccessTokenAsync(deviceCode, interval, CancellationToken.None);
 
         _logger.VerifyLogs();
         await action.Should().ThrowAsync<Exception>();
@@ -152,14 +168,20 @@ public class AuthenticationServiceTests
             Scope = null,
             Error = "access_denied",
             ErrorDescription = null,
-            Interval = null
+            Interval = null,
         }.ToFlurlJsonResponse();
 
         _githubWebClient
-            .PostJsonAsync("/login/oauth/access_token", Arg.Any<object>(), null, Arg.Any<CancellationToken>())
+            .PostJsonAsync(
+                "/login/oauth/access_token",
+                Arg.Any<object>(),
+                null,
+                Arg.Any<CancellationToken>()
+            )
             .Returns(reponse);
 
-        var action = () => _sut.PollForAccessTokenAsync(deviceCode, interval, CancellationToken.None);
+        var action = () =>
+            _sut.PollForAccessTokenAsync(deviceCode, interval, CancellationToken.None);
 
         _logger.VerifyLogs();
         await action.Should().ThrowAsync<Exception>();

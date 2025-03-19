@@ -13,6 +13,8 @@ public record LogVerification(
 {
     public override string ToString()
     {
-        return Valid ? $"Valid: {Message}" : $"Invalid: {ErrorMessage} - Expected: {ExpectedLevel} {ExpectedMessagePattern} - Actual: {Level} {Message}";
+        return Valid
+            ? $"Valid: {Message}"
+            : $"Invalid: {ErrorMessage} - Expected: {ExpectedLevel} {ExpectedMessagePattern} - Actual: {Level} {Message}";
     }
 };

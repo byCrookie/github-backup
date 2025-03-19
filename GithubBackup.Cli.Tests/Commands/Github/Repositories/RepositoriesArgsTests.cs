@@ -9,7 +9,6 @@ using GithubBackup.Core.Github.Repositories;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Repositories;
 
-
 public class RepositoriesArgsTests
 {
     private readonly RepositoriesArguments _repositoriesArguments = new();
@@ -22,7 +21,7 @@ public class RepositoriesArgsTests
         rootCommand.AddGlobalOptions(_repositoriesArguments.Options());
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             repositoriesArgs =>
             {
@@ -35,11 +34,13 @@ public class RepositoriesArgsTests
             },
             new RepositoriesArgsBinder(_repositoriesArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub --type public --token test --device-flow-auth");
+        await TestCommandline
+            .Build(rootCommand)
+            .InvokeAsync("sub --type public --token test --device-flow-auth");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_FlagsArePassedWithAffiliationAndVisibility_FlagsGetParsed()
     {
@@ -47,7 +48,7 @@ public class RepositoriesArgsTests
         rootCommand.AddGlobalOptions(_repositoriesArguments.Options());
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             repositoriesArgs =>
             {
@@ -60,9 +61,10 @@ public class RepositoriesArgsTests
             },
             new RepositoriesArgsBinder(_repositoriesArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand)
+        await TestCommandline
+            .Build(rootCommand)
             .InvokeAsync("sub --affiliation collaborator --visibility private");
     }
 }

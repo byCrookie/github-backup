@@ -17,7 +17,8 @@ internal sealed class BackupArgsBinder : BinderBase<BackupArgs>
         MigrateArguments migrateArguments,
         DownloadArguments downloadArguments,
         IntervalArguments intervalArguments,
-        LoginArguments loginArguments)
+        LoginArguments loginArguments
+    )
     {
         _migrateArguments = migrateArguments;
         _downloadArguments = downloadArguments;
@@ -27,8 +28,16 @@ internal sealed class BackupArgsBinder : BinderBase<BackupArgs>
 
     protected override BackupArgs GetBoundValue(BindingContext bindingContext)
     {
-        var migrateArgs = new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments).Get(bindingContext);
-        var downloadArgs = new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments).Get(bindingContext);
+        var migrateArgs = new MigrateArgsBinder(
+            _migrateArguments,
+            _intervalArguments,
+            _loginArguments
+        ).Get(bindingContext);
+        var downloadArgs = new DowndloadArgsBinder(
+            _downloadArguments,
+            _intervalArguments,
+            _loginArguments
+        ).Get(bindingContext);
         var intervalArgs = new IntervalArgsBinder(_intervalArguments).Get(bindingContext);
         var loginArgs = new LoginArgsBinder(_loginArguments).Get(bindingContext);
         return new BackupArgs(migrateArgs, downloadArgs, intervalArgs, loginArgs);

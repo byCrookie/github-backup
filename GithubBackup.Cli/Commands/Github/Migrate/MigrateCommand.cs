@@ -11,7 +11,8 @@ namespace GithubBackup.Cli.Commands.Github.Migrate;
 internal static class MigrateCommand
 {
     private const string CommandName = "migrate";
-    private const string CommandDescription = "Migrate a Github user. This command will create a new migration for the given repositories.";
+    private const string CommandDescription =
+        "Migrate a Github user. This command will create a new migration for the given repositories.";
 
     public static Command Create(string[] args, CommandOptions options)
     {
@@ -32,14 +33,19 @@ internal static class MigrateCommand
         return command;
     }
 
-    private static Task RunAsync(string[] args, GlobalArgs globalArgs, MigrateArgs migrateArgs, CommandOptions options)
+    private static Task RunAsync(
+        string[] args,
+        GlobalArgs globalArgs,
+        MigrateArgs migrateArgs,
+        CommandOptions options
+    )
     {
         var runner = new CliRunner<MigrateRunner, MigrateArgs>(
-            args, globalArgs, migrateArgs,
-            new RunOptions
-            {
-                AfterServices = options.AfterServices
-            });
+            args,
+            globalArgs,
+            migrateArgs,
+            new RunOptions { AfterServices = options.AfterServices }
+        );
 
         return runner.RunAsync();
     }

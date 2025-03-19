@@ -15,10 +15,11 @@ public static class LoggerExtensions
             .ReceivedCalls()
             .Where(call => call.GetMethodInfo().Name == nameof(logger.Log))
             .Select(call => new LogEntry(
-                    (LogLevel?)call.GetArguments()[0] ?? throw new Exception("loglevel can not be null"),
-                    call.GetArguments()[2]?.ToString()
-                )
-            ).ToList();
+                (LogLevel?)call.GetArguments()[0]
+                    ?? throw new Exception("loglevel can not be null"),
+                call.GetArguments()[2]?.ToString()
+            ))
+            .ToList();
 
         var logVerifications = new List<LogVerification>();
 
@@ -29,13 +30,31 @@ public static class LoggerExtensions
 
             if (expectedLog is null && log is not null)
             {
-                logVerifications.Add(new LogVerification(null, null, log.Level, log.Message, false, "Log is not expected"));
+                logVerifications.Add(
+                    new LogVerification(
+                        null,
+                        null,
+                        log.Level,
+                        log.Message,
+                        false,
+                        "Log is not expected"
+                    )
+                );
                 continue;
             }
 
             if (log is null && expectedLog is not null)
             {
-                logVerifications.Add(new LogVerification(expectedLog.Level, expectedLog.Message, null, null, false, "Expected log does not exist"));
+                logVerifications.Add(
+                    new LogVerification(
+                        expectedLog.Level,
+                        expectedLog.Message,
+                        null,
+                        null,
+                        false,
+                        "Expected log does not exist"
+                    )
+                );
                 continue;
             }
 
@@ -46,18 +65,44 @@ public static class LoggerExtensions
 
             if (expectedLog!.Level != log!.Level)
             {
-                logVerifications.Add(new LogVerification(expectedLog.Level, expectedLog.Message, log.Level, log.Message, false, "Log level does not match"));
+                logVerifications.Add(
+                    new LogVerification(
+                        expectedLog.Level,
+                        expectedLog.Message,
+                        log.Level,
+                        log.Message,
+                        false,
+                        "Log level does not match"
+                    )
+                );
                 continue;
             }
 
             var regex = new Regex(expectedLog.Message ?? string.Empty);
             if (!regex.IsMatch(log.Message ?? string.Empty))
             {
-                logVerifications.Add(new LogVerification(expectedLog.Level, expectedLog.Message, log.Level, log.Message, false, "Pattern does not match"));
+                logVerifications.Add(
+                    new LogVerification(
+                        expectedLog.Level,
+                        expectedLog.Message,
+                        log.Level,
+                        log.Message,
+                        false,
+                        "Pattern does not match"
+                    )
+                );
                 continue;
             }
 
-            logVerifications.Add(new LogVerification(expectedLog.Level, expectedLog.Message, log.Level, log.Message, true));
+            logVerifications.Add(
+                new LogVerification(
+                    expectedLog.Level,
+                    expectedLog.Message,
+                    log.Level,
+                    log.Message,
+                    true
+                )
+            );
         }
 
         if (logVerifications.All(logVerification => logVerification.Valid))
@@ -66,7 +111,13 @@ public static class LoggerExtensions
         }
 
         var errorMessage = string.Join(Environment.NewLine, logVerifications);
-        var logStack = string.Join(logs.Count > 0 ? $",{Environment.NewLine}" : string.Empty, logs.Select(log => log.ToString()));
-        throw new Exception(errorMessage + $"{Environment.NewLine}{Environment.NewLine}Received:{Environment.NewLine}{logStack}");
+        var logStack = string.Join(
+            logs.Count > 0 ? $",{Environment.NewLine}" : string.Empty,
+            logs.Select(log => log.ToString())
+        );
+        throw new Exception(
+            errorMessage
+                + $"{Environment.NewLine}{Environment.NewLine}Received:{Environment.NewLine}{logStack}"
+        );
     }
 }

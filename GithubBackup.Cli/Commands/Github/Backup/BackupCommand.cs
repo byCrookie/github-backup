@@ -14,8 +14,7 @@ internal static class BackupCommand
 {
     private const string CommandName = "backup";
 
-    private const string CommandDescription =
-        """
+    private const string CommandDescription = """
         Backup a Github user. This command will create a new migration
         for the given repositories and download it when ready.
         """;
@@ -41,20 +40,30 @@ internal static class BackupCommand
         command.SetHandler(
             (globalArgs, backupArgs) => RunAsync(args, globalArgs, backupArgs, options),
             new GlobalArgsBinder(options.GlobalArguments),
-            new BackupArgsBinder(migrateArguments, downloadArguments, intervalArguments, loginArguments)
+            new BackupArgsBinder(
+                migrateArguments,
+                downloadArguments,
+                intervalArguments,
+                loginArguments
+            )
         );
 
         return command;
     }
 
-    private static Task RunAsync(string[] args, GlobalArgs globalArgs, BackupArgs backupArgs, CommandOptions options)
+    private static Task RunAsync(
+        string[] args,
+        GlobalArgs globalArgs,
+        BackupArgs backupArgs,
+        CommandOptions options
+    )
     {
         var runner = new CliRunner<BackupRunner, BackupArgs>(
-            args, globalArgs, backupArgs,
-            new RunOptions
-            {
-                AfterServices = options.AfterServices
-            });
+            args,
+            globalArgs,
+            backupArgs,
+            new RunOptions { AfterServices = options.AfterServices }
+        );
 
         return runner.RunAsync();
     }

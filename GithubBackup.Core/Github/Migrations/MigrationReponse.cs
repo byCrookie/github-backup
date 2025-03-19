@@ -6,10 +6,10 @@ internal sealed class MigrationReponse
 {
     [JsonPropertyName("id")]
     public long Id { get; }
-    
+
     [JsonPropertyName("state")]
     public MigrationState? State { get; }
-    
+
     [JsonPropertyName("created_at")]
     public DateTime CreatedAt { get; }
 

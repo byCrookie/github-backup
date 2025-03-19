@@ -11,11 +11,15 @@ internal sealed class GlobalArgsBinder : BinderBase<GlobalArgs>
     {
         _globalArguments = globalArguments;
     }
-    
+
     protected override GlobalArgs GetBoundValue(BindingContext bindingContext)
     {
-        var verbosity = bindingContext.ParseResult.GetRequiredValueForOption(_globalArguments.VerbosityOption);
-        var quiet = bindingContext.ParseResult.GetRequiredValueForOption(_globalArguments.QuietOption);
+        var verbosity = bindingContext.ParseResult.GetRequiredValueForOption(
+            _globalArguments.VerbosityOption
+        );
+        var quiet = bindingContext.ParseResult.GetRequiredValueForOption(
+            _globalArguments.QuietOption
+        );
         var logFile = bindingContext.ParseResult.GetValueForOption(_globalArguments.LogFileOption);
         return new GlobalArgs(verbosity, quiet, logFile);
     }

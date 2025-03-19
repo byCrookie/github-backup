@@ -9,7 +9,7 @@ internal static class AuthModule
     {
         services.AddTransient<IPersistentCredentialStore, PersistentCredentialStore>();
         services.AddTransient<ILoginService, LoginService>();
-        
+
         services.AddTransient<ILoginPipelineBuilder, LoginPipelineBuilder>();
         services.AddTransient<IDefaultPipeline, DefaultPipeline>();
         services.AddTransient<ITokenFromConfigurationPipeline, TokenFromConfigurationPipeline>();

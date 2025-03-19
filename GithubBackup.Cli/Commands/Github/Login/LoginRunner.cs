@@ -9,10 +9,7 @@ internal sealed class LoginRunner : ICommandRunner
     private readonly LoginArgs _loginArgs;
     private readonly ILoginService _loginService;
 
-    public LoginRunner(
-        GlobalArgs globalArgs,
-        LoginArgs loginArgs,
-        ILoginService loginService)
+    public LoginRunner(GlobalArgs globalArgs, LoginArgs loginArgs, ILoginService loginService)
     {
         _globalArgs = globalArgs;
         _loginArgs = loginArgs;
@@ -21,11 +18,6 @@ internal sealed class LoginRunner : ICommandRunner
 
     public Task RunAsync(CancellationToken ct)
     {
-        return _loginService.WithoutPersistentAsync(
-            _globalArgs,
-            _loginArgs,
-            true,
-            ct
-        );
+        return _loginService.WithoutPersistentAsync(_globalArgs, _loginArgs, true, ct);
     }
 }

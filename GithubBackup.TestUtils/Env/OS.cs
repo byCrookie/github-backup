@@ -11,7 +11,7 @@ public static class OS
             return "linux";
         if (OperatingSystem.IsMacOS())
             return "macos";
-        
+
         throw new NotSupportedException("Operating system not supported");
     }
 }

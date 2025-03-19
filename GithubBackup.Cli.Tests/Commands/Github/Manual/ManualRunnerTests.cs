@@ -17,7 +17,6 @@ using Environment = GithubBackup.Core.Environment.Environment;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Manual;
 
-
 public class ManualRunnerTests
 {
     private readonly TestConsole _ansiConsole = new();
@@ -40,11 +39,16 @@ public class ManualRunnerTests
         var runner = CreateRunner();
 
         var user = new User("test", "test");
-        
+
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
-        _loginService.PersistentOnlyAsync(Arg.Any<GlobalArgs>(), Arg.Any<LoginArgs>(), Arg.Any<CancellationToken>())
+        _loginService
+            .PersistentOnlyAsync(
+                Arg.Any<GlobalArgs>(),
+                Arg.Any<LoginArgs>(),
+                Arg.Any<CancellationToken>()
+            )
             .Returns(user);
-        
+
         _ansiConsole.Input.PushCharacter('y');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
         _ansiConsole.Input.PushCharacter('n');
@@ -63,21 +67,26 @@ public class ManualRunnerTests
         var runner = CreateRunner();
 
         var user = new User("test", "test");
-        
+
         const string validToken = "token1";
-        
+
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
-        _loginService.PersistentOnlyAsync(Arg.Any<GlobalArgs>(), Arg.Any<LoginArgs>(), Arg.Any<CancellationToken>())
+        _loginService
+            .PersistentOnlyAsync(
+                Arg.Any<GlobalArgs>(),
+                Arg.Any<LoginArgs>(),
+                Arg.Any<CancellationToken>()
+            )
             .Returns(user);
 
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
-        
+
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
         _ansiConsole.Input.PushText(validToken);
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
-        
+
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
 
@@ -92,11 +101,11 @@ public class ManualRunnerTests
     public async Task RunAsync_HasNoToken_LoginAndStopWhenNoRepositories()
     {
         var runner = CreateRunner();
-        
+
         const string validToken = "token1";
-        
+
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
-        
+
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
         _ansiConsole.Input.PushText(validToken);
@@ -118,16 +127,16 @@ public class ManualRunnerTests
     public async Task RunAsync_HasInvalidToken_LoginAndStopWhenNoRepositories()
     {
         var runner = CreateRunner();
-        
+
         const string validToken = "token1";
 
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
-        
+
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
         _ansiConsole.Input.PushText(validToken);
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
-        
+
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
         _ansiConsole.Input.PushCharacter('n');
@@ -144,12 +153,17 @@ public class ManualRunnerTests
     public async Task RunAsync_NoMigrations_DoNotBackup()
     {
         var runner = CreateRunner();
-        
+
         var user = new User("test", "test");
-        
-        _loginService.PersistentOnlyAsync(Arg.Any<GlobalArgs>(), Arg.Any<LoginArgs>(), Arg.Any<CancellationToken>())
+
+        _loginService
+            .PersistentOnlyAsync(
+                Arg.Any<GlobalArgs>(),
+                Arg.Any<LoginArgs>(),
+                Arg.Any<CancellationToken>()
+            )
             .Returns(user);
-        
+
         _ansiConsole.Input.PushCharacter('y');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
 
@@ -160,8 +174,7 @@ public class ManualRunnerTests
 
         _dateTimeProvider.Now.Returns(new DateTime(2020, 1, 11));
 
-        _migrationService.GetMigrationsAsync(CancellationToken.None)
-            .Returns(migrations);
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(migrations);
 
         await runner.RunAsync(CancellationToken.None);
 
@@ -174,10 +187,15 @@ public class ManualRunnerTests
     public async Task RunAsync_NoValidMigrations_DoNotBackup()
     {
         var runner = CreateRunner();
-        
+
         var user = new User("test", "test");
-        
-        _loginService.PersistentOnlyAsync(Arg.Any<GlobalArgs>(), Arg.Any<LoginArgs>(), Arg.Any<CancellationToken>())
+
+        _loginService
+            .PersistentOnlyAsync(
+                Arg.Any<GlobalArgs>(),
+                Arg.Any<LoginArgs>(),
+                Arg.Any<CancellationToken>()
+            )
             .Returns(user);
 
         _ansiConsole.Input.PushCharacter('y');
@@ -195,17 +213,13 @@ public class ManualRunnerTests
 
         _dateTimeProvider.Now.Returns(new DateTime(2020, 1, 11));
 
-        _migrationService.GetMigrationsAsync(CancellationToken.None)
-            .Returns(migrations);
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(migrations);
 
-        _migrationService.GetMigrationAsync(1, CancellationToken.None)
-            .Returns(migrations[0]);
+        _migrationService.GetMigrationAsync(1, CancellationToken.None).Returns(migrations[0]);
 
-        _migrationService.GetMigrationAsync(2, CancellationToken.None)
-            .Returns(migrations[1]);
+        _migrationService.GetMigrationAsync(2, CancellationToken.None).Returns(migrations[1]);
 
-        _migrationService.GetMigrationAsync(3, CancellationToken.None)
-            .Returns(migrations[2]);
+        _migrationService.GetMigrationAsync(3, CancellationToken.None).Returns(migrations[2]);
 
         await runner.RunAsync(CancellationToken.None);
 
@@ -218,10 +232,15 @@ public class ManualRunnerTests
     public async Task RunAsync_ValidMigrations_BackupSelected()
     {
         var runner = CreateRunner();
-        
+
         var user = new User("test", "test");
-        
-        _loginService.PersistentOnlyAsync(Arg.Any<GlobalArgs>(), Arg.Any<LoginArgs>(), Arg.Any<CancellationToken>())
+
+        _loginService
+            .PersistentOnlyAsync(
+                Arg.Any<GlobalArgs>(),
+                Arg.Any<LoginArgs>(),
+                Arg.Any<CancellationToken>()
+            )
             .Returns(user);
 
         _ansiConsole.Input.PushCharacter('y');
@@ -241,17 +260,13 @@ public class ManualRunnerTests
 
         const int id = 3;
 
-        _migrationService.GetMigrationsAsync(CancellationToken.None)
-            .Returns(migrations);
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(migrations);
 
-        _migrationService.GetMigrationAsync(1, CancellationToken.None)
-            .Returns(migrations[0]);
+        _migrationService.GetMigrationAsync(1, CancellationToken.None).Returns(migrations[0]);
 
-        _migrationService.GetMigrationAsync(2, CancellationToken.None)
-            .Returns(migrations[1]);
+        _migrationService.GetMigrationAsync(2, CancellationToken.None).Returns(migrations[1]);
 
-        _migrationService.GetMigrationAsync(id, CancellationToken.None)
-            .Returns(migrations[2]);
+        _migrationService.GetMigrationAsync(id, CancellationToken.None).Returns(migrations[2]);
 
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.Spacebar);
@@ -268,8 +283,17 @@ public class ManualRunnerTests
         _ansiConsole.Input.PushText(pathValid.FullName);
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
 
-        _migrationService.DownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), CancellationToken.None)
-            .Returns(call => _fileSystem.Path.Combine(pathValid.FullName, $"test{call.Arg<DownloadMigrationOptions>().Id}.zip"));
+        _migrationService
+            .DownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == id),
+                CancellationToken.None
+            )
+            .Returns(call =>
+                _fileSystem.Path.Combine(
+                    pathValid.FullName,
+                    $"test{call.Arg<DownloadMigrationOptions>().Id}.zip"
+                )
+            );
 
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
@@ -287,9 +311,14 @@ public class ManualRunnerTests
         var runner = CreateRunner();
 
         var user = new User("test", "test");
-        
+
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
-        _loginService.PersistentOnlyAsync(Arg.Any<GlobalArgs>(), Arg.Any<LoginArgs>(), Arg.Any<CancellationToken>())
+        _loginService
+            .PersistentOnlyAsync(
+                Arg.Any<GlobalArgs>(),
+                Arg.Any<LoginArgs>(),
+                Arg.Any<CancellationToken>()
+            )
             .Returns(user);
 
         _ansiConsole.Input.PushCharacter('y');
@@ -301,7 +330,11 @@ public class ManualRunnerTests
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
 
-        _repositoryService.GetRepositoriesAsync(Arg.Is<RepositoryOptions>(o => o.Type == RepositoryType.Public), CancellationToken.None)
+        _repositoryService
+            .GetRepositoriesAsync(
+                Arg.Is<RepositoryOptions>(o => o.Type == RepositoryType.Public),
+                CancellationToken.None
+            )
             .Returns(new List<Repository>());
 
         await runner.RunAsync(CancellationToken.None);
@@ -317,9 +350,14 @@ public class ManualRunnerTests
         var runner = CreateRunner();
 
         var user = new User("test", "test");
-        
+
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
-        _loginService.PersistentOnlyAsync(Arg.Any<GlobalArgs>(), Arg.Any<LoginArgs>(), Arg.Any<CancellationToken>())
+        _loginService
+            .PersistentOnlyAsync(
+                Arg.Any<GlobalArgs>(),
+                Arg.Any<LoginArgs>(),
+                Arg.Any<CancellationToken>()
+            )
             .Returns(user);
 
         _ansiConsole.Input.PushCharacter('y');
@@ -334,10 +372,15 @@ public class ManualRunnerTests
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
 
-        _repositoryService.GetRepositoriesAsync(Arg
-                .Is<RepositoryOptions>(o => o.Type == null
-                                            && o.Affiliation == RepositoryAffiliation.Collaborator
-                                            && o.Visibility == RepositoryVisibility.Private), CancellationToken.None)
+        _repositoryService
+            .GetRepositoriesAsync(
+                Arg.Is<RepositoryOptions>(o =>
+                    o.Type == null
+                    && o.Affiliation == RepositoryAffiliation.Collaborator
+                    && o.Visibility == RepositoryVisibility.Private
+                ),
+                CancellationToken.None
+            )
             .Returns(new List<Repository>());
 
         await runner.RunAsync(CancellationToken.None);
@@ -354,7 +397,12 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _loginService.PersistentOnlyAsync(Arg.Any<GlobalArgs>(), Arg.Any<LoginArgs>(), Arg.Any<CancellationToken>())
+        _loginService
+            .PersistentOnlyAsync(
+                Arg.Any<GlobalArgs>(),
+                Arg.Any<LoginArgs>(),
+                Arg.Any<CancellationToken>()
+            )
             .Returns(user);
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
 
@@ -370,15 +418,16 @@ public class ManualRunnerTests
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
 
-        _repositoryService.GetRepositoriesAsync(Arg
-                .Is<RepositoryOptions>(o => o.Type == null
-                                            && o.Affiliation == RepositoryAffiliation.Collaborator
-                                            && o.Visibility == RepositoryVisibility.Private), CancellationToken.None)
-            .Returns(new List<Repository>
-            {
-                new("test1"),
-                new("test2")
-            });
+        _repositoryService
+            .GetRepositoriesAsync(
+                Arg.Is<RepositoryOptions>(o =>
+                    o.Type == null
+                    && o.Affiliation == RepositoryAffiliation.Collaborator
+                    && o.Visibility == RepositoryVisibility.Private
+                ),
+                CancellationToken.None
+            )
+            .Returns(new List<Repository> { new("test1"), new("test2") });
 
         _ansiConsole.Input.PushKey(ConsoleKey.DownArrow);
         _ansiConsole.Input.PushKey(ConsoleKey.Spacebar);

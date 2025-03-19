@@ -12,9 +12,9 @@ public class TestConsole : ICliConsole
     public TestConsole(Spectre.Console.Testing.TestConsole testConsole)
     {
         _testConsole = testConsole;
-        
+
         var writer = new StandardStreamWriter(testConsole);
-        
+
         Out = writer;
         Error = writer;
     }

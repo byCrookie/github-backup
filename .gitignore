@@ -12,3 +12,6 @@
 
 # Testing
 *.received.*
+
+# User-specific files
+*.DotSettings.user

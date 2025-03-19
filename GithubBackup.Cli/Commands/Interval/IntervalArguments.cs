@@ -4,16 +4,17 @@ namespace GithubBackup.Cli.Commands.Interval;
 
 public class IntervalArguments
 {
-    public Option<long?> IntervalOption { get; } = new(
-        aliases: new[] { "-i", "--interval" },
-        description: IntervalArgDescriptions.Interval.Long
-    ) { IsRequired = false };
+    public Option<long?> IntervalOption { get; } =
+        new(
+            aliases: new[] { "-i", "--interval" },
+            description: IntervalArgDescriptions.Interval.Long
+        )
+        {
+            IsRequired = false,
+        };
 
     public IEnumerable<Option> Options()
     {
-        return new Option[]
-        {
-            IntervalOption
-        };
+        return new Option[] { IntervalOption };
     }
 }

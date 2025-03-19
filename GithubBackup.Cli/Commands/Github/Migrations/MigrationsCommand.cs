@@ -29,15 +29,19 @@ internal static class MigrationsCommand
         return command;
     }
 
-    private static Task RunAsync(string[] args, GlobalArgs globalArgs, MigrationsArgs migrationsArgs,
-        CommandOptions options)
+    private static Task RunAsync(
+        string[] args,
+        GlobalArgs globalArgs,
+        MigrationsArgs migrationsArgs,
+        CommandOptions options
+    )
     {
         var runner = new CliRunner<MigrationsRunner, MigrationsArgs>(
-            args, globalArgs, migrationsArgs,
-            new RunOptions
-            {
-                AfterServices = options.AfterServices
-            });
+            args,
+            globalArgs,
+            migrationsArgs,
+            new RunOptions { AfterServices = options.AfterServices }
+        );
 
         return runner.RunAsync();
     }

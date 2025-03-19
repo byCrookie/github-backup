@@ -16,7 +16,6 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Services;
 
-
 public class CommandRunnerServiceTests
 {
     private readonly CommandRunnerService _sut;
@@ -70,7 +69,7 @@ public class CommandRunnerServiceTests
         _commandRunner.RunAsync(CancellationToken.None).ThrowsAsync(new Exception(errorMessage));
 
         var action = () => _sut.StartAsync(CancellationToken.None);
-        
+
         await action.Should().ThrowAsync<Exception>().WithMessage(errorMessage);
 
         _hostApplicationLifeTime.Received(1).StopApplication();
@@ -82,7 +81,7 @@ public class CommandRunnerServiceTests
             new LogEntry(LogLevel.Critical, "Unhandled exception [(]Command: (.*)[)]: Test"),
             new LogEntry(LogLevel.Information, "Command finished. Duration: (.*)")
         );
-        
+
         await Verify(_ansiConsole.Output);
     }
 
@@ -90,10 +89,12 @@ public class CommandRunnerServiceTests
     public async Task StartAsync_RunnerFailsWithFlurl_ExceptionIsHandled()
     {
         const string errorMessage = "Test";
-        _commandRunner.RunAsync(CancellationToken.None).ThrowsAsync(CreateFlurlHttpException(errorMessage));
+        _commandRunner
+            .RunAsync(CancellationToken.None)
+            .ThrowsAsync(CreateFlurlHttpException(errorMessage));
 
         var action = () => _sut.StartAsync(CancellationToken.None);
-        
+
         await action.Should().ThrowAsync<Exception>().WithMessage(errorMessage);
 
         _hostApplicationLifeTime.Received(1).StopApplication();
@@ -105,32 +106,36 @@ public class CommandRunnerServiceTests
             new LogEntry(LogLevel.Critical, "Unhandled exception [(]Command: (.*)[)]: Test"),
             new LogEntry(LogLevel.Information, "Command finished. Duration: (.*)")
         );
-        
+
         await Verify(_ansiConsole.Output);
     }
 
     private static FlurlHttpException CreateFlurlHttpException(string errorMessage)
     {
-        return new FlurlHttpException(new FlurlCall
-        {
-            Exception = new Exception(errorMessage),
-            Response = new FlurlResponse(new FlurlCall
+        return new FlurlHttpException(
+            new FlurlCall
             {
+                Exception = new Exception(errorMessage),
+                Response = new FlurlResponse(
+                    new FlurlCall
+                    {
+                        HttpResponseMessage = new HttpResponseMessage
+                        {
+                            ReasonPhrase = errorMessage,
+                            Content = new StringContent(errorMessage),
+                            StatusCode = HttpStatusCode.BadRequest,
+                        },
+                    }
+                ),
+                Request = new FlurlRequest(new Url("https://example.com")),
+                HttpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.com"),
                 HttpResponseMessage = new HttpResponseMessage
                 {
                     ReasonPhrase = errorMessage,
-                    Content = new StringContent(errorMessage),
-                    StatusCode = HttpStatusCode.BadRequest
-                }
-            }),
-            Request = new FlurlRequest(new Url("https://example.com")),
-            HttpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://example.com"),
-            HttpResponseMessage = new HttpResponseMessage
-            {
-                ReasonPhrase = errorMessage,
-                Content = new StringContent("error"),
-                StatusCode = HttpStatusCode.BadRequest
+                    Content = new StringContent("error"),
+                    StatusCode = HttpStatusCode.BadRequest,
+                },
             }
-        });
+        );
     }
 }

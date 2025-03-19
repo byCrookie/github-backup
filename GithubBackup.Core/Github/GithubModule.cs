@@ -10,13 +10,13 @@ namespace GithubBackup.Core.Github;
 
 internal static class GithubModule
 {
-   public static void AddGithub(this IServiceCollection services)
-   {
-      services.AddMigration();
-      services.AddAuthentication();
-      services.AddUser();
-      services.AddRepository();
-      services.AddCredentials();
-      services.AddClients();
-   }
+    public static void AddGithub(this IServiceCollection services)
+    {
+        services.AddMigration();
+        services.AddAuthentication();
+        services.AddUser();
+        services.AddRepository();
+        services.AddCredentials();
+        services.AddClients();
+    }
 }

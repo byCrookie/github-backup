@@ -2,5 +2,8 @@
 
 public interface IRepositoryService
 {
-    Task<IReadOnlyCollection<Repository>> GetRepositoriesAsync(RepositoryOptions options, CancellationToken ct);
+    Task<IReadOnlyCollection<Repository>> GetRepositoriesAsync(
+        RepositoryOptions options,
+        CancellationToken ct
+    );
 }

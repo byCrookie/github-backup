@@ -31,7 +31,7 @@ internal static class CliModule
         services.AddSerilog();
         services.AddTransient<IFileSystem, FileSystem>();
         services.AddSingleton<IAnsiConsole>(_ => AnsiConsole.Console);
-        
+
         services.AddCommands<TCliCommand, TCommandArgs>(globalArgs, commandArgs);
     }
 }

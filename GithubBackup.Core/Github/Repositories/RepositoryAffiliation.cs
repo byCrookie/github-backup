@@ -15,6 +15,7 @@ public enum RepositoryAffiliation
 
     [EnumMember(Value = "organization_member")]
     [Description(
-        "Repositories that the user has access to through being a member of an organization. This includes every repository on every team that the user is on.")]
-    OrganizationMember
+        "Repositories that the user has access to through being a member of an organization. This includes every repository on every team that the user is on."
+    )]
+    OrganizationMember,
 }

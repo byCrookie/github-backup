@@ -17,7 +17,7 @@ public class LoginArgsTests
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             loginArgs =>
             {
@@ -27,18 +27,20 @@ public class LoginArgsTests
             },
             new LoginArgsBinder(_loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub --token token --device-flow-auth");
+        await TestCommandline
+            .Build(rootCommand)
+            .InvokeAsync("sub --token token --device-flow-auth");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_ShortFlagsArePassed_FlagsGetParsed()
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             loginArgs =>
             {
@@ -48,18 +50,18 @@ public class LoginArgsTests
             },
             new LoginArgsBinder(_loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         await TestCommandline.Build(rootCommand).InvokeAsync("sub -t token");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_OnlyRequiredArePassed_FlagsGetParsedWithDefaults()
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             loginArgs =>
             {
@@ -69,10 +71,8 @@ public class LoginArgsTests
             },
             new LoginArgsBinder(_loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         await TestCommandline.Build(rootCommand).InvokeAsync("sub");
     }
 }
-
-	

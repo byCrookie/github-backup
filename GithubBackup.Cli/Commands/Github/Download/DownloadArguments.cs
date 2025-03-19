@@ -17,42 +17,58 @@ public class DownloadArguments
         MigrationsOption = new Option<long[]>(
             aliases: new[] { "-m", "--migrations" },
             getDefaultValue: () => Piping.ReadLongs(System.Console.In, piping, false),
-            description: DownloadArgDescriptions.Migrations.Long)
+            description: DownloadArgDescriptions.Migrations.Long
+        )
         {
             IsRequired = false,
             Arity = ArgumentArity.OneOrMore,
-            AllowMultipleArgumentsPerToken = true
+            AllowMultipleArgumentsPerToken = true,
         };
 
         LatestOption = new Option<bool>(
             aliases: new[] { "-l", "--latest" },
             getDefaultValue: () => false,
             description: DownloadArgDescriptions.Latest.Long
-        ) { IsRequired = false };
-        
+        )
+        {
+            IsRequired = false,
+        };
+
         PollOption = new Option<bool>(
             aliases: new[] { "-p", "--poll" },
             getDefaultValue: () => false,
             description: DownloadArgDescriptions.Poll.Long
-        ) { IsRequired = false };
+        )
+        {
+            IsRequired = false,
+        };
 
         DestinationOption = new Option<DirectoryInfo>(
             aliases: new[] { "-d", "--destination" },
             description: DownloadArgDescriptions.Destination.Long
-        ) { IsRequired = true };
+        )
+        {
+            IsRequired = true,
+        };
 
         NumberOfBackupsOption = new Option<int?>(
             aliases: new[] { "-n", "--number-of-backups" },
             description: DownloadArgDescriptions.NumberOfBackups.Long
-        ) { IsRequired = false };
+        )
+        {
+            IsRequired = false,
+        };
 
         OverwriteOption = new Option<bool>(
             aliases: new[] { "-o", "--overwrite" },
             getDefaultValue: () => true,
             description: DownloadArgDescriptions.Overwrite.Long
-        ) { IsRequired = false };
+        )
+        {
+            IsRequired = false,
+        };
     }
-    
+
     public List<Option> Options()
     {
         return new List<Option>
@@ -62,7 +78,7 @@ public class DownloadArguments
             PollOption,
             DestinationOption,
             NumberOfBackupsOption,
-            OverwriteOption
+            OverwriteOption,
         };
     }
 }

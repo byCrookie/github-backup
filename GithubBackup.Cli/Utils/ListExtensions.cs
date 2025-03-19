@@ -9,8 +9,11 @@ internal static class ListExtensions
             source.Add(item);
         }
     }
-    
-    public static async IAsyncEnumerable<TResult> SelectAsync<TItem, TResult>(this IEnumerable<TItem> source, Func<TItem, Task<TResult>> selector)
+
+    public static async IAsyncEnumerable<TResult> SelectAsync<TItem, TResult>(
+        this IEnumerable<TItem> source,
+        Func<TItem, Task<TResult>> selector
+    )
     {
         foreach (var item in source)
         {

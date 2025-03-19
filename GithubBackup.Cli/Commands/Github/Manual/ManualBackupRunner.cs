@@ -33,7 +33,8 @@ internal sealed class ManualBackupRunner : ICommandRunner
         IFileSystem fileSystem,
         IAnsiConsole ansiConsole,
         IDateTimeProvider dateTimeProvider,
-        ILoginService loginService)
+        ILoginService loginService
+    )
     {
         _globalArgs = globalArgs;
         _migrationService = migrationService;
@@ -50,7 +51,10 @@ internal sealed class ManualBackupRunner : ICommandRunner
 
         if (_ansiConsole.Confirm("Do you want to start a migration?", false))
         {
-            var byType = _ansiConsole.Confirm("Do you want to select repositories by type? If selected, no affiliation or visibility can be selected.", false);
+            var byType = _ansiConsole.Confirm(
+                "Do you want to select repositories by type? If selected, no affiliation or visibility can be selected.",
+                false
+            );
             var type = (RepositoryType?)null;
             var affiliation = (RepositoryAffiliation?)RepositoryAffiliation.Owner;
             var visibility = (RepositoryVisibility?)RepositoryVisibility.All;
@@ -58,21 +62,27 @@ internal sealed class ManualBackupRunner : ICommandRunner
             switch (byType)
             {
                 case true:
-                    type = _ansiConsole.Prompt(new SelectionPrompt<RepositoryType>()
-                        .Title("What type of repositories do you want to backup?")
-                        .PageSize(20)
-                        .AddChoices(Enum.GetValues<RepositoryType>()));
+                    type = _ansiConsole.Prompt(
+                        new SelectionPrompt<RepositoryType>()
+                            .Title("What type of repositories do you want to backup?")
+                            .PageSize(20)
+                            .AddChoices(Enum.GetValues<RepositoryType>())
+                    );
                     break;
                 case false:
-                    affiliation = _ansiConsole.Prompt(new SelectionPrompt<RepositoryAffiliation>()
-                        .Title("Which affiliation type do you want to backup?")
-                        .PageSize(20)
-                        .AddChoices(Enum.GetValues<RepositoryAffiliation>()));
+                    affiliation = _ansiConsole.Prompt(
+                        new SelectionPrompt<RepositoryAffiliation>()
+                            .Title("Which affiliation type do you want to backup?")
+                            .PageSize(20)
+                            .AddChoices(Enum.GetValues<RepositoryAffiliation>())
+                    );
 
-                    visibility = _ansiConsole.Prompt(new SelectionPrompt<RepositoryVisibility>()
-                        .Title("Which visibility type do you want to backup?")
-                        .PageSize(20)
-                        .AddChoices(Enum.GetValues<RepositoryVisibility>()));
+                    visibility = _ansiConsole.Prompt(
+                        new SelectionPrompt<RepositoryVisibility>()
+                            .Title("Which visibility type do you want to backup?")
+                            .PageSize(20)
+                            .AddChoices(Enum.GetValues<RepositoryVisibility>())
+                    );
                     break;
             }
 
@@ -88,13 +98,16 @@ internal sealed class ManualBackupRunner : ICommandRunner
 
             var selectedRepositories = _ansiConsole.Prompt(
                 new MultiSelectionPrompt<Repository>()
-                    .Title("Select [green]repositories[/] to backup? If none is selected, all repositories will be backed up.")
+                    .Title(
+                        "Select [green]repositories[/] to backup? If none is selected, all repositories will be backed up."
+                    )
                     .Required(false)
                     .PageSize(20)
                     .MoreChoicesText("(Move up and down to reveal more repositories)")
                     .InstructionsText(
-                        "(Press [blue]<space>[/] to toggle a repository, " +
-                        "[green]<enter>[/] to accept)")
+                        "(Press [blue]<space>[/] to toggle a repository, "
+                            + "[green]<enter>[/] to accept)"
+                    )
                     .AddChoices(repositories)
                     .UseConverter(r => r.FullName)
             );
@@ -106,8 +119,9 @@ internal sealed class ManualBackupRunner : ICommandRunner
                     .Required(false)
                     .MoreChoicesText("(Move up and down to reveal more options)")
                     .InstructionsText(
-                        "(Press [blue]<space>[/] to toggle a option, " +
-                        "[green]<enter>[/] to accept)")
+                        "(Press [blue]<space>[/] to toggle a option, "
+                            + "[green]<enter>[/] to accept)"
+                    )
                     .AddChoices(
                         MigrateArgDescriptions.LockRepositories,
                         MigrateArgDescriptions.ExcludeMetadata,
@@ -147,10 +161,17 @@ internal sealed class ManualBackupRunner : ICommandRunner
             _ansiConsole.WriteLine($"Found {migrations.Count} migrations:");
             foreach (var migration in migrations)
             {
-                _ansiConsole.WriteLine($"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)");
+                _ansiConsole.WriteLine(
+                    $"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)"
+                );
             }
 
-            if (!migrations.Any(m => m.State == MigrationState.Exported && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
+            if (
+                !migrations.Any(m =>
+                    m.State == MigrationState.Exported
+                    && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)
+                )
+            )
             {
                 _ansiConsole.WriteLine("No exported migrations found in the last 7 days.");
                 return;
@@ -163,40 +184,70 @@ internal sealed class ManualBackupRunner : ICommandRunner
                     .PageSize(20)
                     .MoreChoicesText("(Move up and down to reveal more migrations)")
                     .InstructionsText(
-                        "(Press [blue]<space>[/] to toggle a migration, " +
-                        "[green]<enter>[/] to accept)")
-                    .AddChoices(migrations.Where(m => m.State == MigrationState.Exported && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
-                    .UseConverter(m => $"{m.Id} {m.State} {m.CreatedAt} ({(_dateTimeProvider.Now - m.CreatedAt).Days}d)")
+                        "(Press [blue]<space>[/] to toggle a migration, "
+                            + "[green]<enter>[/] to accept)"
+                    )
+                    .AddChoices(
+                        migrations.Where(m =>
+                            m.State == MigrationState.Exported
+                            && m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)
+                        )
+                    )
+                    .UseConverter(m =>
+                        $"{m.Id} {m.State} {m.CreatedAt} ({(_dateTimeProvider.Now - m.CreatedAt).Days}d)"
+                    )
             );
 
-            var destination = _ansiConsole.Ask<string>("Where do you want to save the migration files?");
+            var destination = _ansiConsole.Ask<string>(
+                "Where do you want to save the migration files?"
+            );
 
             while (!_fileSystem.Directory.Exists(destination))
             {
-                destination = _ansiConsole.Ask<string>("The destination directory does not exist. Please enter a valid directory.");
+                destination = _ansiConsole.Ask<string>(
+                    "The destination directory does not exist. Please enter a valid directory."
+                );
             }
 
             foreach (var migration in selectedMigrations)
             {
                 _ansiConsole.WriteLine($"Downloading migration {migration.Id} to {destination}...");
-                var file = await _migrationService.DownloadMigrationAsync(new DownloadMigrationOptions(migration.Id, _fileSystem.DirectoryInfo.New(destination)), ct);
+                var file = await _migrationService.DownloadMigrationAsync(
+                    new DownloadMigrationOptions(
+                        migration.Id,
+                        _fileSystem.DirectoryInfo.New(destination)
+                    ),
+                    ct
+                );
                 _ansiConsole.WriteLine($"Downloaded migration {migration.Id} ({file})");
             }
         } while (_ansiConsole.Confirm("Fetch migration status again?"));
     }
 
-    private static string[] GetRepositoryNames(IReadOnlyCollection<Repository> selectedRepositories, IEnumerable<Repository> repositories)
+    private static string[] GetRepositoryNames(
+        IReadOnlyCollection<Repository> selectedRepositories,
+        IEnumerable<Repository> repositories
+    )
     {
-        return selectedRepositories.Any() ? selectedRepositories.Select(r => r.FullName).ToArray() : repositories.Select(r => r.FullName).ToArray();
+        return selectedRepositories.Any()
+            ? selectedRepositories.Select(r => r.FullName).ToArray()
+            : repositories.Select(r => r.FullName).ToArray();
     }
 
     private async Task LoginAsync(CancellationToken ct)
     {
         try
         {
-            var user = await _loginService.PersistentOnlyAsync(_globalArgs, new LoginArgs(null, false), ct);
+            var user = await _loginService.PersistentOnlyAsync(
+                _globalArgs,
+                new LoginArgs(null, false),
+                ct
+            );
 
-            if (user is not null && _ansiConsole.Confirm($"Do you want to continue as {user.Name}?"))
+            if (
+                user is not null
+                && _ansiConsole.Confirm($"Do you want to continue as {user.Name}?")
+            )
             {
                 return;
             }
@@ -211,7 +262,9 @@ internal sealed class ManualBackupRunner : ICommandRunner
 
     private Task<User> LoginInternAsync(CancellationToken ct)
     {
-        var useDeviceFlowAuth = _ansiConsole.Confirm("Do you want to login using device flow authentication?");
+        var useDeviceFlowAuth = _ansiConsole.Confirm(
+            "Do you want to login using device flow authentication?"
+        );
 
         if (useDeviceFlowAuth)
         {

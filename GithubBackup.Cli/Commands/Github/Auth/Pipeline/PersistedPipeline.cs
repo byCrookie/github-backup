@@ -33,7 +33,12 @@ internal class PersistedPipeline : IPersistedPipeline
         return !args.DeviceFlowAuth && string.IsNullOrWhiteSpace(args.Token);
     }
 
-    public async Task<User?> LoginAsync(GlobalArgs globalArgs, LoginArgs args, bool persist, CancellationToken ct)
+    public async Task<User?> LoginAsync(
+        GlobalArgs globalArgs,
+        LoginArgs args,
+        bool persist,
+        CancellationToken ct
+    )
     {
         if (!IsReponsible(args))
         {
@@ -62,7 +67,7 @@ internal class PersistedPipeline : IPersistedPipeline
                 _logger.LogInformation("Persistent token not found");
                 return null;
             }
-            
+
             await _githubTokenStore.SetAsync(t);
             var user = await _userService.WhoAmIAsync(ct);
             return user;

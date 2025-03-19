@@ -14,14 +14,12 @@ internal sealed class UserService : IUserService
         _githubApiClient = githubApiClient;
         _logger = logger;
     }
-    
+
     public async Task<User> WhoAmIAsync(CancellationToken ct)
     {
         _logger.LogDebug("Getting user information");
-        
-        var response = await _githubApiClient
-            .GetAsync("/user", ct: ct) 
-            .ReceiveJson<UserResponse>();
+
+        var response = await _githubApiClient.GetAsync("/user", ct: ct).ReceiveJson<UserResponse>();
 
         return new User(response.Login, response.Name);
     }

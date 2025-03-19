@@ -4,9 +4,7 @@ namespace GithubBackup.Core.Tests.Utils;
 
 public class NullCache : IMemoryCache
 {
-    public void Dispose()
-    {
-    }
+    public void Dispose() { }
 
     public bool TryGetValue(object key, out object? value)
     {
@@ -19,7 +17,5 @@ public class NullCache : IMemoryCache
         throw new NotSupportedException();
     }
 
-    public void Remove(object key)
-    {
-    }
+    public void Remove(object key) { }
 }

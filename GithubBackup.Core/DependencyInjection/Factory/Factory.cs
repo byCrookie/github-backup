@@ -11,11 +11,14 @@ internal sealed class Factory : IFactory
         _serviceProvider = serviceProvider;
     }
 
-    public T Create<T>() where T : notnull
+    public T Create<T>()
+        where T : notnull
     {
         if (_serviceProvider.GetService(typeof(T)) is not T service)
         {
-            throw new ArgumentException($"Type {typeof(T).FullName} can not be resolved. Try register explicatly.");
+            throw new ArgumentException(
+                $"Type {typeof(T).FullName} can not be resolved. Try register explicatly."
+            );
         }
 
         return service;
@@ -27,24 +30,30 @@ internal sealed class Factory : IFactory
 
         if (service is null)
         {
-            throw new ArgumentException($"Type {type.FullName} can not be resolved. Try register explicatly.");
+            throw new ArgumentException(
+                $"Type {type.FullName} can not be resolved. Try register explicatly."
+            );
         }
 
         return service;
     }
 
-    public T Create<T>(Type type) where T : notnull
+    public T Create<T>(Type type)
+        where T : notnull
     {
         if (_serviceProvider.GetService(type) is not T service)
         {
-            throw new ArgumentException($"Type {typeof(T).FullName} can not be resolved. Try register explicatly.");
+            throw new ArgumentException(
+                $"Type {typeof(T).FullName} can not be resolved. Try register explicatly."
+            );
         }
 
         return service;
     }
 }
 
-public class Factory<T> : IFactory<T> where T : notnull
+public class Factory<T> : IFactory<T>
+    where T : notnull
 {
     private readonly IFactory _factory;
 
@@ -94,7 +103,8 @@ public class Factory<TParameter1, TParameter2, T> : IFactory<TParameter1, TParam
     }
 }
 
-public class Factory<TParameter1, TParameter2, TParameter3, T> : IFactory<TParameter1, TParameter2, TParameter3, T>
+public class Factory<TParameter1, TParameter2, TParameter3, T>
+    : IFactory<TParameter1, TParameter2, TParameter3, T>
     where T : notnull
     where TParameter1 : notnull
     where TParameter2 : notnull
@@ -109,11 +119,17 @@ public class Factory<TParameter1, TParameter2, TParameter3, T> : IFactory<TParam
 
     public T Create(TParameter1 parameter1, TParameter2 parameter2, TParameter3 parameter3)
     {
-        return ActivatorUtilities.CreateInstance<T>(_serviceProvider, parameter1, parameter2, parameter3);
+        return ActivatorUtilities.CreateInstance<T>(
+            _serviceProvider,
+            parameter1,
+            parameter2,
+            parameter3
+        );
     }
 }
 
-public class Factory<TParameter1, TParameter2, TParameter3, TParameter4, T> : IFactory<TParameter1, TParameter2, TParameter3, TParameter4, T>
+public class Factory<TParameter1, TParameter2, TParameter3, TParameter4, T>
+    : IFactory<TParameter1, TParameter2, TParameter3, TParameter4, T>
     where T : notnull
     where TParameter1 : notnull
     where TParameter2 : notnull
@@ -127,13 +143,25 @@ public class Factory<TParameter1, TParameter2, TParameter3, TParameter4, T> : IF
         _serviceProvider = serviceProvider;
     }
 
-    public T Create(TParameter1 parameter1, TParameter2 parameter2, TParameter3 parameter3, TParameter4 parameter4)
+    public T Create(
+        TParameter1 parameter1,
+        TParameter2 parameter2,
+        TParameter3 parameter3,
+        TParameter4 parameter4
+    )
     {
-        return ActivatorUtilities.CreateInstance<T>(_serviceProvider, parameter1, parameter2, parameter3, parameter4);
+        return ActivatorUtilities.CreateInstance<T>(
+            _serviceProvider,
+            parameter1,
+            parameter2,
+            parameter3,
+            parameter4
+        );
     }
 }
 
-public class Factory<TParameter1, TParameter2, TParameter3, TParameter4, TParameter5, T> : IFactory<TParameter1, TParameter2, TParameter3, TParameter4, TParameter5, T>
+public class Factory<TParameter1, TParameter2, TParameter3, TParameter4, TParameter5, T>
+    : IFactory<TParameter1, TParameter2, TParameter3, TParameter4, TParameter5, T>
     where T : notnull
     where TParameter1 : notnull
     where TParameter2 : notnull
@@ -148,8 +176,21 @@ public class Factory<TParameter1, TParameter2, TParameter3, TParameter4, TParame
         _serviceProvider = serviceProvider;
     }
 
-    public T Create(TParameter1 parameter1, TParameter2 parameter2, TParameter3 parameter3, TParameter4 parameter4, TParameter5 parameter5)
+    public T Create(
+        TParameter1 parameter1,
+        TParameter2 parameter2,
+        TParameter3 parameter3,
+        TParameter4 parameter4,
+        TParameter5 parameter5
+    )
     {
-        return ActivatorUtilities.CreateInstance<T>(_serviceProvider, parameter1, parameter2, parameter3, parameter4, parameter5);
+        return ActivatorUtilities.CreateInstance<T>(
+            _serviceProvider,
+            parameter1,
+            parameter2,
+            parameter3,
+            parameter4,
+            parameter5
+        );
     }
 }

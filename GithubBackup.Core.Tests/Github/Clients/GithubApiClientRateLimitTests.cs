@@ -44,23 +44,36 @@ public class GithubApiClientRateLimitTests
         using var httpTest = new HttpTest();
 
         httpTest
-            .RespondWith(string.Empty, (int)HttpStatusCode.TooManyRequests,
-                GetHeaders(new KeyValuePair<string, string>("retry-after", "1")))
+            .RespondWith(
+                string.Empty,
+                (int)HttpStatusCode.TooManyRequests,
+                GetHeaders(new KeyValuePair<string, string>("retry-after", "1"))
+            )
             .RespondWithJson(response, (int)HttpStatusCode.OK, GetHeaders())
             .SimulateException(new UnreachableException());
 
-        var result = await _sut
-            .GetAsync("/test")
-            .ReceiveJson<TestPageResponse>();
+        var result = await _sut.GetAsync("/test").ReceiveJson<TestPageResponse>();
 
         result.Should().BeEquivalentTo(response);
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Debug, "RetryAfter - Delaying for 00:00:01 before retrying request to GET - https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}""")
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Debug,
+                "RetryAfter - Delaying for 00:00:01 before retrying request to GET - https://api.github.com/test"
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                """Received 200 response from https://api.github.com/test with content {"items":\[]}"""
+            )
         );
     }
 
@@ -72,23 +85,44 @@ public class GithubApiClientRateLimitTests
         using var httpTest = new HttpTest();
 
         httpTest
-            .RespondWith(string.Empty, (int)HttpStatusCode.OK, GetHeaders(0, DateTimeOffset.UtcNow.AddSeconds(1)))
-            .RespondWithJson(response, (int)HttpStatusCode.OK, GetHeaders(100, DateTimeOffset.UtcNow.AddSeconds(1)))
+            .RespondWith(
+                string.Empty,
+                (int)HttpStatusCode.OK,
+                GetHeaders(0, DateTimeOffset.UtcNow.AddSeconds(1))
+            )
+            .RespondWithJson(
+                response,
+                (int)HttpStatusCode.OK,
+                GetHeaders(100, DateTimeOffset.UtcNow.AddSeconds(1))
+            )
             .SimulateException(new UnreachableException());
 
-        var result = await _sut
-            .GetAsync("/test")
-            .ReceiveJson<TestPageResponse>();
+        var result = await _sut.GetAsync("/test").ReceiveJson<TestPageResponse>();
 
         result.Should().BeEquivalentTo(response);
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, "Received 200 response from https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Debug, "RateLimit - Delaying for (.*) before retrying request to GET - https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}""")
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                "Received 200 response from https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Debug,
+                "RateLimit - Delaying for (.*) before retrying request to GET - https://api.github.com/test"
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                """Received 200 response from https://api.github.com/test with content {"items":\[]}"""
+            )
         );
     }
 
@@ -106,40 +140,67 @@ public class GithubApiClientRateLimitTests
             .RespondWithJson(response, (int)HttpStatusCode.OK, GetHeaders())
             .SimulateException(new UnreachableException());
 
-        var result = await _sut
-            .GetAsync("/test")
-            .ReceiveJson<TestPageResponse>();
+        var result = await _sut.GetAsync("/test").ReceiveJson<TestPageResponse>();
 
         result.Should().BeEquivalentTo(response);
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Debug, "Retry Attempt 0 - Delaying for (.*) before retrying request to GET - https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Debug, "Retry Attempt 1 - Delaying for (.*) before retrying request to GET - https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Debug, "Retry Attempt 2 - Delaying for (.*) before retrying request to GET - https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}""")
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Debug,
+                "Retry Attempt 0 - Delaying for (.*) before retrying request to GET - https://api.github.com/test"
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Debug,
+                "Retry Attempt 1 - Delaying for (.*) before retrying request to GET - https://api.github.com/test"
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Debug,
+                "Retry Attempt 2 - Delaying for (.*) before retrying request to GET - https://api.github.com/test"
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                """Received 200 response from https://api.github.com/test with content {"items":\[]}"""
+            )
         );
     }
 
-    private static Dictionary<string, string> GetHeaders(int rateLimitRemaining, DateTimeOffset rateLimitReset)
+    private static Dictionary<string, string> GetHeaders(
+        int rateLimitRemaining,
+        DateTimeOffset rateLimitReset
+    )
     {
         return new Dictionary<string, string>
         {
             { "x-ratelimit-remaining", $"{rateLimitRemaining}" },
-            { "x-ratelimit-reset", $"{rateLimitReset.ToUnixTimeSeconds()}" }
+            { "x-ratelimit-reset", $"{rateLimitReset.ToUnixTimeSeconds()}" },
         };
     }
 
-    private static Dictionary<string, string> GetHeaders(params KeyValuePair<string, string>[] headers)
+    private static Dictionary<string, string> GetHeaders(
+        params KeyValuePair<string, string>[] headers
+    )
     {
         var allHeaders = new Dictionary<string, string>
         {
             { "x-ratelimit-remaining", "4999" },
-            { "x-ratelimit-reset", "1614556800" }
+            { "x-ratelimit-reset", "1614556800" },
         };
 
         foreach (var header in headers)

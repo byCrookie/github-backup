@@ -9,7 +9,6 @@ using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Migrate;
 
-
 public class MigrateArgsTests
 {
     private readonly MigrateArguments _migrateArguments = new(false);
@@ -45,10 +44,13 @@ public class MigrateArgsTests
         );
 
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand)
-            .InvokeAsync("sub --repositories repo1 repo2 --lock-repositories --exclude-metadata" +
-                         " --exclude-git-data --exclude-attachements --exclude-releases --exclude-owner-projects --interval 100" +
-                         " --token test --device-flow-auth");
+        await TestCommandline
+            .Build(rootCommand)
+            .InvokeAsync(
+                "sub --repositories repo1 repo2 --lock-repositories --exclude-metadata"
+                    + " --exclude-git-data --exclude-attachements --exclude-releases --exclude-owner-projects --interval 100"
+                    + " --token test --device-flow-auth"
+            );
     }
 
     [Fact]
@@ -80,7 +82,9 @@ public class MigrateArgsTests
         );
 
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub -r repo1 repo2 -lr -em -egd -ea -er -eop -i 100");
+        await TestCommandline
+            .Build(rootCommand)
+            .InvokeAsync("sub -r repo1 repo2 -lr -em -egd -ea -er -eop -i 100");
     }
 
     [Theory]
@@ -88,7 +92,9 @@ public class MigrateArgsTests
     [InlineData("-r repo1 repo2")]
     [InlineData("--repositories repo1 --repositories repo2")]
     [InlineData("--repositories repo1 repo2")]
-    public async Task InvokeAsync_MigrationIsPassedMultipleTimes_FlagsGetParsed(string migrationArgs)
+    public async Task InvokeAsync_MigrationIsPassedMultipleTimes_FlagsGetParsed(
+        string migrationArgs
+    )
     {
         var rootCommand = new RootCommand();
         rootCommand.AddGlobalOptions(_migrateArguments.Options());
@@ -166,7 +172,10 @@ public class MigrateArgsTests
         );
 
         rootCommand.AddCommand(subCommand);
-        var action = () => TestCommandline.Build(rootCommand).InvokeAsync("sub --org-metadata-only --repositories repo1 repo2");
+        var action = () =>
+            TestCommandline
+                .Build(rootCommand)
+                .InvokeAsync("sub --org-metadata-only --repositories repo1 repo2");
 
         await action.Should().ThrowAsync<Exception>();
     }

@@ -14,7 +14,6 @@ using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Backup;
 
-
 public class BackupRunnerTests
 {
     private readonly IMigrationService _migrationService = Substitute.For<IMigrationService>();
@@ -28,7 +27,7 @@ public class BackupRunnerTests
         var backupRunner = CreateBackupRunner(true);
 
         const int id = 1;
-        
+
         _migrationService
             .StartMigrationAsync(Arg.Any<StartMigrationOptions>(), CancellationToken.None)
             .Returns(new Migration(id, MigrationState.Pending, new DateTime(2020, 1, 1)));
@@ -36,21 +35,25 @@ public class BackupRunnerTests
         const string migrationFile = "test";
 
         _migrationService
-            .PollAndDownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), Arg.Any<Func<Migration, Task>>(), Arg.Any<CancellationToken>())
+            .PollAndDownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == id),
+                Arg.Any<Func<Migration, Task>>(),
+                Arg.Any<CancellationToken>()
+            )
             .Returns(migrationFile);
 
         await backupRunner.RunAsync(CancellationToken.None);
-        
+
         await Verify(_ansiConsole.Output);
     }
-    
+
     [Fact]
     public async Task RunAsync_NotQuiet_DoWriteToConsole()
     {
         var backupRunner = CreateBackupRunner(false);
 
         const int id = 1;
-        
+
         _migrationService
             .StartMigrationAsync(Arg.Any<StartMigrationOptions>(), CancellationToken.None)
             .Returns(new Migration(id, MigrationState.Pending, new DateTime(2020, 1, 1)));
@@ -58,7 +61,11 @@ public class BackupRunnerTests
         const string migrationFile = "test";
 
         _migrationService
-            .PollAndDownloadMigrationAsync(Arg.Is<DownloadMigrationOptions>(o => o.Id == id), Arg.Any<Func<Migration, Task>>(), Arg.Any<CancellationToken>())
+            .PollAndDownloadMigrationAsync(
+                Arg.Is<DownloadMigrationOptions>(o => o.Id == id),
+                Arg.Any<Func<Migration, Task>>(),
+                Arg.Any<CancellationToken>()
+            )
             .Returns(migrationFile);
 
         await backupRunner.RunAsync(CancellationToken.None);
@@ -69,9 +76,34 @@ public class BackupRunnerTests
     private BackupRunner CreateBackupRunner(bool quiet)
     {
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
-        var migrateArgs = new MigrateArgs(new []{"test"}, false, false, false, false, false, false, false, new IntervalArgs(null), new LoginArgs(null, false));
-        var downloadArgs = new DownloadArgs(Array.Empty<long>(), false, false, new DirectoryInfo("test"), null, true, new IntervalArgs(null), new LoginArgs(null, false));
-        var backupArgs = new BackupArgs(migrateArgs, downloadArgs, new IntervalArgs(null), new LoginArgs(null, false));
+        var migrateArgs = new MigrateArgs(
+            new[] { "test" },
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            new IntervalArgs(null),
+            new LoginArgs(null, false)
+        );
+        var downloadArgs = new DownloadArgs(
+            Array.Empty<long>(),
+            false,
+            false,
+            new DirectoryInfo("test"),
+            null,
+            true,
+            new IntervalArgs(null),
+            new LoginArgs(null, false)
+        );
+        var backupArgs = new BackupArgs(
+            migrateArgs,
+            downloadArgs,
+            new IntervalArgs(null),
+            new LoginArgs(null, false)
+        );
 
         return new BackupRunner(
             globalArgs,

@@ -11,10 +11,11 @@ internal sealed class RepositoriesArgs
     public LoginArgs LoginArgs { get; }
 
     public RepositoriesArgs(
-        RepositoryType? type, 
+        RepositoryType? type,
         RepositoryAffiliation? affiliation,
         RepositoryVisibility? visibility,
-        LoginArgs loginArgs)
+        LoginArgs loginArgs
+    )
     {
         Type = type;
         Affiliation = affiliation;

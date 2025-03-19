@@ -22,7 +22,8 @@ internal sealed class CommandRunnerService : IHostedService
         IHostApplicationLifetime hostApplicationLifetime,
         ICommandRunner commandRunner,
         IAnsiConsole ansiConsole,
-        IStopwatch stopwatch)
+        IStopwatch stopwatch
+    )
     {
         _globalArgs = globalArgs;
         _logger = logger;
@@ -35,12 +36,12 @@ internal sealed class CommandRunnerService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Running command");
-        
+
         if (!_globalArgs.Quiet)
         {
             _ansiConsole.WriteLine("Running command");
         }
-        
+
         var stopWatch = _stopwatch.StartNew();
 
         try
@@ -51,14 +52,22 @@ internal sealed class CommandRunnerService : IHostedService
         catch (FlurlHttpException e)
         {
             var error = await e.GetResponseStringAsync();
-            _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}",
-                _commandRunner.GetType().Name, error);
+            _logger.LogCritical(
+                e,
+                "Unhandled exception (Command: {Type}): {Message}",
+                _commandRunner.GetType().Name,
+                error
+            );
             throw new Exception(error, e);
         }
         catch (Exception e)
         {
-            _logger.LogCritical(e, "Unhandled exception (Command: {Type}): {Message}",
-                _commandRunner.GetType().Name, e.Message);
+            _logger.LogCritical(
+                e,
+                "Unhandled exception (Command: {Type}): {Message}",
+                _commandRunner.GetType().Name,
+                e.Message
+            );
             throw;
         }
         finally
@@ -70,7 +79,7 @@ internal sealed class CommandRunnerService : IHostedService
             {
                 _ansiConsole.WriteLine($"Command finished. Duration: {stopWatch.Elapsed}");
             }
-            
+
             _hostApplicationLifetime.StopApplication();
         }
     }

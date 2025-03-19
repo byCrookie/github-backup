@@ -49,18 +49,24 @@ public class GithubApiClientCacheTests
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithoutHeader("If-None-Match", "1")
-            .RespondWithJson(cachedResponse, (int)HttpStatusCode.OK, GetHeaders(
-                new KeyValuePair<string, string>("ETag", "1"),
-                new KeyValuePair<string, string>(TestId, nameof(cachedResponse))
-            ));
+            .RespondWithJson(
+                cachedResponse,
+                (int)HttpStatusCode.OK,
+                GetHeaders(
+                    new KeyValuePair<string, string>("ETag", "1"),
+                    new KeyValuePair<string, string>(TestId, nameof(cachedResponse))
+                )
+            );
 
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithHeader("If-None-Match", "1")
-            .RespondWith(notModifiedResponse, (int)HttpStatusCode.NotModified, GetHeaders(
-                new KeyValuePair<string, string>(TestId, nameof(notModifiedResponse))
-            ));
+            .RespondWith(
+                notModifiedResponse,
+                (int)HttpStatusCode.NotModified,
+                GetHeaders(new KeyValuePair<string, string>(TestId, nameof(notModifiedResponse)))
+            );
 
         var result1 = await _sut.GetAsync("/test");
         var result2 = await _sut.GetAsync("/test");
@@ -70,11 +76,23 @@ public class GithubApiClientCacheTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}"""),
-            new LogEntry(LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                """Received 200 response from https://api.github.com/test with content {"items":\[]}"""
+            ),
+            new LogEntry(
+                LogLevel.Debug,
+                "Cache - Caching response for GET - https://api.github.com/test"
+            ),
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Debug, "Cache - Returning cached response for GET - https://api.github.com/test")
+            new LogEntry(
+                LogLevel.Debug,
+                "Cache - Returning cached response for GET - https://api.github.com/test"
+            )
         );
     }
 
@@ -92,18 +110,24 @@ public class GithubApiClientCacheTests
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithoutHeader("If-None-Match", "1")
-            .RespondWithJson(cachedResponse, (int)HttpStatusCode.OK, GetHeaders(
-                new KeyValuePair<string, string>("ETag", "1"),
-                new KeyValuePair<string, string>(TestId, nameof(cachedResponse))
-            ));
+            .RespondWithJson(
+                cachedResponse,
+                (int)HttpStatusCode.OK,
+                GetHeaders(
+                    new KeyValuePair<string, string>("ETag", "1"),
+                    new KeyValuePair<string, string>(TestId, nameof(cachedResponse))
+                )
+            );
 
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithHeader("If-None-Match", "1")
-            .RespondWithJson(newResponse, (int)HttpStatusCode.OK, GetHeaders(
-                new KeyValuePair<string, string>(TestId, nameof(newResponse))
-            ));
+            .RespondWithJson(
+                newResponse,
+                (int)HttpStatusCode.OK,
+                GetHeaders(new KeyValuePair<string, string>(TestId, nameof(newResponse)))
+            );
 
         var result1 = await _sut.GetAsync("/test");
         var result2 = await _sut.GetAsync("/test");
@@ -113,13 +137,31 @@ public class GithubApiClientCacheTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}"""),
-            new LogEntry(LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                """Received 200 response from https://api.github.com/test with content {"items":\[]}"""
+            ),
+            new LogEntry(
+                LogLevel.Debug,
+                "Cache - Caching response for GET - https://api.github.com/test"
+            ),
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Debug, "Cache - Resource has changed, returning new response for GET - https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}""")
+            new LogEntry(
+                LogLevel.Debug,
+                "Cache - Resource has changed, returning new response for GET - https://api.github.com/test"
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                """Received 200 response from https://api.github.com/test with content {"items":\[]}"""
+            )
         );
     }
 
@@ -132,14 +174,22 @@ public class GithubApiClientCacheTests
         using var httpTest = new HttpTest();
 
         httpTest
-            .RespondWithJson(response1, (int)HttpStatusCode.OK, GetHeaders(
-                new KeyValuePair<string, string>("ETag", "1"),
-                new KeyValuePair<string, string>(TestId, nameof(response1))
-            ))
-            .RespondWithJson(response2, (int)HttpStatusCode.OK, GetHeaders(
-                new KeyValuePair<string, string>("ETag", "2"),
-                new KeyValuePair<string, string>(TestId, nameof(response2))
-            ));
+            .RespondWithJson(
+                response1,
+                (int)HttpStatusCode.OK,
+                GetHeaders(
+                    new KeyValuePair<string, string>("ETag", "1"),
+                    new KeyValuePair<string, string>(TestId, nameof(response1))
+                )
+            )
+            .RespondWithJson(
+                response2,
+                (int)HttpStatusCode.OK,
+                GetHeaders(
+                    new KeyValuePair<string, string>("ETag", "2"),
+                    new KeyValuePair<string, string>(TestId, nameof(response2))
+                )
+            );
 
         var result1 = await _sut.GetAsync("/test");
         var result2 = await _sut.GetAsync("/test");
@@ -149,14 +199,35 @@ public class GithubApiClientCacheTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}"""),
-            new LogEntry(LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test"),
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                """Received 200 response from https://api.github.com/test with content {"items":\[]}"""
+            ),
+            new LogEntry(
+                LogLevel.Debug,
+                "Cache - Caching response for GET - https://api.github.com/test"
+            ),
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Debug, "Cache - Resource has changed, returning new response for GET - https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}"""),
-            new LogEntry(LogLevel.Debug, "Cache - Caching response for GET - https://api.github.com/test")
+            new LogEntry(
+                LogLevel.Debug,
+                "Cache - Resource has changed, returning new response for GET - https://api.github.com/test"
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                """Received 200 response from https://api.github.com/test with content {"items":\[]}"""
+            ),
+            new LogEntry(
+                LogLevel.Debug,
+                "Cache - Caching response for GET - https://api.github.com/test"
+            )
         );
     }
 
@@ -169,10 +240,16 @@ public class GithubApiClientCacheTests
         using var httpTest = new HttpTest();
 
         httpTest
-            .RespondWithJson(response1, (int)HttpStatusCode.OK,
-                GetHeaders(new KeyValuePair<string, string>(TestId, nameof(response1))))
-            .RespondWithJson(response2, (int)HttpStatusCode.OK,
-                GetHeaders(new KeyValuePair<string, string>(TestId, nameof(response2))));
+            .RespondWithJson(
+                response1,
+                (int)HttpStatusCode.OK,
+                GetHeaders(new KeyValuePair<string, string>(TestId, nameof(response1)))
+            )
+            .RespondWithJson(
+                response2,
+                (int)HttpStatusCode.OK,
+                GetHeaders(new KeyValuePair<string, string>(TestId, nameof(response2)))
+            );
 
         var result1 = await _sut.GetAsync("/test");
         var result2 = await _sut.GetAsync("/test");
@@ -182,20 +259,34 @@ public class GithubApiClientCacheTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}"""),
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                """Received 200 response from https://api.github.com/test with content {"items":\[]}"""
+            ),
             new LogEntry(LogLevel.Debug, "Requesting https://api.github.com/test"),
-            new LogEntry(LogLevel.Trace, "Sending GET request to https://api.github.com/test with content "),
-            new LogEntry(LogLevel.Trace, """Received 200 response from https://api.github.com/test with content {"items":\[]}""")
+            new LogEntry(
+                LogLevel.Trace,
+                "Sending GET request to https://api.github.com/test with content "
+            ),
+            new LogEntry(
+                LogLevel.Trace,
+                """Received 200 response from https://api.github.com/test with content {"items":\[]}"""
+            )
         );
     }
 
-    private static Dictionary<string, string> GetHeaders(params KeyValuePair<string, string>[] headers)
+    private static Dictionary<string, string> GetHeaders(
+        params KeyValuePair<string, string>[] headers
+    )
     {
         var allHeaders = new Dictionary<string, string>
         {
             { "x-ratelimit-remaining", "4999" },
-            { "x-ratelimit-reset", "1614556800" }
+            { "x-ratelimit-reset", "1614556800" },
         };
 
         foreach (var header in headers)

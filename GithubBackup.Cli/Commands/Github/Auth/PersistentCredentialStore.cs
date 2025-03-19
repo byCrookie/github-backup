@@ -22,7 +22,8 @@ internal sealed class PersistentCredentialStore : IPersistentCredentialStore
     public PersistentCredentialStore(
         IFileSystem fileSystem,
         IEnvironment environment,
-        ILogger<PersistentCredentialStore> logger)
+        ILogger<PersistentCredentialStore> logger
+    )
     {
         _fileSystem = fileSystem;
         _environment = environment;
@@ -66,7 +67,7 @@ internal sealed class PersistentCredentialStore : IPersistentCredentialStore
 
             return DecryptString(encryptedToken, Key, Salt);
         }
-        
+
         _logger.LogDebug("Token file {File} does not exist", file);
         return null;
     }
@@ -107,7 +108,9 @@ internal sealed class PersistentCredentialStore : IPersistentCredentialStore
 
     private bool TryRetrieveTokenStoreFilePath(out string? path)
     {
-        var appDataPath = _environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).FullName;
+        var appDataPath = _environment
+            .GetFolderPath(Environment.SpecialFolder.ApplicationData)
+            .FullName;
         _logger.LogDebug("AppData path is {AppDataPath}", appDataPath);
 
         if (_fileSystem.Directory.Exists(appDataPath))
@@ -137,7 +140,7 @@ internal sealed class PersistentCredentialStore : IPersistentCredentialStore
                 return false;
             }
         }
-        
+
         _logger.LogWarning("AppData path {Path} does not exist", appDataPath);
         path = null;
         return false;

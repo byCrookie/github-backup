@@ -17,10 +17,11 @@ public static partial class Piping
         var inputs = new List<long>();
         while (stdin.ReadLine() is { } line && !string.IsNullOrEmpty(line))
         {
-            var ints = ArgRegex.Matches(line)
+            var ints = ArgRegex
+                .Matches(line)
                 .Select(m => m.Groups["match"].Value)
                 .Select(long.Parse);
-            
+
             inputs.AddRange(ints);
         }
 
@@ -37,10 +38,8 @@ public static partial class Piping
         var inputs = new List<string>();
         while (stdin.ReadLine() is { } line && !string.IsNullOrEmpty(line))
         {
-            var strings = ArgRegex
-                .Matches(line)
-                .Select(m => m.Groups["match"].Value);
-            
+            var strings = ArgRegex.Matches(line).Select(m => m.Groups["match"].Value);
+
             inputs.AddRange(strings);
         }
 
@@ -60,6 +59,9 @@ public static partial class Piping
         }
     }
 
-    [GeneratedRegex("""(?<match>([\w\/-]|\.)+)|"(?<match>[\S\s]*?)"|'(?<match>[\S\s]*?)'""", RegexOptions.Compiled)]
+    [GeneratedRegex(
+        """(?<match>([\w\/-]|\.)+)|"(?<match>[\S\s]*?)"|'(?<match>[\S\s]*?)'""",
+        RegexOptions.Compiled
+    )]
     private static partial Regex GetArgRegex();
 }

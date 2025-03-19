@@ -11,5 +11,5 @@ public enum RepositoryVisibility
     Public,
 
     [EnumMember(Value = "private")]
-    Private
+    Private,
 }

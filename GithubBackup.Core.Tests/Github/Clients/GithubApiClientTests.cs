@@ -23,9 +23,9 @@ public class GithubApiClientTests
     public GithubApiClientTests()
     {
         var tokenStore = Substitute.For<IGithubTokenStore>();
-        
+
         tokenStore.GetAsync().Returns(Token);
-        
+
         _sut = new GithubApiClient(
             new NullCache(),
             tokenStore,
@@ -76,19 +76,31 @@ public class GithubApiClientTests
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 1)
-            .RespondWithJson(new TestPageResponse(itemsBatch1), (int)HttpStatusCode.OK, GetHeaders());
+            .RespondWithJson(
+                new TestPageResponse(itemsBatch1),
+                (int)HttpStatusCode.OK,
+                GetHeaders()
+            );
 
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 2)
-            .RespondWithJson(new TestPageResponse(itemsBatch2), (int)HttpStatusCode.OK, GetHeaders());
+            .RespondWithJson(
+                new TestPageResponse(itemsBatch2),
+                (int)HttpStatusCode.OK,
+                GetHeaders()
+            );
 
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
             .WithQueryParam(pageParam, 3)
-            .RespondWithJson(new TestPageResponse(itemsBatch3), (int)HttpStatusCode.OK, GetHeaders());
+            .RespondWithJson(
+                new TestPageResponse(itemsBatch3),
+                (int)HttpStatusCode.OK,
+                GetHeaders()
+            );
 
         var result = await _sut.ReceiveJsonPagedAsync<TestPageResponse, TestPageItem>(
             "/test",
@@ -114,7 +126,11 @@ public class GithubApiClientTests
         httpTest
             .ForCallsTo(url)
             .WithVerb(HttpMethod.Get)
-            .RespondWithJson(new TestPageResponse(itemsBatch), (int)HttpStatusCode.OK, GetHeaders());
+            .RespondWithJson(
+                new TestPageResponse(itemsBatch),
+                (int)HttpStatusCode.OK,
+                GetHeaders()
+            );
 
         var result = await _sut.ReceiveJsonPagedAsync<TestPageResponse, TestPageItem>(
             "/test",
@@ -132,15 +148,9 @@ public class GithubApiClientTests
     {
         const string url = "https://api.github.com/test";
 
-        var items = new List<TestPageItem>
-        {
-            new(1, "name")
-        };
+        var items = new List<TestPageItem> { new(1, "name") };
 
-        var expectedItems = new List<TestPageItem>
-        {
-            new(1, "name")
-        };
+        var expectedItems = new List<TestPageItem> { new(1, "name") };
 
         using var httpTest = new HttpTest();
 
@@ -149,11 +159,11 @@ public class GithubApiClientTests
             .WithVerb(HttpMethod.Get)
             .RespondWithJson(new TestPageResponse(items), (int)HttpStatusCode.OK, GetHeaders());
 
-        var result = await _sut
-            .GetAsync("/test")
-            .ReceiveJson<TestPageResponse>();
+        var result = await _sut.GetAsync("/test").ReceiveJson<TestPageResponse>();
 
-        result.Items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
+        result
+            .Items.Should()
+            .BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
     }
 
     [Fact]
@@ -161,15 +171,9 @@ public class GithubApiClientTests
     {
         const string url = "https://api.github.com/test";
 
-        var items = new List<TestPageItem>
-        {
-            new(1, "name")
-        };
+        var items = new List<TestPageItem> { new(1, "name") };
 
-        var expectedItems = new List<TestPageItem>
-        {
-            new(1, "name")
-        };
+        var expectedItems = new List<TestPageItem> { new(1, "name") };
 
         using var httpTest = new HttpTest();
 
@@ -181,19 +185,21 @@ public class GithubApiClientTests
             .WithRequestJson(body)
             .RespondWithJson(new TestPageResponse(items), (int)HttpStatusCode.OK, GetHeaders());
 
-        var result = await _sut
-            .PostJsonAsync("/test", body)
-            .ReceiveJson<TestPageResponse>();
+        var result = await _sut.PostJsonAsync("/test", body).ReceiveJson<TestPageResponse>();
 
-        result.Items.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
+        result
+            .Items.Should()
+            .BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
     }
 
-    private static Dictionary<string, string> GetHeaders(params KeyValuePair<string, string>[] headers)
+    private static Dictionary<string, string> GetHeaders(
+        params KeyValuePair<string, string>[] headers
+    )
     {
         var allHeaders = new Dictionary<string, string>
         {
             { "x-ratelimit-remaining", "4999" },
-            { "x-ratelimit-reset", "1614556800" }
+            { "x-ratelimit-reset", "1614556800" },
         };
 
         foreach (var header in headers)

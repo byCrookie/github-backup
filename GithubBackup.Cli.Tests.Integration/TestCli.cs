@@ -16,12 +16,15 @@ public static class TestCli
         Action<HttpTest>? configureHttp = null,
         Action<MockFileSystem>? configureFileSystem = null,
         IDictionary<string, string>? environmentVariables = null,
-        [CallerFilePath] string sourceFile = "")
+        [CallerFilePath] string sourceFile = ""
+    )
     {
         var mockFileSystem = new MockFileSystem();
         configureFileSystem?.Invoke(mockFileSystem);
 
-        foreach (var environmentVariable in environmentVariables ?? new Dictionary<string, string>())
+        foreach (
+            var environmentVariable in environmentVariables ?? new Dictionary<string, string>()
+        )
         {
             Environment.SetEnvironmentVariable(environmentVariable.Key, environmentVariable.Value);
         }
@@ -31,11 +34,14 @@ public static class TestCli
         using var httpTest = new HttpTest();
         configureHttp?.Invoke(httpTest);
 
-        var exitCode = await Boot.Cli.RunAsync(args.Split(" "), new CliOptions
-        {
-            Console = testConsole,
-            AfterServices = hb => hb.Services.AddSingleton<IFileSystem>(mockFileSystem)
-        });
+        var exitCode = await Boot.Cli.RunAsync(
+            args.Split(" "),
+            new CliOptions
+            {
+                Console = testConsole,
+                AfterServices = hb => hb.Services.AddSingleton<IFileSystem>(mockFileSystem),
+            }
+        );
 
         var settings = new VerifySettings();
         settings.AddScrubber(sb => sb.Replace("ReSharperTestRunner", "ghb"));

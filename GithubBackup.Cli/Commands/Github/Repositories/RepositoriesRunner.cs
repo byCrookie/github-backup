@@ -18,7 +18,8 @@ internal sealed class RepositoriesRunner : ICommandRunner
         RepositoriesArgs repositoriesArgs,
         IRepositoryService repositoryService,
         ILoginService loginService,
-        IAnsiConsole ansiConsole)
+        IAnsiConsole ansiConsole
+    )
     {
         _globalArgs = globalArgs;
         _repositoriesArgs = repositoriesArgs;

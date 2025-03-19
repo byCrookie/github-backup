@@ -21,7 +21,8 @@ internal sealed class BackupRunner : ICommandRunner
         IMigrationService migrationService,
         ILoginService loginService,
         IFileSystem fileSystem,
-        IAnsiConsole ansiConsole)
+        IAnsiConsole ansiConsole
+    )
     {
         _globalArgs = globalArgs;
         _backupArgs = backupArgs;
@@ -33,12 +34,7 @@ internal sealed class BackupRunner : ICommandRunner
 
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.WithPersistentAsync(
-            _globalArgs,
-            _backupArgs.LoginArgs,
-            false,
-            ct
-        );
+        await _loginService.WithPersistentAsync(_globalArgs, _backupArgs.LoginArgs, false, ct);
 
         var options = new StartMigrationOptions(
             _backupArgs.MigrateArgs.Repositories,
@@ -56,7 +52,8 @@ internal sealed class BackupRunner : ICommandRunner
         if (!_globalArgs.Quiet)
         {
             _ansiConsole.WriteLine(
-                $"Downloading migration {migration.Id} to {_backupArgs.DownloadArgs.Destination} when ready...");
+                $"Downloading migration {migration.Id} to {_backupArgs.DownloadArgs.Destination} when ready..."
+            );
         }
 
         var downloadOptions = new DownloadMigrationOptions(
@@ -80,6 +77,8 @@ internal sealed class BackupRunner : ICommandRunner
             ct
         );
 
-        _ansiConsole.WriteLine(!_globalArgs.Quiet ? $"Downloaded migration {migration.Id} ({file})" : file);
+        _ansiConsole.WriteLine(
+            !_globalArgs.Quiet ? $"Downloaded migration {migration.Id} ({file})" : file
+        );
     }
 }

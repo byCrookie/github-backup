@@ -11,9 +11,9 @@ public class CliConsole : ICliConsole
     public CliConsole(IAnsiConsole ansiConsole)
     {
         _ansiConsole = ansiConsole;
-        
+
         var writer = new StandardStreamWriter(ansiConsole);
-        
+
         Out = writer;
         Error = writer;
     }

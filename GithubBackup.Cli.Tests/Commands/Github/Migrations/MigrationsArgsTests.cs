@@ -8,7 +8,6 @@ using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Migrations;
 
-
 public class MigrationsArgsTests
 {
     private readonly MigrationsArguments _migrationsArguments = new();
@@ -21,7 +20,7 @@ public class MigrationsArgsTests
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             migrationsArgs =>
             {
@@ -34,12 +33,13 @@ public class MigrationsArgsTests
             },
             new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand)
+        await TestCommandline
+            .Build(rootCommand)
             .InvokeAsync("sub --export --days-old 7 --token test --device-flow-auth");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_FlagsArePassedWithSince_FlagsGetParsed()
     {
@@ -47,7 +47,7 @@ public class MigrationsArgsTests
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             migrationsArgs =>
             {
@@ -60,12 +60,11 @@ public class MigrationsArgsTests
             },
             new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand)
-            .InvokeAsync("sub --export --since 2021-01-01");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub --export --since 2021-01-01");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_ShortFlagsArePassedWithDaysOld_FlagsGetParsed()
     {
@@ -73,7 +72,7 @@ public class MigrationsArgsTests
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             migrationsArgs =>
             {
@@ -86,12 +85,11 @@ public class MigrationsArgsTests
             },
             new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand)
-            .InvokeAsync("sub -e -d 7");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub -e -d 7");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_ShortFlagsArePassedWithSince_FlagsGetParsed()
     {
@@ -99,7 +97,7 @@ public class MigrationsArgsTests
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             migrationsArgs =>
             {
@@ -112,12 +110,11 @@ public class MigrationsArgsTests
             },
             new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand)
-            .InvokeAsync("sub -e -s 2021-01-01");
+        await TestCommandline.Build(rootCommand).InvokeAsync("sub -e -s 2021-01-01");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_OnlyRequiredArePassed_FlagsGetParsedWithDefaults()
     {
@@ -125,7 +122,7 @@ public class MigrationsArgsTests
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             migrationsArgs =>
             {
@@ -138,11 +135,11 @@ public class MigrationsArgsTests
             },
             new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
         await TestCommandline.Build(rootCommand).InvokeAsync("sub");
     }
-    
+
     [Fact]
     public async Task InvokeAsync_SinceAndDaysOld_ValidationFails()
     {
@@ -150,15 +147,16 @@ public class MigrationsArgsTests
         rootCommand.AddGlobalOptions(_migrationsArguments.Options());
         rootCommand.AddGlobalOptions(_loginArguments.Options());
         var subCommand = new Command("sub");
-        
+
         subCommand.SetHandler(
             _ => { },
             new MigrationsArgsBinder(_migrationsArguments, _loginArguments)
         );
-        
+
         rootCommand.AddCommand(subCommand);
-        var action = () => TestCommandline.Build(rootCommand).InvokeAsync("sub --since 2021-01-01 --days-old 7");
-        
+        var action = () =>
+            TestCommandline.Build(rootCommand).InvokeAsync("sub --since 2021-01-01 --days-old 7");
+
         await action.Should().ThrowAsync<Exception>();
     }
 }

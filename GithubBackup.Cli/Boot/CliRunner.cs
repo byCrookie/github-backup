@@ -20,19 +20,18 @@ internal class CliRunner<TCliCommand, TCommandArgs>
         string[] args,
         GlobalArgs globalArgs,
         TCommandArgs commandArgs,
-        RunOptions options)
+        RunOptions options
+    )
     {
         _args = args;
         _globalArgs = globalArgs;
         _commandArgs = commandArgs;
         _options = options;
     }
-    
+
     public Task RunAsync()
     {
-        Log.Logger = CliLogger
-            .Create(_globalArgs)
-            .CreateLogger();
+        Log.Logger = CliLogger.Create(_globalArgs).CreateLogger();
 
         var builder = Host.CreateApplicationBuilder(_args);
 
