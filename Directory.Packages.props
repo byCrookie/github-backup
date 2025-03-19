@@ -3,7 +3,7 @@
     <PackageVersion Include="AutoBogus" Version="2.13.1" />
     <PackageVersion Include="Bogus" Version="35.6.2" />
     <PackageVersion Include="ByteSize" Version="2.1.2" />
-    <PackageVersion Include="FluentAssertions" Version="[7.1.0]" />
+    <PackageVersion Include="FluentAssertions" Version="[8.2.0]" />
     <PackageVersion Include="FluentValidation" Version="11.11.0" />
     <PackageVersion Include="Flurl.Http" Version="4.0.2" />
     <PackageVersion Include="Meziantou.Xunit.ParallelTestFramework" Version="2.3.0" />
