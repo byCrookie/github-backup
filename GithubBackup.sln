@@ -26,6 +26,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GithubBackup.Cli.Tests", "GithubBackup.Cli.Tests\GithubBackup.Cli.Tests.csproj", "{964A4A65-0E9B-4103-9085-B9F458BEA48D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{23207BF5-FFD0-40C9-BA21-614488CD4886}"
+	ProjectSection(SolutionItems) = preProject
+		.github\dependabot.yml = .github\dependabot.yml
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{0130B520-705C-4BF2-A919-C4FBF31D40BF}"
 	ProjectSection(SolutionItems) = preProject

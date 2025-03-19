@@ -18,6 +18,8 @@ updates:
       nuget:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "FluentAssertions"
 
   - package-ecosystem: "github-actions"
     directory: "/"
