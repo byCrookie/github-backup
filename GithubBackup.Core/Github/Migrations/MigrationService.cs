@@ -31,7 +31,7 @@ internal sealed partial class MigrationService : IMigrationService
     public async Task<Migration> StartMigrationAsync(StartMigrationOptions options, CancellationToken ct)
     {
         _logger.LogDebug("Starting migration");
-        
+
         var request = new MigrationRequest(
             options.Repositories,
             options.LockRepositories,
@@ -53,7 +53,7 @@ internal sealed partial class MigrationService : IMigrationService
     public async Task<List<Migration>> GetMigrationsAsync(CancellationToken ct)
     {
         _logger.LogDebug("Getting migrations");
-        
+
         var response = await _githubApiClient
             .ReceiveJsonPagedAsync<List<MigrationReponse>, MigrationReponse>(
                 "/user/migrations",
@@ -69,7 +69,7 @@ internal sealed partial class MigrationService : IMigrationService
     public async Task<Migration> GetMigrationAsync(long id, CancellationToken ct)
     {
         _logger.LogDebug("Getting migration {Id}", id);
-        
+
         var response = await _githubApiClient
             .GetAsync($"/user/migrations/{id}", ct: ct)
             .ReceiveJson<MigrationReponse>();
@@ -81,7 +81,7 @@ internal sealed partial class MigrationService : IMigrationService
         Func<Migration, Task> onPollAsync, CancellationToken ct)
     {
         _logger.LogDebug("Polling migration {Id}", options.Id);
-        
+
         var resiliencePipeline = new ResiliencePipelineBuilder<Migration>()
             .AddRetry(new RetryStrategyOptions<Migration>
             {
@@ -108,25 +108,26 @@ internal sealed partial class MigrationService : IMigrationService
     public async Task<string> DownloadMigrationAsync(DownloadMigrationOptions options, CancellationToken ct)
     {
         var migration = await GetMigrationAsync(options.Id, ct);
-        
+
         if (migration.State != MigrationState.Exported)
         {
-            throw new Exception($"The migration is not {MigrationState.Exported.GetEnumMemberValue()} and cannot be downloaded.");
+            throw new Exception(
+                $"The migration is not {MigrationState.Exported.GetEnumMemberValue()} and cannot be downloaded.");
         }
 
         if (migration.CreatedAt < _dateTimeProvider.Now.AddDays(-7))
         {
             throw new Exception("The migration is older than 7 days and cannot be downloaded anymore.");
         }
-        
+
         var fileName = $"{_dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{options.Id}.tar.gz";
-        var tempFile = _fileSystem.Path.GetTempFileName();
+        var tempFile = _fileSystem.Path.Combine(_fileSystem.Path.GetTempPath(), _fileSystem.Path.GetRandomFileName());
         var tempDirectoryName = _fileSystem.Path.GetDirectoryName(tempFile)!;
         var tempFileName = _fileSystem.Path.GetFileName(tempFile);
-        
+
         await _githubApiClient
             .DownloadFileAsync($"/user/migrations/{options.Id}/archive", tempDirectoryName, tempFileName, ct: ct);
-        
+
         if (options.Overwrite)
         {
             _logger.LogInformation("Overwriting backups");
@@ -144,7 +145,7 @@ internal sealed partial class MigrationService : IMigrationService
         {
             throw new Exception($"A backup with the id {options.Id} already exists.");
         }
-        
+
         _fileSystem.File.Move(tempFile, migrationPath);
         return migrationPath;
     }
@@ -177,7 +178,7 @@ internal sealed partial class MigrationService : IMigrationService
         }
         else
         {
-            _logger.LogInformation("Not to many backups");   
+            _logger.LogInformation("Not to many backups");
         }
     }
 
