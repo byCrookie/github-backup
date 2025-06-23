@@ -6,29 +6,30 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoBogus"/>
-        <PackageReference Include="Bogus"/>
-        <PackageReference Include="FluentAssertions"/>
-        <PackageReference Include="Flurl.Http"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-        <PackageReference Include="NSubstitute"/>
-        <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
-        <PackageReference Include="Spectre.Console.Testing"/>
-        <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers"/>
-        <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers"/>
-        <PackageReference Include="Testcontainers"/>
-        <PackageReference Include="Verify.Xunit"/>
-        <PackageReference Include="xunit"/>
-        <PackageReference Include="xunit.extensibility.core"/>
-        <PackageReference Include="xunit.runner.visualstudio"/>
-        <PackageReference Include="coverlet.collector"/>
+        <PackageReference Include="AutoBogus" />
+        <PackageReference Include="Bogus" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Flurl.Http" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="NSubstitute" />
+        <PackageReference Include="NSubstitute.Analyzers.CSharp" />
+        <PackageReference Include="Spectre.Console" />
+        <PackageReference Include="Spectre.Console.Testing" />
+        <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
+        <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
+        <PackageReference Include="Testcontainers" />
+        <PackageReference Include="Verify.Xunit" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.extensibility.core" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="coverlet.collector" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\GithubBackup.Cli\GithubBackup.Cli.csproj"/>
+        <ProjectReference Include="..\GithubBackup.Cli\GithubBackup.Cli.csproj" />
         <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj" />
-        <ProjectReference Include="..\GithubBackup.TestUtils.Tests\GithubBackup.TestUtils.Tests.csproj"/>
-        <ProjectReference Include="..\GithubBackup.TestUtils\GithubBackup.TestUtils.csproj"/>
+        <ProjectReference Include="..\GithubBackup.TestUtils.Tests\GithubBackup.TestUtils.Tests.csproj" />
+        <ProjectReference Include="..\GithubBackup.TestUtils\GithubBackup.TestUtils.csproj" />
     </ItemGroup>
 
 </Project>
