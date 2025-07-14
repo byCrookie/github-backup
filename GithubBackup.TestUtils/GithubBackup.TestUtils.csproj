@@ -5,10 +5,11 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="Flurl.Http"/>
-        <PackageReference Include="FluentAssertions"/>
-        <PackageReference Include="NSubstitute"/>
-        <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
+        <PackageReference Include="Flurl.Http" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="NSubstitute" />
+        <PackageReference Include="NSubstitute.Analyzers.CSharp" />
+        <PackageReference Include="Spectre.Console" />
         <PackageReference Include="Spectre.Console.Testing" />
     </ItemGroup>
 
