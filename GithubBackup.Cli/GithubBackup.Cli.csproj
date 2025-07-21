@@ -13,37 +13,49 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ByteSize"/>
-        <PackageReference Include="FluentValidation"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting"/>
-        <PackageReference Include="Serilog"/>
-        <PackageReference Include="Serilog.Extensions.Hosting"/>
-        <PackageReference Include="Serilog.Sinks.File"/>
-        <PackageReference Include="Spectre.Console"/>
+        <PackageReference Include="ByteSize" />
+        <PackageReference Include="FluentValidation" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" />
+        <PackageReference Include="Serilog" />
+        <PackageReference Include="Serilog.Extensions.Hosting" />
+        <PackageReference Include="Serilog.Sinks.File" />
+        <PackageReference Include="Spectre.Console" />
         <PackageReference Include="Spectre.Console.Analyzer">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.CommandLine"/>
-        <PackageReference Include="System.CommandLine.Hosting"/>
-        <PackageReference Include="System.Linq.Async"/>
-        <PackageReference Include="System.Threading.RateLimiting"/>
-        <PackageReference Include="TestableIO.System.IO.Abstractions"/>
+        <PackageReference Include="System.CommandLine" />
+        <PackageReference Include="System.CommandLine.Hosting" />
+        <PackageReference Include="System.Linq.Async" />
+        <PackageReference Include="System.Threading.RateLimiting" />
+        <PackageReference Include="TestableIO.System.IO.Abstractions" />
         <PackageReference Include="TestableIO.System.IO.Abstractions.Analyzers">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="TestableIO.System.IO.Abstractions.Extensions"/>
-        <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers"/>
+        <PackageReference Include="TestableIO.System.IO.Abstractions.Extensions" />
+        <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj"/>
+        <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="GithubBackup.Cli.Tests"/>
-        <InternalsVisibleTo Include="GithubBackup.Cli.Tests.Integration"/>
-        <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
+
+      <PackageReference Include="Microsoft.Extensions.Caching.Memory" VersionOverride="9.0.7" />
+
+      <PackageReference Include="Microsoft.Extensions.Http" VersionOverride="9.0.7" />
+
+      <PackageReference Include="Microsoft.Extensions.Http.Polly" VersionOverride="9.0.7" />
+
+      <PackageReference Include="Microsoft.Net.Http.Headers" VersionOverride="9.0.7" />
+
+      <PackageReference Include="Polly" VersionOverride="8.6.2" />
+
+      <PackageReference Include="System.Runtime.Caching" VersionOverride="9.0.7" />
+        <InternalsVisibleTo Include="GithubBackup.Cli.Tests" />
+        <InternalsVisibleTo Include="GithubBackup.Cli.Tests.Integration" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
     </ItemGroup>
 </Project>

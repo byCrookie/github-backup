@@ -6,25 +6,39 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoBogus"/>
-        <PackageReference Include="Bogus"/>
-        <PackageReference Include="FluentAssertions"/>
-        <PackageReference Include="Flurl.Http"/>
+        <PackageReference Include="AutoBogus" />
+        <PackageReference Include="Bogus" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Flurl.Http" />
         <PackageReference Include="Meziantou.Xunit.ParallelTestFramework" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-        <PackageReference Include="NSubstitute"/>
-        <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="NSubstitute" />
+        <PackageReference Include="NSubstitute.Analyzers.CSharp" />
         <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
         <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers" />
         <PackageReference Include="Verify.Xunit" />
-        <PackageReference Include="xunit"/>
-        <PackageReference Include="xunit.extensibility.core"/>
-        <PackageReference Include="xunit.runner.visualstudio"/>
-        <PackageReference Include="coverlet.collector"/>
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.extensibility.core" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="coverlet.collector" />
     </ItemGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj"/>
+    
+      <PackageReference Include="Microsoft.Extensions.Caching.Memory" VersionOverride="9.0.7" />
+    
+      <PackageReference Include="Microsoft.Extensions.Http" VersionOverride="9.0.7" />
+    
+      <PackageReference Include="Microsoft.Extensions.Http.Polly" VersionOverride="9.0.7" />
+    
+      <PackageReference Include="Microsoft.Net.Http.Headers" VersionOverride="9.0.7" />
+    
+      <PackageReference Include="Polly" VersionOverride="8.6.2" />
+    
+      <PackageReference Include="Spectre.Console" />
+    
+      <PackageReference Include="System.Runtime.Caching" VersionOverride="9.0.7" />
+        <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj" />
         <ProjectReference Include="..\GithubBackup.TestUtils\GithubBackup.TestUtils.csproj" />
     </ItemGroup>
 

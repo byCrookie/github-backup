@@ -6,22 +6,24 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoBogus"/>
-        <PackageReference Include="Bogus"/>
-        <PackageReference Include="FluentAssertions"/>
-        <PackageReference Include="Flurl.Http"/>
+        <PackageReference Include="AutoBogus" />
+        <PackageReference Include="Bogus" />
+        <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Flurl.Http" />
         <PackageReference Include="Meziantou.Xunit.ParallelTestFramework" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-        <PackageReference Include="NSubstitute"/>
-        <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="NSubstitute" />
+        <PackageReference Include="NSubstitute.Analyzers.CSharp" />
         <PackageReference Include="Verify.Xunit" />
-        <PackageReference Include="xunit"/>
-        <PackageReference Include="xunit.extensibility.core"/>
-        <PackageReference Include="xunit.runner.visualstudio"/>
-        <PackageReference Include="coverlet.collector"/>
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.extensibility.core" />
+        <PackageReference Include="xunit.runner.visualstudio" />
+        <PackageReference Include="coverlet.collector" />
     </ItemGroup>
 
     <ItemGroup>
+
+      <PackageReference Include="Spectre.Console" />
       <ProjectReference Include="..\GithubBackup.TestUtils\GithubBackup.TestUtils.csproj" />
     </ItemGroup>
 
