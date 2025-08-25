@@ -42,6 +42,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Caching.Memory" VersionOverride="9.0.8" />
+      <PackageReference Include="Microsoft.Extensions.Http" VersionOverride="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" VersionOverride="9.0.8" />
+    <PackageReference Include="Microsoft.Net.Http.Headers" VersionOverride="9.0.8" />
+    <PackageReference Include="Polly" VersionOverride="8.6.3" />
+    <PackageReference Include="System.Runtime.Caching" VersionOverride="9.0.8" />
         <InternalsVisibleTo Include="GithubBackup.Cli.Tests"/>
         <InternalsVisibleTo Include="GithubBackup.Cli.Tests.Integration"/>
         <InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
