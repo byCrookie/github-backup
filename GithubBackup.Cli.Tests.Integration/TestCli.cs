@@ -39,6 +39,7 @@ public static class TestCli
             args.Split(" "),
             new CliOptions
             {
+                EnableDefaultExceptionHandler = false,
                 Output = testConsole.Profile.Out.Writer,
                 Error = testConsole.Profile.Out.Writer,
                 AfterServices = hb => hb.Services.AddSingleton<IFileSystem>(mockFileSystem),

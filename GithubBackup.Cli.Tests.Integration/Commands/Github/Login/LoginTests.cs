@@ -1,4 +1,5 @@
-﻿using GithubBackup.Core.Github.Users;
+﻿using AwesomeAssertions;
+using GithubBackup.Core.Github.Users;
 
 namespace GithubBackup.Cli.Tests.Integration.Commands.Github.Login;
 
@@ -9,7 +10,15 @@ public class LoginTests
     [InlineData("login", 1)]
     public async Task RunAsync__(string args, int exitCode = 0)
     {
-        await TestCli.RunAsync(args, exitCode, _ => { });
+        var action = () => TestCli.RunAsync(args, exitCode, _ => { });
+        if (exitCode == 0)
+        {
+            await action();
+        }
+        else
+        {
+            await action.Should().ThrowAsync<Exception>().WithMessage("Login failed");
+        }
     }
 
     [Fact(Skip = "Not yet implemented")]
