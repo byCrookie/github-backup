@@ -6,29 +6,35 @@ namespace GithubBackup.Cli.Commands.Github.Repositories;
 public class RepositoriesArguments
 {
     public Option<RepositoryType?> TypeOption { get; } =
-        new(aliases: new[] { "-t", "--type" }, description: RepositoriesArgDescriptions.Type.Long)
+        new(
+            name: "--type",
+            aliases: ["-t"]
+        )
         {
-            IsRequired = false,
+            Required = false,
+            Description = RepositoriesArgDescriptions.Type.Long
         };
 
     public Option<RepositoryAffiliation?> AffiliationOption { get; } =
         new(
-            aliases: new[] { "-a", "--affiliation" },
-            getDefaultValue: () => RepositoryAffiliation.Owner,
-            description: RepositoriesArgDescriptions.Affiliation.Long
+            name: "--affiliation",
+            aliases: ["-a"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = RepositoriesArgDescriptions.Affiliation.Long,
+            DefaultValueFactory = _ => RepositoryAffiliation.Owner
         };
 
     public Option<RepositoryVisibility?> VisibilityOption { get; } =
         new(
-            aliases: new[] { "-v", "--visibility" },
-            getDefaultValue: () => RepositoryVisibility.All,
-            description: RepositoriesArgDescriptions.Visibility.Long
+            name: "--visibility",
+            aliases: ["-v"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = RepositoriesArgDescriptions.Visibility.Long,
+            DefaultValueFactory = _ => RepositoryVisibility.All
         };
 
     public IEnumerable<Option> Options()

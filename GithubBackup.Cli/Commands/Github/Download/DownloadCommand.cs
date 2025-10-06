@@ -23,29 +23,25 @@ internal static class DownloadCommand
         command.AddOptions(intervalArguments.Options());
         command.AddOptions(loginArguments.Options());
 
-        command.SetHandler(
-            (globalArgs, downloadArgs) => RunAsync(args, globalArgs, downloadArgs, options),
-            new GlobalArgsBinder(options.GlobalArguments),
-            new DowndloadArgsBinder(downloadArguments, intervalArguments, loginArguments)
-        );
+        command.SetAction((r, ct) =>
+        {
+            var globalArgs = new GlobalArgsBinder(options.GlobalArguments).Get(r);
+            var downloadArgs = new DowndloadArgsBinder(
+                downloadArguments,
+                intervalArguments,
+                loginArguments
+            ).Get(r);
+
+            var runner = new CliRunner<DownloadRunner, DownloadArgs>(
+                args,
+                globalArgs,
+                downloadArgs,
+                new RunOptions { AfterServices = options.AfterServices }
+            );
+
+            return runner.RunAsync(ct);
+        });
 
         return command;
-    }
-
-    private static Task RunAsync(
-        string[] args,
-        GlobalArgs globalArgs,
-        DownloadArgs downloadArgs,
-        CommandOptions options
-    )
-    {
-        var runner = new CliRunner<DownloadRunner, DownloadArgs>(
-            args,
-            globalArgs,
-            downloadArgs,
-            new RunOptions { AfterServices = options.AfterServices }
-        );
-
-        return runner.RunAsync();
     }
 }

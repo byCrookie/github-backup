@@ -1,5 +1,9 @@
 ﻿'' was not matched. Did you mean one of the following?
 -h
+-q
+-l
+-v
+
 Required command was not provided.
 Unrecognized command or argument ''.
 
@@ -10,11 +14,11 @@ Usage:
   ghb [command] [options]
 
 Options:
-  --quiet                                                            Do not print logs to console. [default: True]
-  --log-file <log-file>                                              Path to the log file.
-  --verbosity <Critical|Debug|Error|Information|None|Trace|Warning>  Set the verbosity level of the log file. [default: Information]
-  --version                                                          Show version information
-  -?, -h, --help                                                     Show help and usage information
+  -q, --quiet                                                            Do not print logs to console.
+  -l, --log-file <log-file>                                              Path to the log file.
+  -v, --verbosity <Critical|Debug|Error|Information|None|Trace|Warning>  Set the verbosity level of the log file. [default: Information]
+  -?, -h, --help                                                         Show help and usage information
+  --version                                                              Show version information
 
 Commands:
   manual        Manually backup a Github user. This command is interactive.

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using GithubBackup.Core.Github.Credentials;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

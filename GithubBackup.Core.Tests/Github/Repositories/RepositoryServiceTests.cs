@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using Flurl.Http;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Repositories;

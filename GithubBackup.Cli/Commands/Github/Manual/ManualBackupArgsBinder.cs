@@ -1,10 +1,10 @@
-﻿using System.CommandLine.Binding;
+﻿using System.CommandLine;
 
 namespace GithubBackup.Cli.Commands.Github.Manual;
 
-internal sealed class ManualBackupArgsBinder : BinderBase<ManualBackupArgs>
+internal sealed class ManualBackupArgsBinder
 {
-    protected override ManualBackupArgs GetBoundValue(BindingContext bindingContext)
+    public ManualBackupArgs Get(ParseResult parseResult)
     {
         return new ManualBackupArgs();
     }

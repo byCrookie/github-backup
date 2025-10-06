@@ -1,9 +1,6 @@
 ﻿using System.CommandLine;
-using System.CommandLine.Builder;
-using System.CommandLine.Parsing;
 using GithubBackup.Cli.Commands.Github.Cli;
 using GithubBackup.Cli.Commands.Global;
-using GithubBackup.Cli.Console;
 using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Boot;
@@ -17,7 +14,7 @@ internal static class Cli
         var rootCommand = new RootCommand("Github Backup");
 
         var globalArguments = new GlobalArguments();
-        rootCommand.AddGlobalOptions(globalArguments.Options());
+        rootCommand.AddOptions(globalArguments.Options());
 
         GithubCommands.AddCommands(
             args,
@@ -29,16 +26,10 @@ internal static class Cli
             }
         );
 
-        return new CommandLineBuilder(rootCommand)
-            .UseDefaults()
-            .UseExceptionHandler(
-                (exception, ic) =>
-                {
-                    ((ICliConsole)ic.Console).WriteException(exception);
-                    ic.ExitCode = 1;
-                }
-            )
-            .Build()
-            .InvokeAsync(args, cliOptions.Console);
+        return rootCommand.Parse(args).InvokeAsync(new InvocationConfiguration
+        {
+            Output = cliOptions.Output,
+            Error = cliOptions.Error
+        });
     }
 }

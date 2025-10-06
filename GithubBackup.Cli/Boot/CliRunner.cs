@@ -7,40 +7,26 @@ using Serilog;
 
 namespace GithubBackup.Cli.Boot;
 
-internal class CliRunner<TCliCommand, TCommandArgs>
+internal class CliRunner<TCliCommand, TCommandArgs>(
+    string[] args,
+    GlobalArgs globalArgs,
+    TCommandArgs commandArgs,
+    RunOptions options)
     where TCommandArgs : class
     where TCliCommand : class, ICommandRunner
 {
-    private readonly string[] _args;
-    private readonly GlobalArgs _globalArgs;
-    private readonly TCommandArgs _commandArgs;
-    private readonly RunOptions _options;
-
-    public CliRunner(
-        string[] args,
-        GlobalArgs globalArgs,
-        TCommandArgs commandArgs,
-        RunOptions options
-    )
+    public Task RunAsync(CancellationToken ct)
     {
-        _args = args;
-        _globalArgs = globalArgs;
-        _commandArgs = commandArgs;
-        _options = options;
-    }
+        Log.Logger = CliLogger.Create(globalArgs).CreateLogger();
 
-    public Task RunAsync()
-    {
-        Log.Logger = CliLogger.Create(_globalArgs).CreateLogger();
-
-        var builder = Host.CreateApplicationBuilder(_args);
+        var builder = Host.CreateApplicationBuilder(args);
 
         builder.Configuration.AddEnvironmentVariables("GITHUB_BACKUP_");
 
-        builder.Services.AddCli<TCliCommand, TCommandArgs>(_globalArgs, _commandArgs);
-        _options.AfterServices.Invoke(builder);
+        builder.Services.AddCli<TCliCommand, TCommandArgs>(globalArgs, commandArgs);
+        options.AfterServices.Invoke(builder);
 
         var host = builder.Build();
-        return host.RunAsync();
+        return host.RunAsync(ct);
     }
 }

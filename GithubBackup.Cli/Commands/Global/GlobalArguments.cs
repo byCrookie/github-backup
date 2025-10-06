@@ -7,23 +7,38 @@ public class GlobalArguments
 {
     public Option<bool> QuietOption { get; } =
         new(
-            aliases: new[] { "--quiet" },
-            getDefaultValue: () => true,
-            description: GlobalArgDescriptions.Quiet.Long
-        );
+            name: "--quiet",
+            aliases: ["-q"]
+        )
+        {
+            Description = GlobalArgDescriptions.Quiet.Long,
+            DefaultValueFactory = _ => true,
+            Recursive = true
+        };
 
     public Option<FileInfo?> LogFileOption { get; } =
-        new(aliases: new[] { "--log-file" }, description: GlobalArgDescriptions.LogFile.Long);
+        new(
+            name: "--log-file",
+            aliases: ["-l"]
+        )
+        {
+            Description = GlobalArgDescriptions.LogFile.Long,
+            Recursive = true
+        };
 
     public Option<LogLevel> VerbosityOption { get; } =
         new(
-            aliases: new[] { "--verbosity" },
-            getDefaultValue: () => LogLevel.Information,
-            description: GlobalArgDescriptions.Verbosity.Long
-        );
+            name: "--verbosity",
+            aliases: ["-v"]
+        )
+        {
+            Description = GlobalArgDescriptions.Verbosity.Long,
+            DefaultValueFactory = _ => LogLevel.Information,
+            Recursive = true
+        };
 
     public IEnumerable<Option> Options()
     {
-        return new Option[] { QuietOption, LogFileOption, VerbosityOption };
+        return [QuietOption, LogFileOption, VerbosityOption];
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Text;
-using FluentAssertions;
+using AwesomeAssertions;
 using Flurl.Http;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Migrations;

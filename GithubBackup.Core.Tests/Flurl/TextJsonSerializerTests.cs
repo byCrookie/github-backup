@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using FluentAssertions;
+using AwesomeAssertions;
 using GithubBackup.Core.Utils;
 
 namespace GithubBackup.Core.Tests.Flurl;

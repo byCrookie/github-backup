@@ -1,5 +1,5 @@
 using AutoBogus;
-using FluentAssertions;
+using AwesomeAssertions;
 using Flurl.Http;
 using Flurl.Http.Testing;
 using GithubBackup.Core.Flurl;

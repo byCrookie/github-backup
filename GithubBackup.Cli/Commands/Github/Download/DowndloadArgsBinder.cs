@@ -1,11 +1,10 @@
-﻿using System.CommandLine.Binding;
+﻿using System.CommandLine;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Interval;
-using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Download;
 
-internal sealed class DowndloadArgsBinder : BinderBase<DownloadArgs>
+internal sealed class DowndloadArgsBinder
 {
     private readonly DownloadArguments _downloadArguments;
     private readonly IntervalArguments _intervalArguments;
@@ -22,31 +21,29 @@ internal sealed class DowndloadArgsBinder : BinderBase<DownloadArgs>
         _loginArguments = loginArguments;
     }
 
-    public DownloadArgs Get(BindingContext bindingContext) => GetBoundValue(bindingContext);
-
-    protected override DownloadArgs GetBoundValue(BindingContext bindingContext)
+    public DownloadArgs Get(ParseResult parseResult)
     {
-        var migrations = bindingContext.ParseResult.GetRequiredValueForOption(
+        var migrations = parseResult.GetRequiredValue(
             _downloadArguments.MigrationsOption
         );
-        var latest = bindingContext.ParseResult.GetRequiredValueForOption(
+        var latest = parseResult.GetRequiredValue(
             _downloadArguments.LatestOption
         );
-        var poll = bindingContext.ParseResult.GetRequiredValueForOption(
+        var poll = parseResult.GetRequiredValue(
             _downloadArguments.PollOption
         );
-        var destination = bindingContext.ParseResult.GetRequiredValueForOption(
+        var destination = parseResult.GetRequiredValue(
             _downloadArguments.DestinationOption
         );
-        var numberOfBackups = bindingContext.ParseResult.GetValueForOption(
+        var numberOfBackups = parseResult.GetValue(
             _downloadArguments.NumberOfBackupsOption
         );
-        var overwrite = bindingContext.ParseResult.GetRequiredValueForOption(
+        var overwrite = parseResult.GetRequiredValue(
             _downloadArguments.OverwriteOption
         );
 
-        var intervalArgs = new IntervalArgsBinder(_intervalArguments).Get(bindingContext);
-        var loginArgs = new LoginArgsBinder(_loginArguments).Get(bindingContext);
+        var intervalArgs = new IntervalArgsBinder(_intervalArguments).Get(parseResult);
+        var loginArgs = new LoginArgsBinder(_loginArguments).Get(parseResult);
 
         return new DownloadArgs(
             migrations,

@@ -1,58 +1,43 @@
-﻿using System.CommandLine.Binding;
+﻿using System.CommandLine;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Interval;
-using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Migrate;
 
-internal sealed class MigrateArgsBinder : BinderBase<MigrateArgs>
+internal sealed class MigrateArgsBinder(
+    MigrateArguments migrateArguments,
+    IntervalArguments intervalArguments,
+    LoginArguments loginArguments)
 {
-    private readonly MigrateArguments _migrateArguments;
-    private readonly IntervalArguments _intervalArguments;
-    private readonly LoginArguments _loginArguments;
-
-    public MigrateArgsBinder(
-        MigrateArguments migrateArguments,
-        IntervalArguments intervalArguments,
-        LoginArguments loginArguments
-    )
+    public MigrateArgs Get(ParseResult parseResult)
     {
-        _migrateArguments = migrateArguments;
-        _intervalArguments = intervalArguments;
-        _loginArguments = loginArguments;
-    }
-
-    public MigrateArgs Get(BindingContext bindingContext) => GetBoundValue(bindingContext);
-
-    protected override MigrateArgs GetBoundValue(BindingContext bindingContext)
-    {
-        var repositories = bindingContext.ParseResult.GetRequiredValueForOption(
-            _migrateArguments.RepositoriesOption
+        var repositories = parseResult.GetRequiredValue(
+            migrateArguments.RepositoriesOption
         );
-        var lockRepositories = bindingContext.ParseResult.GetRequiredValueForOption(
-            _migrateArguments.LockRepositoriesOption
+        var lockRepositories = parseResult.GetRequiredValue(
+            migrateArguments.LockRepositoriesOption
         );
-        var excludeMetadata = bindingContext.ParseResult.GetRequiredValueForOption(
-            _migrateArguments.ExcludeMetadataOption
+        var excludeMetadata = parseResult.GetRequiredValue(
+            migrateArguments.ExcludeMetadataOption
         );
-        var excludeGitData = bindingContext.ParseResult.GetRequiredValueForOption(
-            _migrateArguments.ExcludeGitDataOption
+        var excludeGitData = parseResult.GetRequiredValue(
+            migrateArguments.ExcludeGitDataOption
         );
-        var excludeAttachements = bindingContext.ParseResult.GetRequiredValueForOption(
-            _migrateArguments.ExcludeAttachementsOption
+        var excludeAttachements = parseResult.GetRequiredValue(
+            migrateArguments.ExcludeAttachementsOption
         );
-        var excludeReleases = bindingContext.ParseResult.GetRequiredValueForOption(
-            _migrateArguments.ExcludeReleasesOption
+        var excludeReleases = parseResult.GetRequiredValue(
+            migrateArguments.ExcludeReleasesOption
         );
-        var excludeOwnerProjects = bindingContext.ParseResult.GetRequiredValueForOption(
-            _migrateArguments.ExcludeOwnerProjectsOption
+        var excludeOwnerProjects = parseResult.GetRequiredValue(
+            migrateArguments.ExcludeOwnerProjectsOption
         );
-        var excludeMetadataOnly = bindingContext.ParseResult.GetRequiredValueForOption(
-            _migrateArguments.OrgMetadataOnlyOption
+        var excludeMetadataOnly = parseResult.GetRequiredValue(
+            migrateArguments.OrgMetadataOnlyOption
         );
 
-        var intervalArgs = new IntervalArgsBinder(_intervalArguments).Get(bindingContext);
-        var loginArgs = new LoginArgsBinder(_loginArguments).Get(bindingContext);
+        var intervalArgs = new IntervalArgsBinder(intervalArguments).Get(parseResult);
+        var loginArgs = new LoginArgsBinder(loginArguments).Get(parseResult);
 
         return new MigrateArgs(
             repositories,

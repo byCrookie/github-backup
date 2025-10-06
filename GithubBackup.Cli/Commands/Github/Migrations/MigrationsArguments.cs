@@ -6,45 +6,51 @@ public class MigrationsArguments
 {
     public Option<bool> ExportOption { get; } =
         new(
-            aliases: new[] { "-e", "--export" },
-            getDefaultValue: () => true,
-            description: MigrationsArgDescriptions.Export.Long
+            name: "--export",
+            aliases: ["-e"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = MigrationsArgDescriptions.Export.Long,
+            DefaultValueFactory = _ => true
         };
 
     public Option<DateTime?> SinceOption { get; } =
-        new(aliases: new[] { "-s", "--since" }, description: MigrationsArgDescriptions.Since.Long)
+        new(
+            name: "--since",
+            aliases: ["-s"]
+        )
         {
-            IsRequired = false,
+            Required = false,
+            Description = MigrationsArgDescriptions.Since.Long
         };
 
     public Option<long?> DaysOldOption { get; } =
         new(
-            aliases: new[] { "-d", "--days-old" },
-            description: MigrationsArgDescriptions.DaysOld.Long
+            name: "--days-old",
+            aliases: ["-d"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = MigrationsArgDescriptions.DaysOld.Long
         };
 
     public MigrationsArguments()
     {
-        SinceOption.AddValidator(result =>
+        SinceOption.Validators.Add(result =>
         {
-            var since = result.GetValueForOption(SinceOption);
-            var daysOld = result.GetValueForOption(DaysOldOption);
+            var since = result.GetValue(SinceOption);
+            var daysOld = result.GetValue(DaysOldOption);
 
             if (since is not null && daysOld is not null)
             {
-                result.ErrorMessage = MigrationsArgsValidator.CannotSpecifySinceAndDaysOld;
+                result.AddError(MigrationsArgsValidator.CannotSpecifySinceAndDaysOld);
             }
         });
     }
 
     public IEnumerable<Option> Options()
     {
-        return new Option[] { ExportOption, SinceOption, DaysOldOption };
+        return [ExportOption, SinceOption, DaysOldOption];
     }
 }

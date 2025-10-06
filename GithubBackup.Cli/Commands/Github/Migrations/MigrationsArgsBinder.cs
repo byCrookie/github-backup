@@ -1,34 +1,23 @@
-﻿using System.CommandLine.Binding;
+﻿using System.CommandLine;
 using GithubBackup.Cli.Commands.Github.Login;
-using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Migrations;
 
-internal sealed class MigrationsArgsBinder : BinderBase<MigrationsArgs>
+internal sealed class MigrationsArgsBinder(
+    MigrationsArguments migrationsArguments,
+    LoginArguments loginArguments)
 {
-    private readonly MigrationsArguments _migrationsArguments;
-    private readonly LoginArguments _loginArguments;
-
-    public MigrationsArgsBinder(
-        MigrationsArguments migrationsArguments,
-        LoginArguments loginArguments
-    )
+    public MigrationsArgs Get(ParseResult parseResult)
     {
-        _migrationsArguments = migrationsArguments;
-        _loginArguments = loginArguments;
-    }
-
-    protected override MigrationsArgs GetBoundValue(BindingContext bindingContext)
-    {
-        var export = bindingContext.ParseResult.GetRequiredValueForOption(
-            _migrationsArguments.ExportOption
+        var export = parseResult.GetRequiredValue(
+            migrationsArguments.ExportOption
         );
-        var since = bindingContext.ParseResult.GetValueForOption(_migrationsArguments.SinceOption);
-        var daysOld = bindingContext.ParseResult.GetValueForOption(
-            _migrationsArguments.DaysOldOption
+        var since = parseResult.GetValue(migrationsArguments.SinceOption);
+        var daysOld = parseResult.GetValue(
+            migrationsArguments.DaysOldOption
         );
 
-        var loginArgs = new LoginArgsBinder(_loginArguments).Get(bindingContext);
+        var loginArgs = new LoginArgsBinder(loginArguments).Get(parseResult);
 
         return new MigrationsArgs(export, daysOld, since, loginArgs);
     }

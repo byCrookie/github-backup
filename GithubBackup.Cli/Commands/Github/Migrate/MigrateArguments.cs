@@ -17,95 +17,103 @@ public class MigrateArguments
     public MigrateArguments(bool piping)
     {
         RepositoriesOption = new Option<string[]>(
-            aliases: new[] { "-r", "--repositories" },
-            getDefaultValue: () => Piping.ReadStrings(System.Console.In, piping, false),
-            description: MigrateArgDescriptions.Repositories.Long
+            name: "--repositories",
+            aliases: ["-r"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = MigrateArgDescriptions.Repositories.Long,
             Arity = ArgumentArity.ZeroOrMore,
             AllowMultipleArgumentsPerToken = true,
+            DefaultValueFactory = _ => Piping.ReadStrings(Console.In, piping, false)
         };
 
         LockRepositoriesOption = new Option<bool>(
-            aliases: new[] { "-lr", "--lock-repositories" },
-            getDefaultValue: () => false,
-            description: MigrateArgDescriptions.LockRepositories.Long
+            name: "--lock-repositories",
+            aliases: ["-lr"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = MigrateArgDescriptions.LockRepositories.Long,
+            DefaultValueFactory = _ => false
         };
 
         ExcludeMetadataOption = new Option<bool>(
-            aliases: new[] { "-em", "--exclude-metadata" },
-            getDefaultValue: () => false,
-            description: MigrateArgDescriptions.ExcludeMetadata.Long
+            name: "--exclude-metadata",
+            aliases: ["-em"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = MigrateArgDescriptions.ExcludeMetadata.Long,
+            DefaultValueFactory = _ => false
         };
 
         ExcludeGitDataOption = new Option<bool>(
-            aliases: new[] { "-egd", "--exclude-git-data" },
-            getDefaultValue: () => false,
-            description: MigrateArgDescriptions.ExcludeGitData.Long
+            name: "--exclude-git-data",
+            aliases: ["-egd"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = MigrateArgDescriptions.ExcludeGitData.Long,
+            DefaultValueFactory = _ => false
         };
 
         ExcludeAttachementsOption = new Option<bool>(
-            aliases: new[] { "-ea", "--exclude-attachements" },
-            getDefaultValue: () => false,
-            description: MigrateArgDescriptions.ExcludeAttachements.Long
+            name: "--exclude-attachements",
+            aliases: ["-ea"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = MigrateArgDescriptions.ExcludeAttachements.Long,
+            DefaultValueFactory = _ => false
         };
 
         ExcludeReleasesOption = new Option<bool>(
-            aliases: new[] { "-er", "--exclude-releases" },
-            getDefaultValue: () => false,
-            description: MigrateArgDescriptions.ExcludeReleases.Long
+            name: "--exclude-releases",
+            aliases: ["-er"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = MigrateArgDescriptions.ExcludeReleases.Long,
+            DefaultValueFactory = _ => false
         };
 
         ExcludeOwnerProjectsOption = new Option<bool>(
-            aliases: new[] { "-eop", "--exclude-owner-projects" },
-            getDefaultValue: () => false,
-            description: MigrateArgDescriptions.ExcludeOwnerProjects.Long
+            name: "--exclude-owner-projects",
+            aliases: ["-eop"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = MigrateArgDescriptions.ExcludeOwnerProjects.Long,
+            DefaultValueFactory = _ => false
         };
 
         OrgMetadataOnlyOption = new Option<bool>(
-            aliases: new[] { "-omo", "--org-metadata-only" },
-            getDefaultValue: () => false,
-            description: MigrateArgDescriptions.OrgMetadataOnly.Long
+            name: "--org-metadata-only",
+            aliases: ["-omo"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = MigrateArgDescriptions.OrgMetadataOnly.Long,
+            DefaultValueFactory = _ => false
         };
 
-        OrgMetadataOnlyOption.AddValidator(result =>
+        OrgMetadataOnlyOption.Validators.Add(result =>
         {
-            var repositories = result.GetValueForOption(RepositoriesOption);
-            var orgMetadataOnly = result.GetValueForOption(OrgMetadataOnlyOption);
+            var repositories = result.GetValue(RepositoriesOption);
+            var orgMetadataOnly = result.GetValue(OrgMetadataOnlyOption);
 
             if (orgMetadataOnly && repositories?.Length > 0)
             {
-                result.ErrorMessage = MigrateArgsValidator.OrgMetadataOnlyMustBeUsedAlone;
+                result.AddError(MigrateArgsValidator.OrgMetadataOnlyMustBeUsedAlone);
             }
         });
     }
 
     public IEnumerable<Option> Options()
     {
-        return new Option[]
-        {
+        return
+        [
             RepositoriesOption,
             LockRepositoriesOption,
             ExcludeMetadataOption,
@@ -113,7 +121,7 @@ public class MigrateArguments
             ExcludeAttachementsOption,
             ExcludeReleasesOption,
             ExcludeOwnerProjectsOption,
-            OrgMetadataOnlyOption,
-        };
+            OrgMetadataOnlyOption
+        ];
     }
 }

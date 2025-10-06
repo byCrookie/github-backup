@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using GithubBackup.Core.Utils;
 
 namespace GithubBackup.Core.Tests.Utils;

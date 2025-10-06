@@ -20,29 +20,24 @@ internal static class RepositoriesCommand
         command.AddOptions(repositoriesArguments.Options());
         command.AddOptions(loginArguments.Options());
 
-        command.SetHandler(
-            (globalArgs, repositoriesArgs) => RunAsync(args, globalArgs, repositoriesArgs, options),
-            new GlobalArgsBinder(options.GlobalArguments),
-            new RepositoriesArgsBinder(repositoriesArguments, loginArguments)
-        );
+        command.SetAction((r, ct) =>
+        {
+            var globalArgs = new GlobalArgsBinder(options.GlobalArguments).Get(r);
+            var repositoriesArgs = new RepositoriesArgsBinder(
+                repositoriesArguments,
+                loginArguments
+            ).Get(r);
+
+            var runner = new CliRunner<RepositoriesRunner, RepositoriesArgs>(
+                args,
+                globalArgs,
+                repositoriesArgs,
+                new RunOptions { AfterServices = options.AfterServices }
+            );
+
+            return runner.RunAsync(ct);
+        });
 
         return command;
-    }
-
-    private static Task RunAsync(
-        string[] args,
-        GlobalArgs globalArgs,
-        RepositoriesArgs repositoriesArgs,
-        CommandOptions options
-    )
-    {
-        var runner = new CliRunner<RepositoriesRunner, RepositoriesArgs>(
-            args,
-            globalArgs,
-            repositoriesArgs,
-            new RunOptions { AfterServices = options.AfterServices }
-        );
-
-        return runner.RunAsync();
     }
 }

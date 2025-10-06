@@ -1,5 +1,5 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
-using FluentAssertions;
+using AwesomeAssertions;
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;

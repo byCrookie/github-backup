@@ -5,23 +5,28 @@ namespace GithubBackup.Cli.Commands.Github.Login;
 public class LoginArguments
 {
     public Option<string?> TokenOption { get; } =
-        new(aliases: new[] { "--token" }, description: LoginArgDescriptions.Token.Long)
+        new(
+            name: "--token",
+            aliases: ["-t"]
+        )
         {
-            IsRequired = false,
+            Required = false,
+            Description = LoginArgDescriptions.Token.Long
         };
 
     public Option<bool> DeviceFlowAuthOption { get; } =
         new(
-            aliases: new[] { "--device-flow-auth" },
-            getDefaultValue: () => false,
-            description: LoginArgDescriptions.DeviceFlowAuth.Long
+            name: "--device-flow-auth",
+            aliases: ["-d"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = LoginArgDescriptions.DeviceFlowAuth.Long,
+            DefaultValueFactory = _ => false
         };
 
     public IEnumerable<Option> Options()
     {
-        return new Option[] { TokenOption, DeviceFlowAuthOption };
+        return [TokenOption, DeviceFlowAuthOption];
     }
 }

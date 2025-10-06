@@ -6,11 +6,12 @@ public class IntervalArguments
 {
     public Option<long?> IntervalOption { get; } =
         new(
-            aliases: new[] { "-i", "--interval" },
-            description: IntervalArgDescriptions.Interval.Long
+            name: "--interval",
+            aliases: ["-i"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = IntervalArgDescriptions.Interval.Long
         };
 
     public IEnumerable<Option> Options()

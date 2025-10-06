@@ -7,8 +7,8 @@
 
     <ItemGroup>
         <PackageReference Include="AutoBogus"/>
+        <PackageReference Include="AwesomeAssertions" />
         <PackageReference Include="Bogus"/>
-        <PackageReference Include="FluentAssertions"/>
         <PackageReference Include="Flurl.Http"/>
         <PackageReference Include="Meziantou.Xunit.ParallelTestFramework" />
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>

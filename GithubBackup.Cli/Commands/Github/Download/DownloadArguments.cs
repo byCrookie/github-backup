@@ -15,57 +15,63 @@ public class DownloadArguments
     public DownloadArguments(bool piping)
     {
         MigrationsOption = new Option<long[]>(
-            aliases: new[] { "-m", "--migrations" },
-            getDefaultValue: () => Piping.ReadLongs(System.Console.In, piping, false),
-            description: DownloadArgDescriptions.Migrations.Long
+            name: "--migrations",
+            aliases: ["-m"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = DownloadArgDescriptions.Migrations.Long,
             Arity = ArgumentArity.OneOrMore,
             AllowMultipleArgumentsPerToken = true,
+            DefaultValueFactory = _ => Piping.ReadLongs(System.Console.In, piping, false)
         };
 
         LatestOption = new Option<bool>(
-            aliases: new[] { "-l", "--latest" },
-            getDefaultValue: () => false,
-            description: DownloadArgDescriptions.Latest.Long
+            name: "--latest",
+            aliases: ["-l"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = DownloadArgDescriptions.Latest.Long,
+            DefaultValueFactory = _ => false
         };
 
         PollOption = new Option<bool>(
-            aliases: new[] { "-p", "--poll" },
-            getDefaultValue: () => false,
-            description: DownloadArgDescriptions.Poll.Long
+            name: "--poll",
+            aliases: ["-p"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = DownloadArgDescriptions.Poll.Long,
+            DefaultValueFactory = _ => false
         };
 
         DestinationOption = new Option<DirectoryInfo>(
-            aliases: new[] { "-d", "--destination" },
-            description: DownloadArgDescriptions.Destination.Long
+            name: "--destination",
+            aliases: ["-d"]
         )
         {
-            IsRequired = true,
+            Required = true,
+            Description = DownloadArgDescriptions.Destination.Long
         };
 
         NumberOfBackupsOption = new Option<int?>(
-            aliases: new[] { "-n", "--number-of-backups" },
-            description: DownloadArgDescriptions.NumberOfBackups.Long
+            name: "--number-of-backups",
+            aliases: ["-n"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = DownloadArgDescriptions.NumberOfBackups.Long
         };
 
         OverwriteOption = new Option<bool>(
-            aliases: new[] { "-o", "--overwrite" },
-            getDefaultValue: () => true,
-            description: DownloadArgDescriptions.Overwrite.Long
+            name: "--overwrite",
+            aliases: ["-o"]
         )
         {
-            IsRequired = false,
+            Required = false,
+            Description = DownloadArgDescriptions.Overwrite.Long,
+            DefaultValueFactory = _ => true
         };
     }
 

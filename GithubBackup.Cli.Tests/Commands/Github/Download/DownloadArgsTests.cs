@@ -1,11 +1,10 @@
 ﻿using System.CommandLine;
-using System.CommandLine.Parsing;
-using FluentAssertions;
+using AwesomeAssertions;
 using GithubBackup.Cli.Commands.Github.Download;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Interval;
-using GithubBackup.Cli.Tests.Utils;
 using GithubBackup.Cli.Utils;
+using GithubBackup.TestUtils;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Download;
 
@@ -18,67 +17,55 @@ public class DownloadArgsTests
     [Fact]
     public async Task InvokeAsync_FlagsArePassed_FlagsGetParsed()
     {
-        var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(_downloadArguments.Options());
-        rootCommand.AddGlobalOptions(_intervalArguments.Options());
-        rootCommand.AddGlobalOptions(_loginArguments.Options());
-        var subCommand = new Command("sub");
+        var command = new Command("sub");
+        command.AddOptions(_downloadArguments.Options());
+        command.AddOptions(_intervalArguments.Options());
+        command.AddOptions(_loginArguments.Options());
 
-        subCommand.SetHandler(
-            downloadArgs =>
-            {
-                downloadArgs.Should().NotBeNull();
-                downloadArgs.Destination.Name.Should().Be("migrations");
-                downloadArgs.Latest.Should().BeTrue();
-                downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
-                downloadArgs.NumberOfBackups.Should().Be(5);
-                downloadArgs.Overwrite.Should().BeTrue();
-                downloadArgs.IntervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(100));
-                downloadArgs.LoginArgs.Token.Should().Be("test");
-                downloadArgs.LoginArgs.DeviceFlowAuth.Should().BeTrue();
-            },
-            new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments)
-        );
+        command.SetAction(p =>
+        {
+            var downloadArgs = new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments).Get(p);
+            downloadArgs.Should().NotBeNull();
+            downloadArgs.Destination.Name.Should().Be("migrations");
+            downloadArgs.Latest.Should().BeTrue();
+            downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
+            downloadArgs.NumberOfBackups.Should().Be(5);
+            downloadArgs.Overwrite.Should().BeTrue();
+            downloadArgs.IntervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(100));
+            downloadArgs.LoginArgs.Token.Should().Be("test");
+            downloadArgs.LoginArgs.DeviceFlowAuth.Should().BeTrue();
+        });
 
-        rootCommand.AddCommand(subCommand);
-        await TestCommandline
-            .Build(rootCommand)
-            .InvokeAsync(
+        await command.Parse(
                 "sub --destination ./migrations --latest --migrations 1 2 3"
                     + " --number-of-backups 5 --overwrite --interval 100"
                     + " --token test --device-flow-auth"
-            );
+            ).InvokeTestAsync();
     }
 
     [Fact]
     public async Task InvokeAsync_ShortFlagsArePassed_FlagsGetParsed()
     {
-        var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(_downloadArguments.Options());
-        rootCommand.AddGlobalOptions(_intervalArguments.Options());
-        rootCommand.AddGlobalOptions(_loginArguments.Options());
-        var subCommand = new Command("sub");
+        var command = new Command("sub");
+        command.AddOptions(_downloadArguments.Options());
+        command.AddOptions(_intervalArguments.Options());
+        command.AddOptions(_loginArguments.Options());
 
-        subCommand.SetHandler(
-            downloadArgs =>
-            {
-                downloadArgs.Should().NotBeNull();
-                downloadArgs.Destination.Name.Should().Be("migrations");
-                downloadArgs.Latest.Should().BeTrue();
-                downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
-                downloadArgs.NumberOfBackups.Should().Be(5);
-                downloadArgs.Overwrite.Should().BeTrue();
-                downloadArgs.IntervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(100));
-                downloadArgs.LoginArgs.Token.Should().BeNull();
-                downloadArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
-            },
-            new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments)
-        );
+        command.SetAction(p =>
+        {
+            var downloadArgs = new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments).Get(p);
+            downloadArgs.Should().NotBeNull();
+            downloadArgs.Destination.Name.Should().Be("migrations");
+            downloadArgs.Latest.Should().BeTrue();
+            downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
+            downloadArgs.NumberOfBackups.Should().Be(5);
+            downloadArgs.Overwrite.Should().BeTrue();
+            downloadArgs.IntervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(100));
+            downloadArgs.LoginArgs.Token.Should().BeNull();
+            downloadArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
+        });
 
-        rootCommand.AddCommand(subCommand);
-        await TestCommandline
-            .Build(rootCommand)
-            .InvokeAsync("sub -d ./migrations -l -m 1 2 3 -n 5 -o -i 100");
+        await command.Parse("sub -d ./migrations -l -m 1 2 3 -n 5 -o -i 100").InvokeTestAsync();
     }
 
     [Theory]
@@ -90,58 +77,48 @@ public class DownloadArgsTests
         string migrationArgs
     )
     {
-        var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(_downloadArguments.Options());
-        rootCommand.AddGlobalOptions(_intervalArguments.Options());
-        var subCommand = new Command("sub");
+        var command = new Command("sub");
+        command.AddOptions(_downloadArguments.Options());
+        command.AddOptions(_intervalArguments.Options());
 
-        subCommand.SetHandler(
-            downloadArgs =>
-            {
-                downloadArgs.Should().NotBeNull();
-                downloadArgs.Destination.Name.Should().Be("migrations");
-                downloadArgs.Latest.Should().BeTrue();
-                downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
-                downloadArgs.NumberOfBackups.Should().Be(5);
-                downloadArgs.Overwrite.Should().BeTrue();
-                downloadArgs.IntervalArgs.Interval.Should().BeNull();
-                downloadArgs.LoginArgs.Token.Should().BeNull();
-                downloadArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
-            },
-            new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments)
-        );
+        command.SetAction(p =>
+        {
+            var downloadArgs = new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments).Get(p);
+            downloadArgs.Should().NotBeNull();
+            downloadArgs.Destination.Name.Should().Be("migrations");
+            downloadArgs.Latest.Should().BeTrue();
+            downloadArgs.Migrations.Should().BeEquivalentTo(new long[] { 1, 2, 3 });
+            downloadArgs.NumberOfBackups.Should().Be(5);
+            downloadArgs.Overwrite.Should().BeTrue();
+            downloadArgs.IntervalArgs.Interval.Should().BeNull();
+            downloadArgs.LoginArgs.Token.Should().BeNull();
+            downloadArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
+        });
 
-        rootCommand.AddCommand(subCommand);
-        await TestCommandline
-            .Build(rootCommand)
-            .InvokeAsync("sub -d ./migrations -l -o -n 5 " + migrationArgs);
+        await command.Parse("sub -d ./migrations -l -o -n 5 " + migrationArgs).InvokeTestAsync();
     }
 
     [Fact]
     public async Task InvokeAsync_OnlyRequiredArePassed_FlagsGetParsedWithDefaults()
     {
-        var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(_downloadArguments.Options());
-        rootCommand.AddGlobalOptions(_intervalArguments.Options());
-        var subCommand = new Command("sub");
+        var command = new Command("sub");
+        command.AddOptions(_downloadArguments.Options());
+        command.AddOptions(_intervalArguments.Options());
 
-        subCommand.SetHandler(
-            downloadArgs =>
-            {
-                downloadArgs.Should().NotBeNull();
-                downloadArgs.Destination.Name.Should().Be("migrations");
-                downloadArgs.Latest.Should().BeFalse();
-                downloadArgs.Migrations.Should().BeEmpty();
-                downloadArgs.NumberOfBackups.Should().BeNull();
-                downloadArgs.Overwrite.Should().BeTrue();
-                downloadArgs.IntervalArgs.Interval.Should().BeNull();
-                downloadArgs.LoginArgs.Token.Should().BeNull();
-                downloadArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
-            },
-            new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments)
-        );
+        command.SetAction(p =>
+        {
+            var downloadArgs = new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments).Get(p);
+            downloadArgs.Should().NotBeNull();
+            downloadArgs.Destination.Name.Should().Be("migrations");
+            downloadArgs.Latest.Should().BeFalse();
+            downloadArgs.Migrations.Should().BeEmpty();
+            downloadArgs.NumberOfBackups.Should().BeNull();
+            downloadArgs.Overwrite.Should().BeTrue();
+            downloadArgs.IntervalArgs.Interval.Should().BeNull();
+            downloadArgs.LoginArgs.Token.Should().BeNull();
+            downloadArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
+        });
 
-        rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub -d ./migrations");
+        await command.Parse("sub -d ./migrations").InvokeTestAsync();
     }
 }

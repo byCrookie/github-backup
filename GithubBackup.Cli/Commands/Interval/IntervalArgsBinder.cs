@@ -1,8 +1,8 @@
-﻿using System.CommandLine.Binding;
+﻿using System.CommandLine;
 
 namespace GithubBackup.Cli.Commands.Interval;
 
-internal sealed class IntervalArgsBinder : BinderBase<IntervalArgs>
+internal sealed class IntervalArgsBinder
 {
     private readonly IntervalArguments _intervalArguments;
 
@@ -11,11 +11,9 @@ internal sealed class IntervalArgsBinder : BinderBase<IntervalArgs>
         _intervalArguments = intervalArguments;
     }
 
-    public IntervalArgs Get(BindingContext bindingContext) => GetBoundValue(bindingContext);
-
-    protected override IntervalArgs GetBoundValue(BindingContext bindingContext)
+    public IntervalArgs Get(ParseResult parseResult)
     {
-        var interval = bindingContext.ParseResult.GetValueForOption(
+        var interval = parseResult.GetValue(
             _intervalArguments.IntervalOption
         );
         return new IntervalArgs(interval is null ? null : TimeSpan.FromSeconds(interval.Value));

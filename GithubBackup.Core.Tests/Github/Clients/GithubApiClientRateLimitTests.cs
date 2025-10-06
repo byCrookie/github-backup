@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
-using FluentAssertions;
+using AwesomeAssertions;
 using Flurl.Http;
 using Flurl.Http.Testing;
 using GithubBackup.Core.Github.Clients;

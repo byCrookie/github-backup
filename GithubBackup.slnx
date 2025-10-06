@@ -1,0 +1,29 @@
+﻿<Solution>
+  <Folder Name="/_/">
+    <File Path="global.json" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="nuget.config" />
+    <File Path="version.json" />
+    <File Path=".gitignore" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="CHANGELOG.md" />
+  </Folder>
+  <Folder Name="/_/.github/">
+    <File Path=".github\dependabot.yml" />
+  </Folder>
+  <Folder Name="/_/.github/workflows/">
+    <File Path=".github\workflows\release.yml" />
+    <File Path=".github\workflows\test_linux_x64.yml" />
+    <File Path=".github\workflows\test_osx_x64.yml" />
+    <File Path=".github\workflows\test_win_x64.yml" />
+  </Folder>
+  <Project Path="GithubBackup.Cli.Tests.Integration\GithubBackup.Cli.Tests.Integration.csproj" Type="Classic C#" />
+  <Project Path="GithubBackup.Cli.Tests\GithubBackup.Cli.Tests.csproj" Type="Classic C#" />
+  <Project Path="GithubBackup.Cli\GithubBackup.Cli.csproj" Type="Classic C#" />
+  <Project Path="GithubBackup.Core.Tests\GithubBackup.Core.Tests.csproj" Type="Classic C#" />
+  <Project Path="GithubBackup.Core\GithubBackup.Core.csproj" Type="Classic C#" />
+  <Project Path="GithubBackup.TestUtils.Tests\GithubBackup.TestUtils.Tests.csproj" Type="Classic C#" />
+  <Project Path="GithubBackup.TestUtils\GithubBackup.TestUtils.csproj" Type="Classic C#" />
+</Solution>

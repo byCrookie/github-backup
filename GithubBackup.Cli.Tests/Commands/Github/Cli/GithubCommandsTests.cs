@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using FluentAssertions;
+using AwesomeAssertions;
 using GithubBackup.Cli.Commands.Github.Cli;
 using GithubBackup.Cli.Commands.Global;
 

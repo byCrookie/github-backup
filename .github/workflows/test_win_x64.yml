@@ -24,7 +24,7 @@ jobs:
         run: dotnet restore
         
       - name: Build
-        run: dotnet build GithubBackup.sln --configuration Release --no-restore
+        run: dotnet build GithubBackup.slnx --configuration Release --no-restore
         
       - name: Test
-        run: dotnet test GithubBackup.sln --configuration Release --no-restore
+        run: dotnet test GithubBackup.slnx --configuration Release --no-restore

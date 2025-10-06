@@ -1,9 +1,8 @@
 ﻿using System.CommandLine;
-using System.CommandLine.Parsing;
-using FluentAssertions;
+using AwesomeAssertions;
 using GithubBackup.Cli.Commands.Interval;
-using GithubBackup.Cli.Tests.Utils;
 using GithubBackup.Cli.Utils;
+using GithubBackup.TestUtils;
 
 namespace GithubBackup.Cli.Tests.Commands.Interval;
 
@@ -14,60 +13,48 @@ public class IntervalArgsTests
     [Fact]
     public async Task InvokeAsync_FlagsArePassed_FlagsGetParsed()
     {
-        var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(_intervalArguments.Options());
-        var subCommand = new Command("sub");
-
-        subCommand.SetHandler(
-            intervalArgs =>
-            {
-                intervalArgs.Should().NotBeNull();
-                intervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(10));
-            },
-            new IntervalArgsBinder(_intervalArguments)
-        );
-
-        rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub --interval 10");
+        var command = new Command("sub");
+        command.AddOptions(_intervalArguments.Options());
+        
+        command.SetAction(p =>
+        {
+            var intervalArgs = new IntervalArgsBinder(_intervalArguments).Get(p);
+            intervalArgs.Should().NotBeNull();
+            intervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(10));
+        });
+        
+        await command.Parse("sub --interval 10").InvokeTestAsync();
     }
 
     [Fact]
     public async Task InvokeAsync_ShortFlagsArePassed_FlagsGetParsed()
     {
-        var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(_intervalArguments.Options());
-        var subCommand = new Command("sub");
+        var command = new Command("sub");
+        command.AddOptions(_intervalArguments.Options());
 
-        subCommand.SetHandler(
-            intervalArgs =>
-            {
-                intervalArgs.Should().NotBeNull();
-                intervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(10));
-            },
-            new IntervalArgsBinder(_intervalArguments)
-        );
-
-        rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub -i 10");
+        command.SetAction(p =>
+        {
+            var intervalArgs = new IntervalArgsBinder(_intervalArguments).Get(p);
+            intervalArgs.Should().NotBeNull();
+            intervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(10));
+        });
+        
+        await command.Parse("sub -i 10").InvokeTestAsync();
     }
 
     [Fact]
     public async Task InvokeAsync_NoFlagsArePassed_DefaultsAreUsed()
     {
-        var rootCommand = new RootCommand();
-        rootCommand.AddGlobalOptions(_intervalArguments.Options());
-        var subCommand = new Command("sub");
+        var command = new Command("sub");
+        command.AddOptions(_intervalArguments.Options());
 
-        subCommand.SetHandler(
-            intervalArgs =>
-            {
-                intervalArgs.Should().NotBeNull();
-                intervalArgs.Interval.Should().BeNull();
-            },
-            new IntervalArgsBinder(_intervalArguments)
-        );
+        command.SetAction(p =>
+        {
+            var intervalArgs = new IntervalArgsBinder(_intervalArguments).Get(p);
+            intervalArgs.Should().NotBeNull();
+            intervalArgs.Interval.Should().BeNull();
+        });
 
-        rootCommand.AddCommand(subCommand);
-        await TestCommandline.Build(rootCommand).InvokeAsync("sub");
+        await command.Parse("sub").InvokeTestAsync();
     }
 }

@@ -20,29 +20,24 @@ internal static class MigrationsCommand
         command.AddOptions(migrationsArguments.Options());
         command.AddOptions(loginArguments.Options());
 
-        command.SetHandler(
-            (globalArgs, migrationsArgs) => RunAsync(args, globalArgs, migrationsArgs, options),
-            new GlobalArgsBinder(options.GlobalArguments),
-            new MigrationsArgsBinder(migrationsArguments, loginArguments)
-        );
+        command.SetAction((r, ct) =>
+        {
+            var globalArgs = new GlobalArgsBinder(options.GlobalArguments).Get(r);
+            var migrationsArgs = new MigrationsArgsBinder(
+                migrationsArguments,
+                loginArguments
+            ).Get(r);
+
+            var runner = new CliRunner<MigrationsRunner, MigrationsArgs>(
+                args,
+                globalArgs,
+                migrationsArgs,
+                new RunOptions { AfterServices = options.AfterServices }
+            );
+
+            return runner.RunAsync(ct);
+        });
 
         return command;
-    }
-
-    private static Task RunAsync(
-        string[] args,
-        GlobalArgs globalArgs,
-        MigrationsArgs migrationsArgs,
-        CommandOptions options
-    )
-    {
-        var runner = new CliRunner<MigrationsRunner, MigrationsArgs>(
-            args,
-            globalArgs,
-            migrationsArgs,
-            new RunOptions { AfterServices = options.AfterServices }
-        );
-
-        return runner.RunAsync();
     }
 }

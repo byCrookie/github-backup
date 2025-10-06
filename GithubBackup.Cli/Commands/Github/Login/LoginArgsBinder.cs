@@ -1,23 +1,14 @@
-﻿using System.CommandLine.Binding;
+﻿using System.CommandLine;
 
 namespace GithubBackup.Cli.Commands.Github.Login;
 
-internal sealed class LoginArgsBinder : BinderBase<LoginArgs>
+internal sealed class LoginArgsBinder(LoginArguments loginArguments)
 {
-    private readonly LoginArguments _loginArguments;
-
-    public LoginArgsBinder(LoginArguments loginArguments)
+    public LoginArgs Get(ParseResult parseResult)
     {
-        _loginArguments = loginArguments;
-    }
-
-    public LoginArgs Get(BindingContext bindingContext) => GetBoundValue(bindingContext);
-
-    protected override LoginArgs GetBoundValue(BindingContext bindingContext)
-    {
-        var token = bindingContext.ParseResult.GetValueForOption(_loginArguments.TokenOption);
-        var deviceFlowAuth = bindingContext.ParseResult.GetValueForOption(
-            _loginArguments.DeviceFlowAuthOption
+        var token = parseResult.GetValue(loginArguments.TokenOption);
+        var deviceFlowAuth = parseResult.GetValue(
+            loginArguments.DeviceFlowAuthOption
         );
 
         return new LoginArgs(token, deviceFlowAuth);

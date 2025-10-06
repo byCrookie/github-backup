@@ -8,15 +8,7 @@ public static class CommandExtensions
     {
         foreach (var option in options)
         {
-            command.AddOption(option);
-        }
-    }
-
-    public static void AddGlobalOptions(this Command command, IEnumerable<Option> options)
-    {
-        foreach (var option in options)
-        {
-            command.AddGlobalOption(option);
+            command.Add(option);
         }
     }
 
@@ -24,7 +16,7 @@ public static class CommandExtensions
     {
         foreach (var subCommand in subCommands)
         {
-            command.AddCommand(subCommand);
+            command.Add(subCommand);
         }
     }
 }

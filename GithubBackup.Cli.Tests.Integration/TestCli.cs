@@ -1,10 +1,11 @@
 ﻿using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.CompilerServices;
-using FluentAssertions;
+using AwesomeAssertions;
 using Flurl.Http.Testing;
 using GithubBackup.Cli.Boot;
 using Microsoft.Extensions.DependencyInjection;
+using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Integration;
 
@@ -29,7 +30,7 @@ public static class TestCli
             Environment.SetEnvironmentVariable(environmentVariable.Key, environmentVariable.Value);
         }
 
-        var testConsole = new TestConsole(new Spectre.Console.Testing.TestConsole());
+        var testConsole = new TestConsole();
 
         using var httpTest = new HttpTest();
         configureHttp?.Invoke(httpTest);
@@ -38,7 +39,8 @@ public static class TestCli
             args.Split(" "),
             new CliOptions
             {
-                Console = testConsole,
+                Output = testConsole.Profile.Out.Writer,
+                Error = testConsole.Profile.Out.Writer,
                 AfterServices = hb => hb.Services.AddSingleton<IFileSystem>(mockFileSystem),
             }
         );
@@ -48,7 +50,7 @@ public static class TestCli
         settings.AddScrubber(sb => sb.Replace("testhost", "ghb"));
 
         // ReSharper disable once ExplicitCallerInfoArgument
-        await Verify(testConsole.Out.ToString(), settings, sourceFile).UseParameters(args);
+        await Verify(testConsole.Output, settings, sourceFile).UseParameters(args);
 
         exitCode.Should().Be(expectedExitCode);
     }

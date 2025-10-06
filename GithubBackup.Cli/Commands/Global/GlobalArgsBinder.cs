@@ -1,9 +1,8 @@
-﻿using System.CommandLine.Binding;
-using GithubBackup.Cli.Utils;
+﻿using System.CommandLine;
 
 namespace GithubBackup.Cli.Commands.Global;
 
-internal sealed class GlobalArgsBinder : BinderBase<GlobalArgs>
+internal sealed class GlobalArgsBinder
 {
     private readonly GlobalArguments _globalArguments;
 
@@ -12,15 +11,15 @@ internal sealed class GlobalArgsBinder : BinderBase<GlobalArgs>
         _globalArguments = globalArguments;
     }
 
-    protected override GlobalArgs GetBoundValue(BindingContext bindingContext)
+    public GlobalArgs Get(ParseResult parseResult)
     {
-        var verbosity = bindingContext.ParseResult.GetRequiredValueForOption(
+        var verbosity = parseResult.GetRequiredValue(
             _globalArguments.VerbosityOption
         );
-        var quiet = bindingContext.ParseResult.GetRequiredValueForOption(
+        var quiet = parseResult.GetRequiredValue(
             _globalArguments.QuietOption
         );
-        var logFile = bindingContext.ParseResult.GetValueForOption(_globalArguments.LogFileOption);
+        var logFile = parseResult.GetValue(_globalArguments.LogFileOption);
         return new GlobalArgs(verbosity, quiet, logFile);
     }
 }

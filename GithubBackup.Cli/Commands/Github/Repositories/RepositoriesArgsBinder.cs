@@ -1,10 +1,9 @@
-﻿using System.CommandLine.Binding;
+﻿using System.CommandLine;
 using GithubBackup.Cli.Commands.Github.Login;
-using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Repositories;
 
-internal sealed class RepositoriesArgsBinder : BinderBase<RepositoriesArgs>
+internal sealed class RepositoriesArgsBinder
 {
     private readonly RepositoriesArguments _repositoriesArguments;
     private readonly LoginArguments _loginArguments;
@@ -18,17 +17,17 @@ internal sealed class RepositoriesArgsBinder : BinderBase<RepositoriesArgs>
         _loginArguments = loginArguments;
     }
 
-    protected override RepositoriesArgs GetBoundValue(BindingContext bindingContext)
+    public RepositoriesArgs Get(ParseResult parseResult)
     {
-        var type = bindingContext.ParseResult.GetValueForOption(_repositoriesArguments.TypeOption);
-        var affiliation = bindingContext.ParseResult.GetRequiredValueForOption(
+        var type = parseResult.GetValue(_repositoriesArguments.TypeOption);
+        var affiliation = parseResult.GetRequiredValue(
             _repositoriesArguments.AffiliationOption
         );
-        var visibility = bindingContext.ParseResult.GetRequiredValueForOption(
+        var visibility = parseResult.GetRequiredValue(
             _repositoriesArguments.VisibilityOption
         );
 
-        var loginArgs = new LoginArgsBinder(_loginArguments).Get(bindingContext);
+        var loginArgs = new LoginArgsBinder(_loginArguments).Get(parseResult);
 
         return new RepositoriesArgs(type, affiliation, visibility, loginArgs);
     }

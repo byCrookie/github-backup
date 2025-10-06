@@ -6,7 +6,7 @@ updates:
       interval: "weekly"
       day: "wednesday"
     groups:
-      dotnet-sdk:
+      dotnet:
         patterns:
           - "*"
 
@@ -15,17 +15,15 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      nuget:
+      dotnet:
         patterns:
           - "*"
-    ignore:
-      - dependency-name: "FluentAssertions"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     groups:
-      github-actions:
+      dotnet:
         patterns:
           - "*"

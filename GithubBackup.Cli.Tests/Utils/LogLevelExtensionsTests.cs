@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using AwesomeAssertions;
 using GithubBackup.Cli.Utils;
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
