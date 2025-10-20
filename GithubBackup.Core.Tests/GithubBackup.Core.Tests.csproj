@@ -24,6 +24,7 @@
     </ItemGroup>
     
     <ItemGroup>
+      <PackageReference Include="Spectre.Console" />
         <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj"/>
         <ProjectReference Include="..\GithubBackup.TestUtils\GithubBackup.TestUtils.csproj" />
     </ItemGroup>

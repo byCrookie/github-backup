@@ -25,6 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Spectre.Console" VersionOverride="0.52.0" />
         <ProjectReference Include="..\GithubBackup.Cli\GithubBackup.Cli.csproj"/>
         <ProjectReference Include="..\GithubBackup.Core\GithubBackup.Core.csproj" />
         <ProjectReference Include="..\GithubBackup.TestUtils.Tests\GithubBackup.TestUtils.Tests.csproj"/>
