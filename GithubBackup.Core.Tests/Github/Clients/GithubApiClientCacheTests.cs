@@ -1,11 +1,11 @@
-﻿using System.Net;
+﻿using System.IO.Abstractions.TestingHelpers;
+using System.Net;
 using AwesomeAssertions;
 using Flurl.Http.Testing;
 using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
-using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

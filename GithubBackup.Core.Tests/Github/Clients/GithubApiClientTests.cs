@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.IO.Abstractions.TestingHelpers;
+using System.Net;
 using AutoBogus;
 using AwesomeAssertions;
 using Flurl.Http;
@@ -7,7 +8,6 @@ using GithubBackup.Core.Github.Clients;
 using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Tests.Utils;
 using GithubBackup.Core.Utils;
-using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Net.Http.Headers;
 using NSubstitute;

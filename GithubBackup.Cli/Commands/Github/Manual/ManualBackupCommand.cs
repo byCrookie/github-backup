@@ -8,8 +8,7 @@ namespace GithubBackup.Cli.Commands.Github.Manual;
 internal static class ManualBackupCommand
 {
     private const string CommandName = "manual";
-    private const string CommandDescription =
-        "Interactively create and download GitHub backups.";
+    private const string CommandDescription = "Interactively create and download GitHub backups.";
 
     public static Command Create(string[] args, CommandOptions options)
     {

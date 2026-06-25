@@ -113,7 +113,10 @@ internal sealed class LoginService(
         }
         catch (Exception e)
         {
-            logger.LogInformation("Temporary token is invalid; deleting cache entry: {Exception}", e.Message);
+            logger.LogInformation(
+                "Temporary token is invalid; deleting cache entry: {Exception}",
+                e.Message
+            );
             await temporaryCredentialStore.DeleteTokenAsync(ct);
             return null;
         }

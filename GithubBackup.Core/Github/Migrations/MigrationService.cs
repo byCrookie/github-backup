@@ -135,7 +135,11 @@ internal sealed partial class MigrationService(
         var tempFileName = fileSystem.Path.GetFileName(tempFile);
         options.OnTemporaryFileCreated?.Invoke(tempFile);
 
-        logger.LogInformation("Downloading migration {Id} to temporary file {TempFile}", options.Id, tempFile);
+        logger.LogInformation(
+            "Downloading migration {Id} to temporary file {TempFile}",
+            options.Id,
+            tempFile
+        );
 
         await githubApiClient.DownloadFileAsync(
             $"/user/migrations/{options.Id}/archive",

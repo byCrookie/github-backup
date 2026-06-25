@@ -44,8 +44,7 @@ internal sealed class BackupRunner(
             fileSystem.DirectoryInfo.Wrap(backupArgs.DownloadArgs.Destination),
             backupArgs.DownloadArgs.NumberOfBackups,
             backupArgs.DownloadArgs.Overwrite,
-            onTemporaryFileCreated: tempFile =>
-                output.Status($"Using temporary file {tempFile}")
+            onTemporaryFileCreated: tempFile => output.Status($"Using temporary file {tempFile}")
         );
 
         var file = globalArgs.Quiet

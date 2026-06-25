@@ -229,7 +229,7 @@ public class MigrationServiceTests
                 {MigrationState.Pending}
                 {MigrationState.Exporting}
                 {MigrationState.Exported}
-                """
+                """.ReplaceLineEndings("\n").Trim()
             );
     }
 

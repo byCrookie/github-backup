@@ -16,8 +16,8 @@ internal static class DownloadProgress
         return progress.StartAsync(ctx =>
         {
             var task = ctx.AddTask(description, maxValue: 100);
-            return downloadAsync((downloadedBytes, totalBytes) =>
-                Update(task, downloadedBytes, totalBytes)
+            return downloadAsync(
+                (downloadedBytes, totalBytes) => Update(task, downloadedBytes, totalBytes)
             );
         });
     }
@@ -34,7 +34,8 @@ internal static class DownloadProgress
         task.IsIndeterminate = false;
         task.MaxValue = totalBytes.Value;
         task.Value = downloadedBytes;
-        task.Description = $"Downloaded {FormatBytes(downloadedBytes)} of {FormatBytes(totalBytes.Value)}";
+        task.Description =
+            $"Downloaded {FormatBytes(downloadedBytes)} of {FormatBytes(totalBytes.Value)}";
     }
 
     private static string FormatBytes(long bytes)

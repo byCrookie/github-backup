@@ -10,7 +10,8 @@ namespace GithubBackup.Cli.Commands.Github.Repositories;
 internal static class RepositoriesCommand
 {
     private const string CommandName = "repositories";
-    private const string CommandDescription = "List GitHub repositories available to the authenticated user.";
+    private const string CommandDescription =
+        "List GitHub repositories available to the authenticated user.";
 
     public static Command Create(string[] args, CommandOptions options)
     {

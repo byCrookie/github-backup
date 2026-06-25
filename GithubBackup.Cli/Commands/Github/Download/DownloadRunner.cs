@@ -123,8 +123,7 @@ internal sealed class DownloadRunner(
             fileSystem.DirectoryInfo.Wrap(downloadArgs.Destination),
             downloadArgs.NumberOfBackups,
             downloadArgs.Overwrite,
-            onTemporaryFileCreated: tempFile =>
-                output.Status($"Using temporary file {tempFile}"),
+            onTemporaryFileCreated: tempFile => output.Status($"Using temporary file {tempFile}"),
             onDownloadProgress: onDownloadProgress
         );
 

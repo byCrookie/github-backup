@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO.Abstractions.TestingHelpers;
 using System.Net;
 using AwesomeAssertions;
 using Flurl.Http;
@@ -8,7 +9,6 @@ using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Tests.Utils;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
-using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 

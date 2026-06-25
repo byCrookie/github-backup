@@ -18,7 +18,10 @@ internal sealed class CommandIntervalRunnerService(
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("Starting interval command runner with interval {Interval}", interval);
+        logger.LogInformation(
+            "Starting interval command runner with interval {Interval}",
+            interval
+        );
 
         output.Status($"Running command every {interval}.");
 
