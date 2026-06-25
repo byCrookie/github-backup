@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using Flurl.Http;
 using Flurl.Http.Configuration;
 using Flurl.Http.Content;
-using GithubBackup.Core.Flurl;
 
 namespace GithubBackup.TestUtils.Flurl;
 

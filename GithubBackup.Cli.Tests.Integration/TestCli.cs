@@ -1,5 +1,6 @@
 ﻿using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using AwesomeAssertions;
 using Flurl.Http.Testing;
@@ -50,8 +51,17 @@ public static class TestCli
         settings.AddScrubber(sb => sb.Replace("ReSharperTestRunner", "ghb"));
         settings.AddScrubber(sb => sb.Replace("testhost", "ghb"));
 
-        // ReSharper disable once ExplicitCallerInfoArgument
-        await Verify(testConsole.Output, settings, sourceFile).UseParameters(args);
+        await Verify(testConsole.Output, settings, sourceFile)
+            .UseParameters(args)
+            .ScrubLinesWithReplace(s =>
+                s.Replace(
+                    Assembly.GetExecutingAssembly().GetName().Name
+                        ?? throw new InvalidOperationException(
+                            "Can not get executing assembly name"
+                        ),
+                    "ghb"
+                )
+            );
 
         exitCode.Should().Be(expectedExitCode);
     }

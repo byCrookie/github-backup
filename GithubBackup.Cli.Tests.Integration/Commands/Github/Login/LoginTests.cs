@@ -1,4 +1,5 @@
-﻿using AwesomeAssertions;
+﻿using System.Net;
+using AwesomeAssertions;
 using GithubBackup.Core.Github.Users;
 
 namespace GithubBackup.Cli.Tests.Integration.Commands.Github.Login;
@@ -62,8 +63,8 @@ public class LoginTests
         );
     }
 
-    [Fact(Skip = "Not yet implemented")]
-    public async Task RunAsync_LoginUsingToken_ThrowsException()
+    [Fact]
+    public async Task RunAsync_LoginUsingToken_Succeeds()
     {
         const string url = "https://api.github.com/user";
 
@@ -71,7 +72,7 @@ public class LoginTests
 
         await TestCli.RunAsync(
             args,
-            1,
+            0,
             http =>
             {
                 http.ForCallsTo(url)
@@ -79,6 +80,32 @@ public class LoginTests
                     .RespondWithJson(new UserResponse("user", "user"), headers: GetHeaders());
             }
         );
+    }
+
+    [Fact]
+    public async Task RunAsync_LoginUsingToken_ThrowsException()
+    {
+        const string url = "https://api.github.com/user";
+
+        const string args = "login --token ghp_7569254b-1521-4b1e-96ff-fc637f4e2f4d";
+
+        var action = async () =>
+            await TestCli.RunAsync(
+                args,
+                1,
+                http =>
+                {
+                    http.ForCallsTo(url)
+                        .WithVerb(HttpMethod.Get)
+                        .RespondWithJson(
+                            new UserResponse("user", "user"),
+                            (int)HttpStatusCode.BadRequest,
+                            headers: GetHeaders()
+                        );
+                }
+            );
+
+        await action.Should().ThrowAsync<Exception>().WithMessage("Token is invalid");
     }
 
     private static Dictionary<string, string> GetHeaders(
