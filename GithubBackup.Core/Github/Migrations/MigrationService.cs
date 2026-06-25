@@ -133,6 +133,7 @@ internal sealed partial class MigrationService(
         );
         var tempDirectoryName = fileSystem.Path.GetDirectoryName(tempFile)!;
         var tempFileName = fileSystem.Path.GetFileName(tempFile);
+        options.OnTemporaryFileCreated?.Invoke(tempFile);
 
         logger.LogInformation("Downloading migration {Id} to temporary file {TempFile}", options.Id, tempFile);
 
@@ -140,7 +141,8 @@ internal sealed partial class MigrationService(
             $"/user/migrations/{options.Id}/archive",
             tempDirectoryName,
             tempFileName,
-            ct: ct
+            ct: ct,
+            onProgress: options.OnDownloadProgress
         );
 
         if (options.Overwrite)

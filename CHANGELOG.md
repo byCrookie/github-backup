@@ -7,3 +7,4 @@ This release includes the following features:
 - Login: Tokens are resolved from --token, GITHUB_BACKUP_TOKEN, or GitHub device flow. Device flow tokens are cached temporarily while valid.
 - Improved manual backup flow
 - Improved logging and error handling
+- Show download progress

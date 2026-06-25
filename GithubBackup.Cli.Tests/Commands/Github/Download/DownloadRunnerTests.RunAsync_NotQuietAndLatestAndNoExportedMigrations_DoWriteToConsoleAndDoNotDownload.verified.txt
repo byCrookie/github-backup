@@ -1,2 +1,3 @@
 ﻿Downloading latest migration
+Fetching migrations...
 No downloadable migrations found.

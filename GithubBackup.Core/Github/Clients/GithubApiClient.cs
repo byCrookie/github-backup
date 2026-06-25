@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.IO.Abstractions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Flurl;
@@ -18,6 +19,7 @@ using Polly.Retry;
 namespace GithubBackup.Core.Github.Clients;
 
 internal class GithubApiClient(
+    IFileSystem fileSystem,
     IMemoryCache memoryCache,
     IGithubTokenStore githubTokenStore,
     IDateTimeOffsetProvider dateTimeOffsetProvider,
@@ -85,7 +87,8 @@ internal class GithubApiClient(
         string path,
         string? fileName = null,
         Action<IFlurlRequest>? configure = null,
-        CancellationToken? ct = null
+        CancellationToken? ct = null,
+        Action<long, long?>? onProgress = null
     )
     {
         var request = _client
@@ -93,11 +96,40 @@ internal class GithubApiClient(
             .WithOAuthBearerToken(await githubTokenStore.GetAsync());
         configure?.Invoke(request);
         logger.LogDebug("Downloading {Url} to {Path}", request.Url, path);
-        var file = await request.DownloadFileAsync(
-            path,
-            fileName,
-            cancellationToken: ct ?? CancellationToken.None
+
+        var cancellationToken = ct ?? CancellationToken.None;
+        fileName ??= fileSystem.Path.GetFileName(request.Url.Path);
+        var file = fileSystem.Path.Combine(path, fileName);
+        fileSystem.Directory.CreateDirectory(path);
+
+        var response = await request.SendAsync(
+            HttpMethod.Get,
+            completionOption: HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken: cancellationToken
         );
+
+        var totalBytes = response.ResponseMessage.Content.Headers.ContentLength;
+        var downloadedBytes = 0L;
+        var buffer = new byte[81920];
+
+        await using var responseStream = await response.ResponseMessage.Content.ReadAsStreamAsync(
+            cancellationToken
+        );
+        await using var fileStream = fileSystem.File.Create(file);
+
+        while (true)
+        {
+            var bytesRead = await responseStream.ReadAsync(buffer, cancellationToken);
+            if (bytesRead == 0)
+            {
+                break;
+            }
+
+            await fileStream.WriteAsync(buffer.AsMemory(0, bytesRead), cancellationToken);
+            downloadedBytes += bytesRead;
+            onProgress?.Invoke(downloadedBytes, totalBytes);
+        }
+
         logger.LogInformation("Downloaded {Url} to {Path}", request.Url, file);
         return file;
     }

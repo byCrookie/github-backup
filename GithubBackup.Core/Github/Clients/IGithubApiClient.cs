@@ -18,7 +18,8 @@ public interface IGithubApiClient
         string path,
         string? fileName = null,
         Action<IFlurlRequest>? configure = null,
-        CancellationToken? ct = null
+        CancellationToken? ct = null,
+        Action<long, long?>? onProgress = null
     );
 
     Task<IFlurlResponse> GetAsync(

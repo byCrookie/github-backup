@@ -118,7 +118,8 @@ public class BackupRunnerTests
                     _ansiConsole.Profile.Out.Writer,
                     _ansiConsole.Profile.Out.Writer
                 )
-            )
+            ),
+            _ansiConsole
         );
     }
 }

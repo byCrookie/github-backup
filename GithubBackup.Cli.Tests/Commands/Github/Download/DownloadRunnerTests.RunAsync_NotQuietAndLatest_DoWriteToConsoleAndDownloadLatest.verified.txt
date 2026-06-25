@@ -1,4 +1,6 @@
 ﻿Downloading latest migration
+Fetching migrations...
 Downloading migration 1 to test...
+Migration 1: 0%
 Downloaded migration 1 to test
 test

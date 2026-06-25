@@ -3,6 +3,7 @@ using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Migrations;
+using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Backup;
 
@@ -12,7 +13,8 @@ internal sealed class BackupRunner(
     IMigrationService migrationService,
     ILoginService loginService,
     IFileSystem fileSystem,
-    ICliOutput output
+    ICliOutput output,
+    IAnsiConsole ansiConsole
 ) : ICommandRunner
 {
     public async Task RunAsync(CancellationToken ct)
@@ -30,6 +32,7 @@ internal sealed class BackupRunner(
             backupArgs.MigrateArgs.OrgMetadataOnly
         );
 
+        output.Status("Creating migration...");
         var migration = await migrationService.StartMigrationAsync(options, ct);
 
         output.Status(
@@ -40,11 +43,41 @@ internal sealed class BackupRunner(
             migration.Id,
             fileSystem.DirectoryInfo.Wrap(backupArgs.DownloadArgs.Destination),
             backupArgs.DownloadArgs.NumberOfBackups,
-            backupArgs.DownloadArgs.Overwrite
+            backupArgs.DownloadArgs.Overwrite,
+            onTemporaryFileCreated: tempFile =>
+                output.Status($"Using temporary file {tempFile}")
         );
 
-        var file = await migrationService.PollAndDownloadMigrationAsync(
-            downloadOptions,
+        var file = globalArgs.Quiet
+            ? await DownloadAsync(downloadOptions, null, ct)
+            : await DownloadProgress.RunAsync(
+                ansiConsole,
+                $"Migration {migration.Id}",
+                onProgress => DownloadAsync(downloadOptions, onProgress, ct)
+            );
+
+        output.Status($"Downloaded migration {migration.Id} to {file}");
+        output.Data(file);
+    }
+
+    private Task<string> DownloadAsync(
+        DownloadMigrationOptions options,
+        Action<long, long?>? onDownloadProgress,
+        CancellationToken ct
+    )
+    {
+        options = new DownloadMigrationOptions(
+            options.Id,
+            options.Destination,
+            options.NumberOfBackups,
+            options.Overwrite,
+            options.MedianFirstRetryDelay,
+            options.OnTemporaryFileCreated,
+            onDownloadProgress
+        );
+
+        return migrationService.PollAndDownloadMigrationAsync(
+            options,
             update =>
             {
                 output.Status($"Migration {update.Id} is {update.State}...");
@@ -53,8 +86,5 @@ internal sealed class BackupRunner(
             },
             ct
         );
-
-        output.Status($"Downloaded migration {migration.Id} to {file}");
-        output.Data(file);
     }
 }

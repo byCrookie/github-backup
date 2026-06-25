@@ -25,7 +25,7 @@ internal sealed class DownloadRunner(
 
         if (downloadArgs.Migrations.Length != 0)
         {
-            output.Status("Downloading selected migrations...");
+            output.Status($"Downloading {downloadArgs.Migrations.Length} selected migration(s)...");
 
             logger.LogInformation("Downloading migrations by ID");
             await DownloadUsingIdsAsync(ct);
@@ -49,6 +49,7 @@ internal sealed class DownloadRunner(
 
     private async Task DownloadLatestAsync(CancellationToken ct)
     {
+        output.Status("Fetching migrations...");
         var migrations = await migrationService.GetMigrationsAsync(ct);
 
         if (migrations.All(e => e.State != MigrationState.Exported))
@@ -69,6 +70,7 @@ internal sealed class DownloadRunner(
 
     private async Task DownloadUsingIdsAsync(CancellationToken ct)
     {
+        output.Status("Fetching migrations...");
         var migrations = (await migrationService.GetMigrationsAsync(ct))
             .OrderBy(m => m.CreatedAt)
             .ToList();
@@ -89,31 +91,45 @@ internal sealed class DownloadRunner(
             downloadArgs.Destination
         );
 
+        string path;
+
         if (!globalArgs.Quiet)
         {
             output.Status($"Downloading migration {id} to {downloadArgs.Destination}...");
-            var progress = ansiConsole.Progress();
-            progress.RefreshRate = TimeSpan.FromSeconds(5);
-            await progress.StartAsync(_ => DownloadMigrationAsync(id, ct));
-            return;
+            path = await DownloadProgress.RunAsync(
+                ansiConsole,
+                $"Migration {id}",
+                onProgress => DownloadMigrationAsync(id, onProgress, ct)
+            );
+        }
+        else
+        {
+            path = await DownloadMigrationAsync(id, null, ct);
         }
 
-        await DownloadMigrationAsync(id, ct);
+        logger.LogInformation("Downloaded migration {Id} to {Path}", id, path);
+        output.Status($"Downloaded migration {id} to {path}");
+        output.Data(path);
     }
 
-    private async Task DownloadMigrationAsync(long id, CancellationToken ct)
+    private async Task<string> DownloadMigrationAsync(
+        long id,
+        Action<long, long?>? onDownloadProgress,
+        CancellationToken ct
+    )
     {
         var options = new DownloadMigrationOptions(
             id,
             fileSystem.DirectoryInfo.Wrap(downloadArgs.Destination),
             downloadArgs.NumberOfBackups,
-            downloadArgs.Overwrite
+            downloadArgs.Overwrite,
+            onTemporaryFileCreated: tempFile =>
+                output.Status($"Using temporary file {tempFile}"),
+            onDownloadProgress: onDownloadProgress
         );
 
         var path = await DownloadAsync(options, ct);
-        logger.LogInformation("Downloaded migration {Id} to {Path}", id, path);
-        output.Status($"Downloaded migration {id} to {path}");
-        output.Data(path);
+        return path;
     }
 
     private Task<string> DownloadAsync(DownloadMigrationOptions options, CancellationToken ct)

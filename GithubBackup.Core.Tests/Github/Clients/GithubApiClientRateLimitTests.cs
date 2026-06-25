@@ -8,6 +8,7 @@ using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Tests.Utils;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
+using System.IO.Abstractions.TestingHelpers;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
@@ -29,6 +30,7 @@ public class GithubApiClientRateLimitTests
         tokenStore.GetAsync().Returns(Token);
 
         _sut = new GithubApiClient(
+            new MockFileSystem(),
             new NullCache(),
             tokenStore,
             new DateTimeOffsetProvider(),
