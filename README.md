@@ -1,10 +1,10 @@
 # github-backup
 
-Back up your GitHub repositories locally, including their full Git history.
+Back up your GitHub account locally using GitHub’s migration exports.
 
 ## Install
 
-Download the appropriate binary from the GitHub Releases page.
+Download the binary for your platform from the GitHub Releases page.
 
 * **Windows:** Add the executable to your `PATH`.
 * **macOS / Linux:** Make it executable:
@@ -19,7 +19,7 @@ chmod +x ghb
 ghb --help
 ```
 
-### Authentication
+## Authentication
 
 Tokens are resolved in this order:
 
@@ -27,11 +27,9 @@ Tokens are resolved in this order:
 2. `GITHUB_BACKUP_TOKEN`
 3. GitHub device flow
 
-Device-flow tokens are stored temporarily while valid.
+## Scheduled backups
 
-### Scheduled backups
-
-Use `--interval` to run backups periodically.
+Use `--interval` to run backups regularly.
 
 ## Contributing
 
