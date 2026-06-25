@@ -24,7 +24,11 @@ public class DownloadArgsTests
 
         command.SetAction(p =>
         {
-            var downloadArgs = new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments).Get(p);
+            var downloadArgs = new DowndloadArgsBinder(
+                _downloadArguments,
+                _intervalArguments,
+                _loginArguments
+            ).Get(p);
             downloadArgs.Should().NotBeNull();
             downloadArgs.Destination.Name.Should().Be("migrations");
             downloadArgs.Latest.Should().BeTrue();
@@ -36,11 +40,13 @@ public class DownloadArgsTests
             downloadArgs.LoginArgs.DeviceFlowAuth.Should().BeTrue();
         });
 
-        await command.Parse(
+        await command
+            .Parse(
                 "sub --destination ./migrations --latest --migrations 1 2 3"
                     + " --number-of-backups 5 --overwrite --interval 100"
                     + " --token test --device-flow-auth"
-            ).InvokeTestAsync();
+            )
+            .InvokeTestAsync();
     }
 
     [Fact]
@@ -53,7 +59,11 @@ public class DownloadArgsTests
 
         command.SetAction(p =>
         {
-            var downloadArgs = new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments).Get(p);
+            var downloadArgs = new DowndloadArgsBinder(
+                _downloadArguments,
+                _intervalArguments,
+                _loginArguments
+            ).Get(p);
             downloadArgs.Should().NotBeNull();
             downloadArgs.Destination.Name.Should().Be("migrations");
             downloadArgs.Latest.Should().BeTrue();
@@ -83,7 +93,11 @@ public class DownloadArgsTests
 
         command.SetAction(p =>
         {
-            var downloadArgs = new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments).Get(p);
+            var downloadArgs = new DowndloadArgsBinder(
+                _downloadArguments,
+                _intervalArguments,
+                _loginArguments
+            ).Get(p);
             downloadArgs.Should().NotBeNull();
             downloadArgs.Destination.Name.Should().Be("migrations");
             downloadArgs.Latest.Should().BeTrue();
@@ -107,7 +121,11 @@ public class DownloadArgsTests
 
         command.SetAction(p =>
         {
-            var downloadArgs = new DowndloadArgsBinder(_downloadArguments, _intervalArguments, _loginArguments).Get(p);
+            var downloadArgs = new DowndloadArgsBinder(
+                _downloadArguments,
+                _intervalArguments,
+                _loginArguments
+            ).Get(p);
             downloadArgs.Should().NotBeNull();
             downloadArgs.Destination.Name.Should().Be("migrations");
             downloadArgs.Latest.Should().BeFalse();

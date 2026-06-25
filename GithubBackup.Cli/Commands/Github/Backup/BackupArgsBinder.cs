@@ -10,7 +10,8 @@ internal sealed class BackupArgsBinder(
     MigrateArguments migrateArguments,
     DownloadArguments downloadArguments,
     IntervalArguments intervalArguments,
-    LoginArguments loginArguments)
+    LoginArguments loginArguments
+)
 {
     public BackupArgs Get(ParseResult parseResult)
     {

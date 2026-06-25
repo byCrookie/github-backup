@@ -5,34 +5,25 @@ namespace GithubBackup.Cli.Commands.Github.Migrations;
 public class MigrationsArguments
 {
     public Option<bool> ExportOption { get; } =
-        new(
-            name: "--export",
-            aliases: ["-e"]
-        )
+        new(name: "--export", aliases: ["-e"])
         {
             Required = false,
             Description = MigrationsArgDescriptions.Export.Long,
-            DefaultValueFactory = _ => true
+            DefaultValueFactory = _ => true,
         };
 
     public Option<DateTime?> SinceOption { get; } =
-        new(
-            name: "--since",
-            aliases: ["-s"]
-        )
+        new(name: "--since", aliases: ["-s"])
         {
             Required = false,
-            Description = MigrationsArgDescriptions.Since.Long
+            Description = MigrationsArgDescriptions.Since.Long,
         };
 
     public Option<long?> DaysOldOption { get; } =
-        new(
-            name: "--days-old",
-            aliases: ["-d"]
-        )
+        new(name: "--days-old", aliases: ["-d"])
         {
             Required = false,
-            Description = MigrationsArgDescriptions.DaysOld.Long
+            Description = MigrationsArgDescriptions.DaysOld.Long,
         };
 
     public MigrationsArguments()

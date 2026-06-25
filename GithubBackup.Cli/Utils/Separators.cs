@@ -1,9 +1,9 @@
 ﻿namespace GithubBackup.Cli.Utils;
 
-public record Seperators(string[] Values)
+public record Separators(string[] Values)
 {
     public override string ToString()
     {
         return string.Join(" or ", Values);
     }
-};
+}

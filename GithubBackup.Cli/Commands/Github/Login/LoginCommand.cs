@@ -24,20 +24,22 @@ internal static class LoginCommand
         var loginArguments = new LoginArguments();
         command.AddOptions(loginArguments.Options());
 
-        command.SetAction((r, ct) =>
-        {
-            var globalArgs = new GlobalArgsBinder(options.GlobalArguments).Get(r);
-            var loginArgs = new LoginArgsBinder(loginArguments).Get(r);
+        command.SetAction(
+            (r, ct) =>
+            {
+                var globalArgs = new GlobalArgsBinder(options.GlobalArguments).Get(r);
+                var loginArgs = new LoginArgsBinder(loginArguments).Get(r);
 
-            var runner = new CliRunner<LoginRunner, LoginArgs>(
-                args,
-                globalArgs,
-                loginArgs,
-                new RunOptions { AfterServices = options.AfterServices }
-            );
+                var runner = new CliRunner<LoginRunner, LoginArgs>(
+                    args,
+                    globalArgs,
+                    loginArgs,
+                    new RunOptions { AfterServices = options.AfterServices }
+                );
 
-            return runner.RunAsync(ct);
-        });
+                return runner.RunAsync(ct);
+            }
+        );
 
         return command;
     }

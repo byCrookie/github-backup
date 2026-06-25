@@ -34,7 +34,7 @@ public class RepositoryServiceTests
                 Arg.Any<Action<IFlurlRequest>?>(),
                 ct
             )
-            .Returns(new List<RepositoryResponse> { new("Test 1"), new("Test 2") });
+            .Returns([new("Test 1"), new("Test 2")]);
 
         var result = await _sut.GetRepositoriesAsync(new RepositoryOptions(RepositoryType.All), ct);
 

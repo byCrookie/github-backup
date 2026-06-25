@@ -9,32 +9,19 @@ using Polly.Retry;
 
 namespace GithubBackup.Core.Github.Migrations;
 
-internal sealed partial class MigrationService : IMigrationService
+internal sealed partial class MigrationService(
+    IFileSystem fileSystem,
+    IGithubApiClient githubApiClient,
+    IDateTimeProvider dateTimeProvider,
+    ILogger<MigrationService> logger
+) : IMigrationService
 {
-    private readonly IFileSystem _fileSystem;
-    private readonly IGithubApiClient _githubApiClient;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly ILogger<MigrationService> _logger;
-
-    public MigrationService(
-        IFileSystem fileSystem,
-        IGithubApiClient githubApiClient,
-        IDateTimeProvider dateTimeProvider,
-        ILogger<MigrationService> logger
-    )
-    {
-        _fileSystem = fileSystem;
-        _githubApiClient = githubApiClient;
-        _dateTimeProvider = dateTimeProvider;
-        _logger = logger;
-    }
-
     public async Task<Migration> StartMigrationAsync(
         StartMigrationOptions options,
         CancellationToken ct
     )
     {
-        _logger.LogDebug("Starting migration");
+        logger.LogDebug("Starting migration");
 
         var request = new MigrationRequest(
             options.Repositories,
@@ -47,7 +34,7 @@ internal sealed partial class MigrationService : IMigrationService
             options.ExcludeMetadataOnly
         );
 
-        var response = await _githubApiClient
+        var response = await githubApiClient
             .PostJsonAsync("/user/migrations", request, ct: ct)
             .ReceiveJson<MigrationReponse>();
 
@@ -56,9 +43,9 @@ internal sealed partial class MigrationService : IMigrationService
 
     public async Task<List<Migration>> GetMigrationsAsync(CancellationToken ct)
     {
-        _logger.LogDebug("Getting migrations");
+        logger.LogDebug("Getting migrations");
 
-        var response = await _githubApiClient.ReceiveJsonPagedAsync<
+        var response = await githubApiClient.ReceiveJsonPagedAsync<
             List<MigrationReponse>,
             MigrationReponse
         >("/user/migrations", 100, r => r, null, ct);
@@ -68,9 +55,9 @@ internal sealed partial class MigrationService : IMigrationService
 
     public async Task<Migration> GetMigrationAsync(long id, CancellationToken ct)
     {
-        _logger.LogDebug("Getting migration {Id}", id);
+        logger.LogDebug("Getting migration {Id}", id);
 
-        var response = await _githubApiClient
+        var response = await githubApiClient
             .GetAsync($"/user/migrations/{id}", ct: ct)
             .ReceiveJson<MigrationReponse>();
 
@@ -83,7 +70,7 @@ internal sealed partial class MigrationService : IMigrationService
         CancellationToken ct
     )
     {
-        _logger.LogDebug("Polling migration {Id}", options.Id);
+        logger.LogDebug("Polling migration {Id}", options.Id);
 
         var resiliencePipeline = new ResiliencePipelineBuilder<Migration>()
             .AddRetry(
@@ -104,7 +91,7 @@ internal sealed partial class MigrationService : IMigrationService
             async cancellationToken =>
             {
                 var migrationStatus = await GetMigrationAsync(options.Id, cancellationToken);
-                _logger.LogInformation(
+                logger.LogInformation(
                     "Migration {Id} is {State}",
                     migrationStatus.Id,
                     migrationStatus.State
@@ -132,22 +119,22 @@ internal sealed partial class MigrationService : IMigrationService
             );
         }
 
-        if (migration.CreatedAt < _dateTimeProvider.Now.AddDays(-7))
+        if (migration.CreatedAt < dateTimeProvider.Now.AddDays(-7))
         {
             throw new Exception(
                 "The migration is older than 7 days and cannot be downloaded anymore."
             );
         }
 
-        var fileName = $"{_dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{options.Id}.tar.gz";
-        var tempFile = _fileSystem.Path.Combine(
-            _fileSystem.Path.GetTempPath(),
-            _fileSystem.Path.GetRandomFileName()
+        var fileName = $"{dateTimeProvider.Now:yyyyMMddHHmmss}_migration_{options.Id}.tar.gz";
+        var tempFile = fileSystem.Path.Combine(
+            fileSystem.Path.GetTempPath(),
+            fileSystem.Path.GetRandomFileName()
         );
-        var tempDirectoryName = _fileSystem.Path.GetDirectoryName(tempFile)!;
-        var tempFileName = _fileSystem.Path.GetFileName(tempFile);
+        var tempDirectoryName = fileSystem.Path.GetDirectoryName(tempFile)!;
+        var tempFileName = fileSystem.Path.GetFileName(tempFile);
 
-        await _githubApiClient.DownloadFileAsync(
+        await githubApiClient.DownloadFileAsync(
             $"/user/migrations/{options.Id}/archive",
             tempDirectoryName,
             tempFileName,
@@ -156,23 +143,23 @@ internal sealed partial class MigrationService : IMigrationService
 
         if (options.Overwrite)
         {
-            _logger.LogInformation("Overwriting backups");
+            logger.LogInformation("Overwriting backups");
             OverwriteBackups(options);
         }
 
         if (options.NumberOfBackups is not null)
         {
-            _logger.LogInformation("Applying retention rules");
+            logger.LogInformation("Applying retention rules");
             ApplyRetentionRules(options);
         }
 
-        var migrationPath = _fileSystem.Path.Combine(options.Destination.FullName, fileName);
-        if (_fileSystem.File.Exists(migrationPath))
+        var migrationPath = fileSystem.Path.Combine(options.Destination.FullName, fileName);
+        if (fileSystem.File.Exists(migrationPath))
         {
             throw new Exception($"A backup with the id {options.Id} already exists.");
         }
 
-        _fileSystem.File.Move(tempFile, migrationPath);
+        fileSystem.File.Move(tempFile, migrationPath);
         return migrationPath;
     }
 
@@ -183,9 +170,9 @@ internal sealed partial class MigrationService : IMigrationService
             throw new Exception("The number of backups cannot be 0.");
         }
 
-        var backups = _fileSystem
+        var backups = fileSystem
             .Directory.GetFiles(options.Destination.FullName, "*", SearchOption.TopDirectoryOnly)
-            .Select(file => BackupFileNameRegex().Match(_fileSystem.Path.GetFileName(file)))
+            .Select(file => BackupFileNameRegex().Match(fileSystem.Path.GetFileName(file)))
             .Where(match => match.Success)
             .ToList();
 
@@ -198,40 +185,40 @@ internal sealed partial class MigrationService : IMigrationService
 
             foreach (var backup in backupsToDelete)
             {
-                _logger.LogInformation(
+                logger.LogInformation(
                     "Deleting backup {Backup} because to many backups are present",
                     backup.Value
                 );
-                _fileSystem.File.Delete(
-                    _fileSystem.Path.Combine(options.Destination.FullName, backup.Value)
+                fileSystem.File.Delete(
+                    fileSystem.Path.Combine(options.Destination.FullName, backup.Value)
                 );
             }
         }
         else
         {
-            _logger.LogInformation("Not to many backups");
+            logger.LogInformation("Not to many backups");
         }
     }
 
     private void OverwriteBackups(DownloadMigrationOptions options)
     {
-        var identicalBackups = _fileSystem
+        var identicalBackups = fileSystem
             .Directory.GetFiles(options.Destination.FullName, "*", SearchOption.TopDirectoryOnly)
-            .Select(file => BackupFileNameRegex().Match(_fileSystem.Path.GetFileName(file)))
+            .Select(file => BackupFileNameRegex().Match(fileSystem.Path.GetFileName(file)))
             .Where(match => match.Success && match.Groups["Id"].Value == options.Id.ToString())
             .ToList();
 
-        if (!identicalBackups.Any())
+        if (identicalBackups.Count == 0)
         {
-            _logger.LogInformation("No identical backups found");
+            logger.LogInformation("No identical backups found");
             return;
         }
 
         foreach (var backup in identicalBackups)
         {
-            _logger.LogInformation("Deleting identical backup {Backup}", backup.Value);
-            _fileSystem.File.Delete(
-                _fileSystem.Path.Combine(options.Destination.FullName, backup.Value)
+            logger.LogInformation("Deleting identical backup {Backup}", backup.Value);
+            fileSystem.File.Delete(
+                fileSystem.Path.Combine(options.Destination.FullName, backup.Value)
             );
         }
     }

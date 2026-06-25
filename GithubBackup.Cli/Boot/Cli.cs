@@ -26,11 +26,15 @@ internal static class Cli
             }
         );
 
-        return rootCommand.Parse(args).InvokeAsync(new InvocationConfiguration
-        {
-            EnableDefaultExceptionHandler = cliOptions.EnableDefaultExceptionHandler,
-            Output = cliOptions.Output,
-            Error = cliOptions.Error
-        });
+        return rootCommand
+            .Parse(args)
+            .InvokeAsync(
+                new InvocationConfiguration
+                {
+                    EnableDefaultExceptionHandler = cliOptions.EnableDefaultExceptionHandler,
+                    Output = cliOptions.Output,
+                    Error = cliOptions.Error,
+                }
+            );
     }
 }

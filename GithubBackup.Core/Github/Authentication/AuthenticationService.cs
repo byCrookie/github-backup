@@ -6,29 +6,20 @@ using Polly.Retry;
 
 namespace GithubBackup.Core.Github.Authentication;
 
-internal sealed class AuthenticationService : IAuthenticationService
+internal sealed class AuthenticationService(
+    ILogger<AuthenticationService> logger,
+    IGithubWebClient githubWebClient
+) : IAuthenticationService
 {
-    private readonly ILogger<AuthenticationService> _logger;
-    private readonly IGithubWebClient _githubWebClient;
-
     private const string ClientId = "e197b2a7e36e8a0d5ea9";
-
-    public AuthenticationService(
-        ILogger<AuthenticationService> logger,
-        IGithubWebClient githubWebClient
-    )
-    {
-        _logger = logger;
-        _githubWebClient = githubWebClient;
-    }
 
     public async Task<DeviceAndUserCodes> RequestDeviceAndUserCodesAsync(CancellationToken ct)
     {
-        _logger.LogDebug("Requesting device and user codes");
+        logger.LogDebug("Requesting device and user codes");
 
         const string scope = "repo user user:email read:user";
 
-        var response = await _githubWebClient
+        var response = await githubWebClient
             .PostJsonAsync("/login/device/code", new { client_id = ClientId, scope }, ct: ct)
             .ReceiveJson<DeviceAndUserCodesResponse>();
 
@@ -47,7 +38,7 @@ internal sealed class AuthenticationService : IAuthenticationService
         CancellationToken ct
     )
     {
-        _logger.LogDebug("Polling for access token");
+        logger.LogDebug("Polling for access token");
 
         const string grantType = "urn:ietf:params:oauth:grant-type:device_code";
 
@@ -68,7 +59,7 @@ internal sealed class AuthenticationService : IAuthenticationService
 
         var response = await resiliencePipeline.ExecuteAsync(
             async cancellationToken =>
-                await _githubWebClient
+                await githubWebClient
                     .PostJsonAsync(
                         "/login/oauth/access_token",
                         new
@@ -108,7 +99,7 @@ internal sealed class AuthenticationService : IAuthenticationService
             case "authorization_pending":
             {
                 var delay = intervalWrapper.Interval;
-                _logger.LogInformation(
+                logger.LogInformation(
                     "Authorization pending. Retrying in {Seconds} seconds",
                     delay.TotalSeconds
                 );
@@ -120,7 +111,7 @@ internal sealed class AuthenticationService : IAuthenticationService
                     response.Interval ?? intervalWrapper.Interval.TotalSeconds + 5
                 );
                 intervalWrapper.Update(newDelay);
-                _logger.LogInformation(
+                logger.LogInformation(
                     "Slow down. Retrying in {Seconds} seconds",
                     newDelay.TotalSeconds
                 );

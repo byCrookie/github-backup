@@ -3,7 +3,7 @@ using GithubBackup.Cli.Commands.Github.Login;
 
 namespace GithubBackup.Cli.Commands.Github.Migrations;
 
-internal sealed class MigrationsArgs
+internal sealed record MigrationsArgs
 {
     public bool Export { get; }
     public long? DaysOld { get; }

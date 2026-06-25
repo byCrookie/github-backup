@@ -5,7 +5,7 @@ using GithubBackup.Cli.Commands.Services;
 
 namespace GithubBackup.Cli.Commands.Github.Migrate;
 
-internal sealed class MigrateArgs : ICommandIntervalArgs
+internal sealed record MigrateArgs : ICommandIntervalArgs
 {
     public string[] Repositories { get; }
     public bool LockRepositories { get; }

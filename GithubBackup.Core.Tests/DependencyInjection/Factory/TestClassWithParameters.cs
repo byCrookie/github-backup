@@ -1,22 +1,14 @@
 ﻿namespace GithubBackup.Core.Tests.DependencyInjection.Factory;
 
-public class TestClassWithParameters : ITestClassWithParameters
+public class TestClassWithParameters(
+    string parameter1,
+    ITestDependency1 testDependency1,
+    ITestDependency2 testDependency2,
+    string parameter2
+) : ITestClassWithParameters
 {
-    public string Parameter1 { get; }
-    public ITestDependency1 TestDependency1 { get; }
-    public ITestDependency2 TestDependency2 { get; }
-    public string Parameter2 { get; }
-
-    public TestClassWithParameters(
-        string parameter1,
-        ITestDependency1 testDependency1,
-        ITestDependency2 testDependency2,
-        string parameter2
-    )
-    {
-        Parameter1 = parameter1;
-        TestDependency1 = testDependency1;
-        TestDependency2 = testDependency2;
-        Parameter2 = parameter2;
-    }
+    public string Parameter1 { get; } = parameter1;
+    public ITestDependency1 TestDependency1 { get; } = testDependency1;
+    public ITestDependency2 TestDependency2 { get; } = testDependency2;
+    public string Parameter2 { get; } = parameter2;
 }

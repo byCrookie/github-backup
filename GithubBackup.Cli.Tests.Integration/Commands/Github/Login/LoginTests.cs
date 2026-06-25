@@ -55,7 +55,10 @@ public class LoginTests
                     .WithVerb(HttpMethod.Get)
                     .RespondWithJson(new UserResponse("user", "user"), headers: GetHeaders());
             },
-            fs => fs.Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData))
+            fs =>
+                fs.Directory.CreateDirectory(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+                )
         );
     }
 

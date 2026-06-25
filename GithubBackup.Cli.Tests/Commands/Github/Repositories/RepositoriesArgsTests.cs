@@ -22,7 +22,10 @@ public class RepositoriesArgsTests
 
         command.SetAction(p =>
         {
-            var repositoriesArgs = new RepositoriesArgsBinder(_repositoriesArguments, _loginArguments).Get(p);
+            var repositoriesArgs = new RepositoriesArgsBinder(
+                _repositoriesArguments,
+                _loginArguments
+            ).Get(p);
             repositoriesArgs.Should().NotBeNull();
             repositoriesArgs.Type.Should().Be(RepositoryType.Public);
             repositoriesArgs.Affiliation.Should().Be(RepositoryAffiliation.Owner);
@@ -43,7 +46,10 @@ public class RepositoriesArgsTests
 
         command.SetAction(p =>
         {
-            var repositoriesArgs = new RepositoriesArgsBinder(_repositoriesArguments, _loginArguments).Get(p);
+            var repositoriesArgs = new RepositoriesArgsBinder(
+                _repositoriesArguments,
+                _loginArguments
+            ).Get(p);
             repositoriesArgs.Should().NotBeNull();
             repositoriesArgs.Type.Should().BeNull();
             repositoriesArgs.Affiliation.Should().Be(RepositoryAffiliation.Collaborator);
@@ -52,6 +58,8 @@ public class RepositoriesArgsTests
             repositoriesArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
         });
 
-        await command.Parse("sub --affiliation collaborator --visibility private").InvokeTestAsync();
+        await command
+            .Parse("sub --affiliation collaborator --visibility private")
+            .InvokeTestAsync();
     }
 }

@@ -19,7 +19,10 @@
     <File Path=".github\workflows\test_osx_x64.yml" />
     <File Path=".github\workflows\test_win_x64.yml" />
   </Folder>
-  <Project Path="GithubBackup.Cli.Tests.Integration\GithubBackup.Cli.Tests.Integration.csproj" Type="C#" />
+  <Project
+    Path="GithubBackup.Cli.Tests.Integration\GithubBackup.Cli.Tests.Integration.csproj"
+    Type="C#"
+  />
   <Project Path="GithubBackup.Cli.Tests\GithubBackup.Cli.Tests.csproj" Type="C#" />
   <Project Path="GithubBackup.Cli\GithubBackup.Cli.csproj" Type="C#" />
   <Project Path="GithubBackup.Core.Tests\GithubBackup.Core.Tests.csproj" Type="C#" />

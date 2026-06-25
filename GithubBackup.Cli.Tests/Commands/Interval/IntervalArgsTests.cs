@@ -15,14 +15,14 @@ public class IntervalArgsTests
     {
         var command = new Command("sub");
         command.AddOptions(_intervalArguments.Options());
-        
+
         command.SetAction(p =>
         {
             var intervalArgs = new IntervalArgsBinder(_intervalArguments).Get(p);
             intervalArgs.Should().NotBeNull();
             intervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(10));
         });
-        
+
         await command.Parse("sub --interval 10").InvokeTestAsync();
     }
 
@@ -38,7 +38,7 @@ public class IntervalArgsTests
             intervalArgs.Should().NotBeNull();
             intervalArgs.Interval.Should().Be(TimeSpan.FromSeconds(10));
         });
-        
+
         await command.Parse("sub -i 10").InvokeTestAsync();
     }
 

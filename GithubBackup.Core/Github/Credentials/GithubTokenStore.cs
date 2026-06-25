@@ -2,20 +2,13 @@
 
 namespace GithubBackup.Core.Github.Credentials;
 
-public class GithubTokenStore : IGithubTokenStore
+public class GithubTokenStore(ILogger<GithubTokenStore> logger) : IGithubTokenStore
 {
-    private readonly ILogger<GithubTokenStore> _logger;
-
     private string? _token;
-
-    public GithubTokenStore(ILogger<GithubTokenStore> logger)
-    {
-        _logger = logger;
-    }
 
     public Task SetAsync(string? token)
     {
-        _logger.LogDebug("Setting token");
+        logger.LogDebug("Setting token");
         _token = token;
         return Task.CompletedTask;
     }
@@ -27,7 +20,7 @@ public class GithubTokenStore : IGithubTokenStore
             throw new InvalidOperationException("Token not set");
         }
 
-        _logger.LogDebug("Getting token");
+        logger.LogDebug("Getting token");
         return Task.FromResult(_token);
     }
 }

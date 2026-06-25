@@ -7,28 +7,21 @@ namespace GithubBackup.Cli.Commands.Github.Migrate;
 internal sealed class MigrateArgsBinder(
     MigrateArguments migrateArguments,
     IntervalArguments intervalArguments,
-    LoginArguments loginArguments)
+    LoginArguments loginArguments
+)
 {
     public MigrateArgs Get(ParseResult parseResult)
     {
-        var repositories = parseResult.GetRequiredValue(
-            migrateArguments.RepositoriesOption
-        );
+        var repositories = parseResult.GetRequiredValue(migrateArguments.RepositoriesOption);
         var lockRepositories = parseResult.GetRequiredValue(
             migrateArguments.LockRepositoriesOption
         );
-        var excludeMetadata = parseResult.GetRequiredValue(
-            migrateArguments.ExcludeMetadataOption
-        );
-        var excludeGitData = parseResult.GetRequiredValue(
-            migrateArguments.ExcludeGitDataOption
-        );
+        var excludeMetadata = parseResult.GetRequiredValue(migrateArguments.ExcludeMetadataOption);
+        var excludeGitData = parseResult.GetRequiredValue(migrateArguments.ExcludeGitDataOption);
         var excludeAttachements = parseResult.GetRequiredValue(
             migrateArguments.ExcludeAttachementsOption
         );
-        var excludeReleases = parseResult.GetRequiredValue(
-            migrateArguments.ExcludeReleasesOption
-        );
+        var excludeReleases = parseResult.GetRequiredValue(migrateArguments.ExcludeReleasesOption);
         var excludeOwnerProjects = parseResult.GetRequiredValue(
             migrateArguments.ExcludeOwnerProjectsOption
         );

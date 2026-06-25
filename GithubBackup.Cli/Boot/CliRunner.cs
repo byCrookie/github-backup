@@ -11,7 +11,8 @@ internal class CliRunner<TCliCommand, TCommandArgs>(
     string[] args,
     GlobalArgs globalArgs,
     TCommandArgs commandArgs,
-    RunOptions options)
+    RunOptions options
+)
     where TCommandArgs : class
     where TCliCommand : class, ICommandRunner
 {

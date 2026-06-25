@@ -39,7 +39,7 @@ public class GithubApiClientRateLimitTests
     [Fact]
     public async Task GetGithubApiAsync_WhenHitSecondaryRateLimits_ReturnAfterRetry()
     {
-        var response = new TestPageResponse(new List<TestPageItem>());
+        var response = new TestPageResponse([]);
 
         using var httpTest = new HttpTest();
 
@@ -80,7 +80,7 @@ public class GithubApiClientRateLimitTests
     [Fact]
     public async Task GetGithubApiAsync_WhenHitRateLimits_ReturnAfterResetTime()
     {
-        var response = new TestPageResponse(new List<TestPageItem>());
+        var response = new TestPageResponse([]);
 
         using var httpTest = new HttpTest();
 
@@ -129,7 +129,7 @@ public class GithubApiClientRateLimitTests
     [Fact]
     public async Task GetGithubApiAsync_WhenHitException_ReturnAfter3Attempts()
     {
-        var response = new TestPageResponse(new List<TestPageItem>());
+        var response = new TestPageResponse([]);
 
         using var httpTest = new HttpTest();
 

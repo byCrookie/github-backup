@@ -21,7 +21,10 @@ public class MigrationsArgsTests
 
         command.SetAction(p =>
         {
-            var migrationsArgs = new MigrationsArgsBinder(_migrationsArguments, _loginArguments).Get(p);
+            var migrationsArgs = new MigrationsArgsBinder(
+                _migrationsArguments,
+                _loginArguments
+            ).Get(p);
             migrationsArgs.Should().NotBeNull();
             migrationsArgs.Export.Should().BeTrue();
             migrationsArgs.DaysOld.Should().Be(7);
@@ -30,7 +33,9 @@ public class MigrationsArgsTests
             migrationsArgs.LoginArgs.DeviceFlowAuth.Should().BeTrue();
         });
 
-        await command.Parse("sub --export --days-old 7 --token test --device-flow-auth").InvokeTestAsync();
+        await command
+            .Parse("sub --export --days-old 7 --token test --device-flow-auth")
+            .InvokeTestAsync();
     }
 
     [Fact]
@@ -42,7 +47,10 @@ public class MigrationsArgsTests
 
         command.SetAction(p =>
         {
-            var migrationsArgs = new MigrationsArgsBinder(_migrationsArguments, _loginArguments).Get(p);
+            var migrationsArgs = new MigrationsArgsBinder(
+                _migrationsArguments,
+                _loginArguments
+            ).Get(p);
             migrationsArgs.Should().NotBeNull();
             migrationsArgs.Export.Should().BeTrue();
             migrationsArgs.DaysOld.Should().BeNull();
@@ -63,7 +71,10 @@ public class MigrationsArgsTests
 
         command.SetAction(p =>
         {
-            var migrationsArgs = new MigrationsArgsBinder(_migrationsArguments, _loginArguments).Get(p);
+            var migrationsArgs = new MigrationsArgsBinder(
+                _migrationsArguments,
+                _loginArguments
+            ).Get(p);
             migrationsArgs.Should().NotBeNull();
             migrationsArgs.Export.Should().BeTrue();
             migrationsArgs.DaysOld.Should().Be(7);
@@ -84,7 +95,10 @@ public class MigrationsArgsTests
 
         command.SetAction(p =>
         {
-            var migrationsArgs = new MigrationsArgsBinder(_migrationsArguments, _loginArguments).Get(p);
+            var migrationsArgs = new MigrationsArgsBinder(
+                _migrationsArguments,
+                _loginArguments
+            ).Get(p);
             migrationsArgs.Should().NotBeNull();
             migrationsArgs.Export.Should().BeTrue();
             migrationsArgs.DaysOld.Should().BeNull();
@@ -105,7 +119,10 @@ public class MigrationsArgsTests
 
         command.SetAction(p =>
         {
-            var migrationsArgs = new MigrationsArgsBinder(_migrationsArguments, _loginArguments).Get(p);
+            var migrationsArgs = new MigrationsArgsBinder(
+                _migrationsArguments,
+                _loginArguments
+            ).Get(p);
             migrationsArgs.Should().NotBeNull();
             migrationsArgs.Export.Should().BeTrue();
             migrationsArgs.DaysOld.Should().BeNull();
@@ -126,7 +143,10 @@ public class MigrationsArgsTests
 
         command.SetAction(p =>
         {
-            var migrationsArgs = new MigrationsArgsBinder(_migrationsArguments, _loginArguments).Get(p);
+            var migrationsArgs = new MigrationsArgsBinder(
+                _migrationsArguments,
+                _loginArguments
+            ).Get(p);
             migrationsArgs.Should().NotBeNull();
         });
 

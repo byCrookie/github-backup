@@ -15,20 +15,22 @@ internal static class ManualBackupCommand
     {
         var command = new Command(CommandName, CommandDescription);
 
-        command.SetAction((r, ct) =>
-        {
-            var globalArgs = new GlobalArgsBinder(options.GlobalArguments).Get(r);
-            var manualBackupArgs = new ManualBackupArgsBinder().Get(r);
+        command.SetAction(
+            (r, ct) =>
+            {
+                var globalArgs = new GlobalArgsBinder(options.GlobalArguments).Get(r);
+                var manualBackupArgs = new ManualBackupArgsBinder().Get(r);
 
-            var runner = new CliRunner<ManualBackupRunner, ManualBackupArgs>(
-                args,
-                globalArgs,
-                manualBackupArgs,
-                new RunOptions { AfterServices = options.AfterServices }
-            );
+                var runner = new CliRunner<ManualBackupRunner, ManualBackupArgs>(
+                    args,
+                    globalArgs,
+                    manualBackupArgs,
+                    new RunOptions { AfterServices = options.AfterServices }
+                );
 
-            return runner.RunAsync(ct);
-        });
+                return runner.RunAsync(ct);
+            }
+        );
 
         return command;
     }

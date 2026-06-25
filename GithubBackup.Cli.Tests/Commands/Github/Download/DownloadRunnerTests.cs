@@ -30,14 +30,11 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(
-                new List<Migration>
-                {
-                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                    new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
-                }
-            );
+            .Returns([
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+            ]);
 
         _migrationService
             .DownloadMigrationAsync(
@@ -67,14 +64,11 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(
-                new List<Migration>
-                {
-                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                    new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
-                }
-            );
+            .Returns([
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+            ]);
 
         _migrationService
             .DownloadMigrationAsync(
@@ -104,14 +98,11 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(
-                new List<Migration>
-                {
-                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                    new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
-                }
-            );
+            .Returns([
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+            ]);
 
         _migrationService
             .DownloadMigrationAsync(
@@ -144,14 +135,11 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(
-                new List<Migration>
-                {
-                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                    new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
-                }
-            );
+            .Returns([
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(id, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+            ]);
 
         _migrationService
             .DownloadMigrationAsync(
@@ -182,14 +170,11 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(
-                new List<Migration>
-                {
-                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                    new(1, MigrationState.Exporting, new DateTime(2021, 1, 1)),
-                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
-                }
-            );
+            .Returns([
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(1, MigrationState.Exporting, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+            ]);
 
         await runner.RunAsync(CancellationToken.None);
 
@@ -215,14 +200,11 @@ public class DownloadRunnerTests
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(
-                new List<Migration>
-                {
-                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                    new(1, MigrationState.Exporting, new DateTime(2021, 1, 1)),
-                    new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
-                }
-            );
+            .Returns([
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(1, MigrationState.Exporting, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Pending, new DateTime(2020, 1, 1)),
+            ]);
 
         await runner.RunAsync(CancellationToken.None);
 
@@ -244,18 +226,15 @@ public class DownloadRunnerTests
     [Fact]
     public async Task RunAsync_QuietAndExportMigrations_DoNotWriteToConsoleAndDoDownload()
     {
-        var runner = CreateRunner(true, true, false, new[] { 1L, 2L });
+        var runner = CreateRunner(true, true, false, [1L, 2L]);
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(
-                new List<Migration>
-                {
-                    new(0, MigrationState.Pending, new DateTime(2022, 1, 1)),
-                    new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                    new(2, MigrationState.Exported, new DateTime(2020, 1, 1)),
-                }
-            );
+            .Returns([
+                new(0, MigrationState.Pending, new DateTime(2022, 1, 1)),
+                new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Exported, new DateTime(2020, 1, 1)),
+            ]);
 
         _migrationService
             .DownloadMigrationAsync(
@@ -289,18 +268,15 @@ public class DownloadRunnerTests
     [Fact]
     public async Task RunAsync_NotQuietAndExportMigrations_DoWriteToConsoleAndDoDownload()
     {
-        var runner = CreateRunner(false, true, false, new[] { 1L, 2L });
+        var runner = CreateRunner(false, true, false, [1L, 2L]);
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(
-                new List<Migration>
-                {
-                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                    new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                    new(2, MigrationState.Exported, new DateTime(2020, 1, 1)),
-                }
-            );
+            .Returns([
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Exported, new DateTime(2020, 1, 1)),
+            ]);
 
         _migrationService
             .DownloadMigrationAsync(
@@ -334,18 +310,15 @@ public class DownloadRunnerTests
     [Fact]
     public async Task RunAsync_NotQuietAndExportMigrationsAndUsePolling_DoWriteToConsoleAndDoDownload()
     {
-        var runner = CreateRunner(false, true, true, new[] { 1L, 2L });
+        var runner = CreateRunner(false, true, true, [1L, 2L]);
 
         _migrationService
             .GetMigrationsAsync(CancellationToken.None)
-            .Returns(
-                new List<Migration>
-                {
-                    new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
-                    new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
-                    new(2, MigrationState.Exported, new DateTime(2020, 1, 1)),
-                }
-            );
+            .Returns([
+                new(0, MigrationState.Failed, new DateTime(2022, 1, 1)),
+                new(1, MigrationState.Exported, new DateTime(2021, 1, 1)),
+                new(2, MigrationState.Exported, new DateTime(2020, 1, 1)),
+            ]);
 
         _migrationService
             .PollAndDownloadMigrationAsync(
@@ -382,7 +355,7 @@ public class DownloadRunnerTests
     {
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
         var downloadArgs = new DownloadArgs(
-            ids ?? Array.Empty<long>(),
+            ids ?? [],
             latest,
             poll,
             new DirectoryInfo("test"),

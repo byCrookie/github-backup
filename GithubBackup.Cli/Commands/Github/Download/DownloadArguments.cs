@@ -3,88 +3,66 @@ using GithubBackup.Cli.Utils;
 
 namespace GithubBackup.Cli.Commands.Github.Download;
 
-public class DownloadArguments
+public class DownloadArguments(bool piping)
 {
-    public Option<long[]> MigrationsOption { get; }
-    public Option<bool> LatestOption { get; }
-    public Option<bool> PollOption { get; }
-    public Option<DirectoryInfo> DestinationOption { get; }
-    public Option<int?> NumberOfBackupsOption { get; }
-    public Option<bool> OverwriteOption { get; }
-
-    public DownloadArguments(bool piping)
-    {
-        MigrationsOption = new Option<long[]>(
-            name: "--migrations",
-            aliases: ["-m"]
-        )
+    public Option<long[]> MigrationsOption { get; } =
+        new(name: "--migrations", aliases: ["-m"])
         {
             Required = false,
             Description = DownloadArgDescriptions.Migrations.Long,
             Arity = ArgumentArity.OneOrMore,
             AllowMultipleArgumentsPerToken = true,
-            DefaultValueFactory = _ => Piping.ReadLongs(System.Console.In, piping, false)
+            DefaultValueFactory = _ => Piping.ReadLongs(Console.In, piping, false),
         };
 
-        LatestOption = new Option<bool>(
-            name: "--latest",
-            aliases: ["-l"]
-        )
+    public Option<bool> LatestOption { get; } =
+        new(name: "--latest", aliases: ["-l"])
         {
             Required = false,
             Description = DownloadArgDescriptions.Latest.Long,
-            DefaultValueFactory = _ => false
+            DefaultValueFactory = _ => false,
         };
 
-        PollOption = new Option<bool>(
-            name: "--poll",
-            aliases: ["-p"]
-        )
+    public Option<bool> PollOption { get; } =
+        new(name: "--poll", aliases: ["-p"])
         {
             Required = false,
             Description = DownloadArgDescriptions.Poll.Long,
-            DefaultValueFactory = _ => false
+            DefaultValueFactory = _ => false,
         };
 
-        DestinationOption = new Option<DirectoryInfo>(
-            name: "--destination",
-            aliases: ["-d"]
-        )
+    public Option<DirectoryInfo> DestinationOption { get; } =
+        new(name: "--destination", aliases: ["-d"])
         {
             Required = true,
-            Description = DownloadArgDescriptions.Destination.Long
+            Description = DownloadArgDescriptions.Destination.Long,
         };
 
-        NumberOfBackupsOption = new Option<int?>(
-            name: "--number-of-backups",
-            aliases: ["-n"]
-        )
+    public Option<int?> NumberOfBackupsOption { get; } =
+        new(name: "--number-of-backups", aliases: ["-n"])
         {
             Required = false,
-            Description = DownloadArgDescriptions.NumberOfBackups.Long
+            Description = DownloadArgDescriptions.NumberOfBackups.Long,
         };
 
-        OverwriteOption = new Option<bool>(
-            name: "--overwrite",
-            aliases: ["-o"]
-        )
+    public Option<bool> OverwriteOption { get; } =
+        new(name: "--overwrite", aliases: ["-o"])
         {
             Required = false,
             Description = DownloadArgDescriptions.Overwrite.Long,
-            DefaultValueFactory = _ => true
+            DefaultValueFactory = _ => true,
         };
-    }
 
     public List<Option> Options()
     {
-        return new List<Option>
-        {
+        return
+        [
             MigrationsOption,
             LatestOption,
             PollOption,
             DestinationOption,
             NumberOfBackupsOption,
             OverwriteOption,
-        };
+        ];
     }
 }

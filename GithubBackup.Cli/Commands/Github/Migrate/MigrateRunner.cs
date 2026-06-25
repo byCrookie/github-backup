@@ -5,48 +5,33 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Migrate;
 
-internal sealed class MigrateRunner : ICommandRunner
+internal sealed class MigrateRunner(
+    GlobalArgs globalArgs,
+    MigrateArgs migrateArgs,
+    IMigrationService migrationService,
+    ILoginService loginService,
+    IAnsiConsole ansiConsole
+) : ICommandRunner
 {
-    private readonly GlobalArgs _globalArgs;
-    private readonly MigrateArgs _migrateArgs;
-    private readonly IMigrationService _migrationService;
-    private readonly ILoginService _loginService;
-    private readonly IAnsiConsole _ansiConsole;
-
-    public MigrateRunner(
-        GlobalArgs globalArgs,
-        MigrateArgs migrateArgs,
-        IMigrationService migrationService,
-        ILoginService loginService,
-        IAnsiConsole ansiConsole
-    )
-    {
-        _globalArgs = globalArgs;
-        _migrateArgs = migrateArgs;
-        _migrationService = migrationService;
-        _loginService = loginService;
-        _ansiConsole = ansiConsole;
-    }
-
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.LoginAsync(_globalArgs, _migrateArgs.LoginArgs, ct);
+        await loginService.LoginAsync(globalArgs, migrateArgs.LoginArgs, ct);
 
         var options = new StartMigrationOptions(
-            _migrateArgs.Repositories,
-            _migrateArgs.LockRepositories,
-            _migrateArgs.ExcludeMetadata,
-            _migrateArgs.ExcludeGitData,
-            _migrateArgs.ExcludeAttachements,
-            _migrateArgs.ExcludeReleases,
-            _migrateArgs.ExcludeOwnerProjects,
-            _migrateArgs.OrgMetadataOnly
+            migrateArgs.Repositories,
+            migrateArgs.LockRepositories,
+            migrateArgs.ExcludeMetadata,
+            migrateArgs.ExcludeGitData,
+            migrateArgs.ExcludeAttachements,
+            migrateArgs.ExcludeReleases,
+            migrateArgs.ExcludeOwnerProjects,
+            migrateArgs.OrgMetadataOnly
         );
 
-        var migration = await _migrationService.StartMigrationAsync(options, ct);
+        var migration = await migrationService.StartMigrationAsync(options, ct);
 
-        _ansiConsole.WriteLine(
-            !_globalArgs.Quiet ? $"Migration started with id {migration.Id}" : $"{migration.Id}"
+        ansiConsole.WriteLine(
+            !globalArgs.Quiet ? $"Migration started with id {migration.Id}" : $"{migration.Id}"
         );
     }
 }

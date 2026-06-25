@@ -15,9 +15,9 @@ internal static class BackupCommand
     private const string CommandName = "backup";
 
     private const string CommandDescription = """
-                                              Backup a Github user. This command will create a new migration
-                                              for the given repositories and download it when ready.
-                                              """;
+        Backup a Github user. This command will create a new migration
+        for the given repositories and download it when ready.
+        """;
 
     public static Command Create(string[] args, CommandOptions options)
     {
@@ -37,25 +37,27 @@ internal static class BackupCommand
         command.AddOptions(intervalArguments.Options());
         command.AddOptions(loginArguments.Options());
 
-        command.SetAction((r, ct) =>
-        {
-            var globalArgs = new GlobalArgsBinder(options.GlobalArguments).Get(r);
-            var backupArgs = new BackupArgsBinder(
-                migrateArguments,
-                downloadArguments,
-                intervalArguments,
-                loginArguments
-            ).Get(r);
+        command.SetAction(
+            (r, ct) =>
+            {
+                var globalArgs = new GlobalArgsBinder(options.GlobalArguments).Get(r);
+                var backupArgs = new BackupArgsBinder(
+                    migrateArguments,
+                    downloadArguments,
+                    intervalArguments,
+                    loginArguments
+                ).Get(r);
 
-            var runner = new CliRunner<BackupRunner, BackupArgs>(
-                args,
-                globalArgs,
-                backupArgs,
-                new RunOptions { AfterServices = options.AfterServices }
-            );
+                var runner = new CliRunner<BackupRunner, BackupArgs>(
+                    args,
+                    globalArgs,
+                    backupArgs,
+                    new RunOptions { AfterServices = options.AfterServices }
+                );
 
-            return runner.RunAsync(ct);
-        });
+                return runner.RunAsync(ct);
+            }
+        );
 
         return command;
     }

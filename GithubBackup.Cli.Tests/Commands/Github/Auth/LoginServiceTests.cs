@@ -38,7 +38,9 @@ public class LoginServiceTests
         _dateTimeOffsetProvider = Substitute.For<IDateTimeOffsetProvider>();
         _ansiConsole = new TestConsole();
 
-        _dateTimeOffsetProvider.UtcNow.Returns(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+        _dateTimeOffsetProvider.UtcNow.Returns(
+            new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)
+        );
 
         _sut = new LoginService(
             Substitute.For<ILogger<LoginService>>(),
@@ -66,7 +68,9 @@ public class LoginServiceTests
 
         result.Should().Be(user);
         await _githubTokenStore.Received(1).SetAsync("cli-token");
-        await _temporaryCredentialStore.DidNotReceive().LoadTokenAsync(Arg.Any<CancellationToken>());
+        await _temporaryCredentialStore
+            .DidNotReceive()
+            .LoadTokenAsync(Arg.Any<CancellationToken>());
         await _authenticationService
             .DidNotReceive()
             .RequestDeviceAndUserCodesAsync(Arg.Any<CancellationToken>());
@@ -87,7 +91,9 @@ public class LoginServiceTests
 
         result.Should().Be(user);
         await _githubTokenStore.Received(1).SetAsync("env-token");
-        await _temporaryCredentialStore.DidNotReceive().LoadTokenAsync(Arg.Any<CancellationToken>());
+        await _temporaryCredentialStore
+            .DidNotReceive()
+            .LoadTokenAsync(Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -96,7 +102,12 @@ public class LoginServiceTests
         var user = new User("test", "test");
         _temporaryCredentialStore
             .LoadTokenAsync(CancellationToken.None)
-            .Returns(new TemporaryCredential("cached-token", new DateTimeOffset(2026, 1, 1, 1, 0, 0, TimeSpan.Zero)));
+            .Returns(
+                new TemporaryCredential(
+                    "cached-token",
+                    new DateTimeOffset(2026, 1, 1, 1, 0, 0, TimeSpan.Zero)
+                )
+            );
         _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
 
         var result = await _sut.LoginAsync(
@@ -118,10 +129,17 @@ public class LoginServiceTests
         var user = new User("test", "test");
         _temporaryCredentialStore
             .LoadTokenAsync(CancellationToken.None)
-            .Returns(new TemporaryCredential("cached-token", new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero)));
+            .Returns(
+                new TemporaryCredential(
+                    "cached-token",
+                    new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                )
+            );
         _authenticationService
             .RequestDeviceAndUserCodesAsync(CancellationToken.None)
-            .Returns(new DeviceAndUserCodes("device", "user", "https://github.com/login/device", 900, 5));
+            .Returns(
+                new DeviceAndUserCodes("device", "user", "https://github.com/login/device", 900, 5)
+            );
         _authenticationService
             .PollForAccessTokenAsync("device", 5, CancellationToken.None)
             .Returns(new AccessToken("device-token", "bearer", string.Empty, 60));
@@ -148,7 +166,9 @@ public class LoginServiceTests
     [Fact]
     public async Task TryLoginWithTemporaryTokenAsync_NoTemporaryToken_ReturnsNull()
     {
-        _temporaryCredentialStore.LoadTokenAsync(CancellationToken.None).Returns((TemporaryCredential?)null);
+        _temporaryCredentialStore
+            .LoadTokenAsync(CancellationToken.None)
+            .Returns((TemporaryCredential?)null);
 
         var result = await _sut.TryLoginWithTemporaryTokenAsync(
             GlobalArgs,

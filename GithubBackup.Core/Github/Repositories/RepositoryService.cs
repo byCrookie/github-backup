@@ -5,17 +5,11 @@ using Microsoft.Extensions.Logging;
 
 namespace GithubBackup.Core.Github.Repositories;
 
-internal sealed class RepositoryService : IRepositoryService
+internal sealed class RepositoryService(
+    IGithubApiClient githubApiClient,
+    ILogger<RepositoryService> logger
+) : IRepositoryService
 {
-    private readonly IGithubApiClient _githubApiClient;
-    private readonly ILogger<RepositoryService> _logger;
-
-    public RepositoryService(IGithubApiClient githubApiClient, ILogger<RepositoryService> logger)
-    {
-        _githubApiClient = githubApiClient;
-        _logger = logger;
-    }
-
     public Task<IReadOnlyCollection<Repository>> GetRepositoriesAsync(
         RepositoryOptions options,
         CancellationToken ct
@@ -23,14 +17,14 @@ internal sealed class RepositoryService : IRepositoryService
     {
         if (options.Type is not null)
         {
-            _logger.LogInformation("Getting repositories of type {Type}", options.Type.Value);
+            logger.LogInformation("Getting repositories of type {Type}", options.Type.Value);
             return GetRepositoryResponseAsync(
                 rq => rq.SetQueryParam("type", options.Type.Value.GetEnumMemberValue()),
                 ct
             );
         }
 
-        _logger.LogInformation(
+        logger.LogInformation(
             "Getting repositories of affiliation {Affiliation} and visibility {Visibility}",
             options.Affiliation!.Value,
             options.Visibility!.Value
@@ -48,7 +42,7 @@ internal sealed class RepositoryService : IRepositoryService
         CancellationToken ct
     )
     {
-        var response = await _githubApiClient.ReceiveJsonPagedAsync<
+        var response = await githubApiClient.ReceiveJsonPagedAsync<
             List<RepositoryResponse>,
             RepositoryResponse
         >("/user/repos", 100, r => r, configure, ct);

@@ -69,7 +69,11 @@ public class TemporaryCredentialStoreTests
     {
         var path = CreateAppDataPath();
         var tokenFile = GetTokenFile(path);
-        await _fileSystem.File.WriteAllTextAsync(tokenFile, string.Empty, TestContext.Current.CancellationToken);
+        await _fileSystem.File.WriteAllTextAsync(
+            tokenFile,
+            string.Empty,
+            TestContext.Current.CancellationToken
+        );
 
         var result = await _sut.LoadTokenAsync(CancellationToken.None);
 
@@ -93,7 +97,11 @@ public class TemporaryCredentialStoreTests
             "test",
             new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)
         );
-        await _fileSystem.File.WriteAllTextAsync(tokenFile, JsonSerializer.Serialize(credential), TestContext.Current.CancellationToken);
+        await _fileSystem.File.WriteAllTextAsync(
+            tokenFile,
+            JsonSerializer.Serialize(credential),
+            TestContext.Current.CancellationToken
+        );
 
         var result = await _sut.LoadTokenAsync(CancellationToken.None);
 
@@ -110,10 +118,12 @@ public class TemporaryCredentialStoreTests
 
         var tokenFile = GetTokenFile(path);
         _fileSystem.File.Exists(tokenFile).Should().BeTrue();
-        (await _fileSystem.File.ReadAllTextAsync(tokenFile, TestContext.Current.CancellationToken)).Should().Contain("test");
-        (await _sut.LoadTokenAsync(CancellationToken.None)).Should().Be(
-            new TemporaryCredential("test", expiresAt)
-        );
+        (await _fileSystem.File.ReadAllTextAsync(tokenFile, TestContext.Current.CancellationToken))
+            .Should()
+            .Contain("test");
+        (await _sut.LoadTokenAsync(CancellationToken.None))
+            .Should()
+            .Be(new TemporaryCredential("test", expiresAt));
     }
 
     [Fact]
@@ -121,7 +131,11 @@ public class TemporaryCredentialStoreTests
     {
         var path = CreateAppDataPath();
         var tokenFile = GetTokenFile(path);
-        await _fileSystem.File.WriteAllTextAsync(tokenFile, "test", TestContext.Current.CancellationToken);
+        await _fileSystem.File.WriteAllTextAsync(
+            tokenFile,
+            "test",
+            TestContext.Current.CancellationToken
+        );
 
         await _sut.DeleteTokenAsync(CancellationToken.None);
 

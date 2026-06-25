@@ -54,7 +54,7 @@ public class MigrateRunnerTests
     {
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
         var migrateArgs = new MigrateArgs(
-            new[] { "test" },
+            ["test"],
             false,
             false,
             false,

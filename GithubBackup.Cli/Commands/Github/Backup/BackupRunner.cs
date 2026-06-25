@@ -12,8 +12,8 @@ internal sealed class BackupRunner(
     IMigrationService migrationService,
     ILoginService loginService,
     IFileSystem fileSystem,
-    IAnsiConsole ansiConsole)
-    : ICommandRunner
+    IAnsiConsole ansiConsole
+) : ICommandRunner
 {
     public async Task RunAsync(CancellationToken ct)
     {

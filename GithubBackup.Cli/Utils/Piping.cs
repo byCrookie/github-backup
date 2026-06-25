@@ -4,14 +4,14 @@ namespace GithubBackup.Cli.Utils;
 
 public static partial class Piping
 {
-    public static Seperators Separators { get; } = new(new[] { ",", ":", ";", " " });
+    public static Separators Separators { get; } = new([",", ":", ";", " "]);
     private static Regex ArgRegex { get; } = GetArgRegex();
 
     public static long[] ReadLongs(TextReader stdin, bool piping, bool force)
     {
         if (!force && (!piping || !IsPipedInput()))
         {
-            return Array.Empty<long>();
+            return [];
         }
 
         var inputs = new List<long>();
@@ -25,14 +25,14 @@ public static partial class Piping
             inputs.AddRange(ints);
         }
 
-        return !inputs.Any() ? Array.Empty<long>() : inputs.ToArray();
+        return inputs.Count == 0 ? [] : inputs.ToArray();
     }
 
     public static string[] ReadStrings(TextReader stdin, bool piping, bool force)
     {
         if (!force && (!piping || !IsPipedInput()))
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         var inputs = new List<string>();
@@ -43,14 +43,14 @@ public static partial class Piping
             inputs.AddRange(strings);
         }
 
-        return !inputs.Any() ? Array.Empty<string>() : inputs.ToArray();
+        return inputs.Count == 0 ? [] : inputs.ToArray();
     }
 
     private static bool IsPipedInput()
     {
         try
         {
-            _ = System.Console.KeyAvailable;
+            _ = Console.KeyAvailable;
             return false;
         }
         catch

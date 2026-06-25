@@ -16,46 +16,34 @@ public class MigrateArguments
 
     public MigrateArguments(bool piping)
     {
-        RepositoriesOption = new Option<string[]>(
-            name: "--repositories",
-            aliases: ["-r"]
-        )
+        RepositoriesOption = new Option<string[]>(name: "--repositories", aliases: ["-r"])
         {
             Required = false,
             Description = MigrateArgDescriptions.Repositories.Long,
             Arity = ArgumentArity.ZeroOrMore,
             AllowMultipleArgumentsPerToken = true,
-            DefaultValueFactory = _ => Piping.ReadStrings(Console.In, piping, false)
+            DefaultValueFactory = _ => Piping.ReadStrings(Console.In, piping, false),
         };
 
-        LockRepositoriesOption = new Option<bool>(
-            name: "--lock-repositories",
-            aliases: ["-lr"]
-        )
+        LockRepositoriesOption = new Option<bool>(name: "--lock-repositories", aliases: ["-lr"])
         {
             Required = false,
             Description = MigrateArgDescriptions.LockRepositories.Long,
-            DefaultValueFactory = _ => false
+            DefaultValueFactory = _ => false,
         };
 
-        ExcludeMetadataOption = new Option<bool>(
-            name: "--exclude-metadata",
-            aliases: ["-em"]
-        )
+        ExcludeMetadataOption = new Option<bool>(name: "--exclude-metadata", aliases: ["-em"])
         {
             Required = false,
             Description = MigrateArgDescriptions.ExcludeMetadata.Long,
-            DefaultValueFactory = _ => false
+            DefaultValueFactory = _ => false,
         };
 
-        ExcludeGitDataOption = new Option<bool>(
-            name: "--exclude-git-data",
-            aliases: ["-egd"]
-        )
+        ExcludeGitDataOption = new Option<bool>(name: "--exclude-git-data", aliases: ["-egd"])
         {
             Required = false,
             Description = MigrateArgDescriptions.ExcludeGitData.Long,
-            DefaultValueFactory = _ => false
+            DefaultValueFactory = _ => false,
         };
 
         ExcludeAttachementsOption = new Option<bool>(
@@ -65,17 +53,14 @@ public class MigrateArguments
         {
             Required = false,
             Description = MigrateArgDescriptions.ExcludeAttachements.Long,
-            DefaultValueFactory = _ => false
+            DefaultValueFactory = _ => false,
         };
 
-        ExcludeReleasesOption = new Option<bool>(
-            name: "--exclude-releases",
-            aliases: ["-er"]
-        )
+        ExcludeReleasesOption = new Option<bool>(name: "--exclude-releases", aliases: ["-er"])
         {
             Required = false,
             Description = MigrateArgDescriptions.ExcludeReleases.Long,
-            DefaultValueFactory = _ => false
+            DefaultValueFactory = _ => false,
         };
 
         ExcludeOwnerProjectsOption = new Option<bool>(
@@ -85,17 +70,14 @@ public class MigrateArguments
         {
             Required = false,
             Description = MigrateArgDescriptions.ExcludeOwnerProjects.Long,
-            DefaultValueFactory = _ => false
+            DefaultValueFactory = _ => false,
         };
 
-        OrgMetadataOnlyOption = new Option<bool>(
-            name: "--org-metadata-only",
-            aliases: ["-omo"]
-        )
+        OrgMetadataOnlyOption = new Option<bool>(name: "--org-metadata-only", aliases: ["-omo"])
         {
             Required = false,
             Description = MigrateArgDescriptions.OrgMetadataOnly.Long,
-            DefaultValueFactory = _ => false
+            DefaultValueFactory = _ => false,
         };
 
         OrgMetadataOnlyOption.Validators.Add(result =>
@@ -121,7 +103,7 @@ public class MigrateArguments
             ExcludeAttachementsOption,
             ExcludeReleasesOption,
             ExcludeOwnerProjectsOption,
-            OrgMetadataOnlyOption
+            OrgMetadataOnlyOption,
         ];
     }
 }

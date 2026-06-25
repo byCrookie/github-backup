@@ -40,7 +40,7 @@ public class GithubApiClientCacheTests
     {
         const string url = "https://api.github.com/test";
 
-        var cachedResponse = new TestPageResponse(new List<TestPageItem>());
+        var cachedResponse = new TestPageResponse([]);
         var notModifiedResponse = string.Empty;
 
         using var httpTest = new HttpTest();
@@ -101,8 +101,8 @@ public class GithubApiClientCacheTests
     {
         const string url = "https://api.github.com/test";
 
-        var cachedResponse = new TestPageResponse(new List<TestPageItem>());
-        var newResponse = new TestPageResponse(new List<TestPageItem>());
+        var cachedResponse = new TestPageResponse([]);
+        var newResponse = new TestPageResponse([]);
 
         using var httpTest = new HttpTest();
 
@@ -168,8 +168,8 @@ public class GithubApiClientCacheTests
     [Fact]
     public async Task GetGithubApiAsync_WhenCacheHitAndETagsDontMatch_ReturnMakeCall()
     {
-        var response1 = new TestPageResponse(new List<TestPageItem>());
-        var response2 = new TestPageResponse(new List<TestPageItem>());
+        var response1 = new TestPageResponse([]);
+        var response2 = new TestPageResponse([]);
 
         using var httpTest = new HttpTest();
 
@@ -234,8 +234,8 @@ public class GithubApiClientCacheTests
     [Fact]
     public async Task GetGithubApiAsync_WhenCacheHitAndNoETag_ReturnMakeCall()
     {
-        var response1 = new TestPageResponse(new List<TestPageItem>());
-        var response2 = new TestPageResponse(new List<TestPageItem>());
+        var response1 = new TestPageResponse([]);
+        var response2 = new TestPageResponse([]);
 
         using var httpTest = new HttpTest();
 

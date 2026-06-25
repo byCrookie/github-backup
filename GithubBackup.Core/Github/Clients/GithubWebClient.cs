@@ -15,16 +15,15 @@ internal class GithubWebClient(ILogger<GithubWebClient> logger) : IGithubWebClie
     private const string Accept = "application/vnd.github.v3+json";
     private const string BaseUrl = "https://github.com";
 
-    private readonly Lazy<IFlurlClient> _client = new(
-        () =>
-            new FlurlClient(BaseUrl)
-                .WithSettings(s =>
-                    s.JsonSerializer = new DefaultJsonSerializer(
-                        new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }
-                    )
+    private readonly Lazy<IFlurlClient> _client = new(() =>
+        new FlurlClient(BaseUrl)
+            .WithSettings(s =>
+                s.JsonSerializer = new DefaultJsonSerializer(
+                    new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }
                 )
-                .WithHeader(HeaderNames.Accept, Accept)
-                .WithHeader(HeaderNames.UserAgent, UserAgent)
+            )
+            .WithHeader(HeaderNames.Accept, Accept)
+            .WithHeader(HeaderNames.UserAgent, UserAgent)
     );
 
     public async Task<IFlurlResponse> PostJsonAsync(

@@ -2,29 +2,29 @@
 
 namespace GithubBackup.Core.Github.Authentication;
 
-internal sealed class AccessTokenResponse
+internal sealed record AccessTokenResponse
 {
     [JsonPropertyName("access_token")]
-    public string? AccessToken { get; set; }
+    public string? AccessToken { get; init; }
 
     [JsonPropertyName("token_type")]
-    public string? TokenType { get; set; }
+    public string? TokenType { get; init; }
 
     [JsonPropertyName("scope")]
-    public string? Scope { get; set; }
+    public string? Scope { get; init; }
 
     [JsonPropertyName("expires_in")]
-    public int? ExpiresIn { get; set; }
+    public int? ExpiresIn { get; init; }
 
     [JsonPropertyName("error")]
-    public string? Error { get; set; }
+    public string? Error { get; init; }
 
     [JsonPropertyName("error_description")]
-    public string? ErrorDescription { get; set; }
+    public string? ErrorDescription { get; init; }
 
     [JsonPropertyName("error_uri")]
-    public Uri? ErrorUri { get; set; }
+    public Uri? ErrorUri { get; init; }
 
     [JsonPropertyName("interval")]
-    public int? Interval { get; set; }
+    public int? Interval { get; init; }
 }

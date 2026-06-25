@@ -24,24 +24,26 @@ internal static class MigrateCommand
         command.AddOptions(intervalArguments.Options());
         command.AddOptions(loginArguments.Options());
 
-        command.SetAction((r, ct) =>
-        {
-            var globalArgs = new GlobalArgsBinder(options.GlobalArguments).Get(r);
-            var migrateArgs = new MigrateArgsBinder(
-                migrateArguments,
-                intervalArguments,
-                loginArguments
-            ).Get(r);
+        command.SetAction(
+            (r, ct) =>
+            {
+                var globalArgs = new GlobalArgsBinder(options.GlobalArguments).Get(r);
+                var migrateArgs = new MigrateArgsBinder(
+                    migrateArguments,
+                    intervalArguments,
+                    loginArguments
+                ).Get(r);
 
-            var runner = new CliRunner<MigrateRunner, MigrateArgs>(
-                args,
-                globalArgs,
-                migrateArgs,
-                new RunOptions { AfterServices = options.AfterServices }
-            );
+                var runner = new CliRunner<MigrateRunner, MigrateArgs>(
+                    args,
+                    globalArgs,
+                    migrateArgs,
+                    new RunOptions { AfterServices = options.AfterServices }
+                );
 
-            return runner.RunAsync(ct);
-        });
+                return runner.RunAsync(ct);
+            }
+        );
 
         return command;
     }

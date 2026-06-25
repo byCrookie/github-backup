@@ -6,43 +6,26 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Migrations;
 
-internal sealed class MigrationsRunner : ICommandRunner
+internal sealed class MigrationsRunner(
+    GlobalArgs globalArgs,
+    MigrationsArgs migrationsArgs,
+    IMigrationService migrationService,
+    ILoginService loginService,
+    IAnsiConsole ansiConsole,
+    IDateTimeProvider dateTimeProvider
+) : ICommandRunner
 {
-    private readonly GlobalArgs _globalArgs;
-    private readonly MigrationsArgs _migrationsArgs;
-    private readonly IMigrationService _migrationService;
-    private readonly ILoginService _loginService;
-    private readonly IAnsiConsole _ansiConsole;
-    private readonly IDateTimeProvider _dateTimeProvider;
-
-    public MigrationsRunner(
-        GlobalArgs globalArgs,
-        MigrationsArgs migrationsArgs,
-        IMigrationService migrationService,
-        ILoginService loginService,
-        IAnsiConsole ansiConsole,
-        IDateTimeProvider dateTimeProvider
-    )
-    {
-        _globalArgs = globalArgs;
-        _migrationsArgs = migrationsArgs;
-        _migrationService = migrationService;
-        _loginService = loginService;
-        _ansiConsole = ansiConsole;
-        _dateTimeProvider = dateTimeProvider;
-    }
-
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.LoginAsync(_globalArgs, _migrationsArgs.LoginArgs, ct);
+        await loginService.LoginAsync(globalArgs, migrationsArgs.LoginArgs, ct);
 
-        var migrations = await _migrationService.GetMigrationsAsync(ct);
+        var migrations = await migrationService.GetMigrationsAsync(ct);
 
-        if (!migrations.Any())
+        if (migrations.Count == 0)
         {
-            if (!_globalArgs.Quiet)
+            if (!globalArgs.Quiet)
             {
-                _ansiConsole.WriteLine("No migrations found.");
+                ansiConsole.WriteLine("No migrations found.");
             }
 
             return;
@@ -50,40 +33,40 @@ internal sealed class MigrationsRunner : ICommandRunner
 
         var filteredMigrations = migrations
             .Where(m =>
-                !_migrationsArgs.Export
+                !migrationsArgs.Export
                 || (
                     m.State == MigrationState.Exported
-                    && (_dateTimeProvider.Now - m.CreatedAt).Days <= 7
+                    && (dateTimeProvider.Now - m.CreatedAt).Days <= 7
                 )
             )
             .Where(m =>
-                _migrationsArgs.DaysOld is null
-                || (_dateTimeProvider.Now - m.CreatedAt).Days <= _migrationsArgs.DaysOld
+                migrationsArgs.DaysOld is null
+                || (dateTimeProvider.Now - m.CreatedAt).Days <= migrationsArgs.DaysOld
             )
-            .Where(m => _migrationsArgs.Since is null || m.CreatedAt >= _migrationsArgs.Since)
+            .Where(m => migrationsArgs.Since is null || m.CreatedAt >= migrationsArgs.Since)
             .ToList();
 
-        if (!filteredMigrations.Any())
+        if (filteredMigrations.Count == 0)
         {
-            if (!_globalArgs.Quiet)
+            if (!globalArgs.Quiet)
             {
-                _ansiConsole.WriteLine("No migrations found after filters were applied.");
+                ansiConsole.WriteLine("No migrations found after filters were applied.");
             }
 
             return;
         }
 
-        if (!_globalArgs.Quiet)
+        if (!globalArgs.Quiet)
         {
-            _ansiConsole.WriteLine($"Found {filteredMigrations.Count} migrations:");
+            ansiConsole.WriteLine($"Found {filteredMigrations.Count} migrations:");
             foreach (var migration in filteredMigrations)
             {
-                _ansiConsole.WriteLine(
-                    $"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)"
+                ansiConsole.WriteLine(
+                    $"- {migration.Id} {migration.State} {migration.CreatedAt} ({(dateTimeProvider.Now - migration.CreatedAt).Days}d)"
                 );
             }
         }
 
-        _ansiConsole.WriteLine(string.Join(" ", filteredMigrations.Select(m => m.Id)));
+        ansiConsole.WriteLine(string.Join(" ", filteredMigrations.Select(m => m.Id)));
     }
 }

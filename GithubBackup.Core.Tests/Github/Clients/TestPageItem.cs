@@ -2,17 +2,11 @@
 
 namespace GithubBackup.Core.Tests.Github.Clients;
 
-public class TestPageItem
+public class TestPageItem(int id, string name)
 {
     [JsonPropertyName("id")]
-    public int Id { get; set; }
+    public int Id { get; set; } = id;
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
-
-    public TestPageItem(int id, string name)
-    {
-        Id = id;
-        Name = name;
-    }
+    public string Name { get; set; } = name;
 }

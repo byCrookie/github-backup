@@ -24,7 +24,11 @@ public class MigrateArgsTests
 
         command.SetAction(p =>
         {
-            var migrateArgs = new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments).Get(p);
+            var migrateArgs = new MigrateArgsBinder(
+                _migrateArguments,
+                _intervalArguments,
+                _loginArguments
+            ).Get(p);
             migrateArgs.Should().NotBeNull();
             migrateArgs.Repositories.Should().BeEquivalentTo("repo1", "repo2");
             migrateArgs.LockRepositories.Should().BeTrue();
@@ -39,11 +43,13 @@ public class MigrateArgsTests
             migrateArgs.LoginArgs.DeviceFlowAuth.Should().BeTrue();
         });
 
-        await command.Parse(
-            "sub --repositories repo1 repo2 --lock-repositories --exclude-metadata"
-            + " --exclude-git-data --exclude-attachements --exclude-releases --exclude-owner-projects --interval 100"
-            + " --token test --device-flow-auth"
-        ).InvokeTestAsync();
+        await command
+            .Parse(
+                "sub --repositories repo1 repo2 --lock-repositories --exclude-metadata"
+                    + " --exclude-git-data --exclude-attachements --exclude-releases --exclude-owner-projects --interval 100"
+                    + " --token test --device-flow-auth"
+            )
+            .InvokeTestAsync();
     }
 
     [Fact]
@@ -56,7 +62,11 @@ public class MigrateArgsTests
 
         command.SetAction(p =>
         {
-            var migrateArgs = new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments).Get(p);
+            var migrateArgs = new MigrateArgsBinder(
+                _migrateArguments,
+                _intervalArguments,
+                _loginArguments
+            ).Get(p);
             migrateArgs.Should().NotBeNull();
             migrateArgs.Repositories.Should().BeEquivalentTo("repo1", "repo2");
             migrateArgs.LockRepositories.Should().BeTrue();
@@ -71,7 +81,9 @@ public class MigrateArgsTests
             migrateArgs.LoginArgs.DeviceFlowAuth.Should().BeFalse();
         });
 
-        await command.Parse("sub -r repo1 repo2 -lr -em -egd -ea -er -eop -i 100").InvokeTestAsync();
+        await command
+            .Parse("sub -r repo1 repo2 -lr -em -egd -ea -er -eop -i 100")
+            .InvokeTestAsync();
     }
 
     [Theory]
@@ -90,7 +102,11 @@ public class MigrateArgsTests
 
         command.SetAction(p =>
         {
-            var migrateArgs = new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments).Get(p);
+            var migrateArgs = new MigrateArgsBinder(
+                _migrateArguments,
+                _intervalArguments,
+                _loginArguments
+            ).Get(p);
             migrateArgs.Should().NotBeNull();
             migrateArgs.Repositories.Should().BeEquivalentTo("repo1", "repo2");
             migrateArgs.LockRepositories.Should().BeFalse();
@@ -118,7 +134,11 @@ public class MigrateArgsTests
 
         command.SetAction(p =>
         {
-            var migrateArgs = new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments).Get(p);
+            var migrateArgs = new MigrateArgsBinder(
+                _migrateArguments,
+                _intervalArguments,
+                _loginArguments
+            ).Get(p);
             migrateArgs.Should().NotBeNull();
             migrateArgs.Repositories.Should().BeEquivalentTo("repo1", "repo2");
             migrateArgs.LockRepositories.Should().BeFalse();
@@ -146,11 +166,16 @@ public class MigrateArgsTests
 
         command.SetAction(p =>
         {
-            var migrateArgs = new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments).Get(p);
+            var migrateArgs = new MigrateArgsBinder(
+                _migrateArguments,
+                _intervalArguments,
+                _loginArguments
+            ).Get(p);
             migrateArgs.Should().NotBeNull();
         });
 
-        var action = () => command.Parse("sub --org-metadata-only --repositories repo1 repo2").InvokeTestAsync();
+        var action = () =>
+            command.Parse("sub --org-metadata-only --repositories repo1 repo2").InvokeTestAsync();
 
         await action.Should().ThrowAsync<Exception>();
     }
@@ -165,7 +190,11 @@ public class MigrateArgsTests
 
         command.SetAction(p =>
         {
-            var migrateArgs = new MigrateArgsBinder(_migrateArguments, _intervalArguments, _loginArguments).Get(p);
+            var migrateArgs = new MigrateArgsBinder(
+                _migrateArguments,
+                _intervalArguments,
+                _loginArguments
+            ).Get(p);
             migrateArgs.Should().NotBeNull();
         });
 

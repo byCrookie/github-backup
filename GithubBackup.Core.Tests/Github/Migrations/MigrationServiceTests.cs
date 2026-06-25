@@ -69,9 +69,7 @@ public class MigrationServiceTests
                 Arg.Any<Action<IFlurlRequest>?>(),
                 ct
             )
-            .Returns(
-                new List<MigrationReponse> { new(id, state, createdAt), new(id2, state, createdAt) }
-            );
+            .Returns([new(id, state, createdAt), new(id2, state, createdAt)]);
 
         var result = await _sut.GetMigrationsAsync(CancellationToken.None);
 
@@ -110,7 +108,7 @@ public class MigrationServiceTests
             .Returns(reponse);
 
         var options = new StartMigrationOptions(
-            new[] { "Test1", "Test2" },
+            ["Test1", "Test2"],
             true,
             true,
             true,

@@ -77,7 +77,7 @@ public class BackupRunnerTests
     {
         var globalArgs = new GlobalArgs(LogLevel.Debug, quiet, new FileInfo("test"));
         var migrateArgs = new MigrateArgs(
-            new[] { "test" },
+            ["test"],
             false,
             false,
             false,
@@ -89,7 +89,7 @@ public class BackupRunnerTests
             new LoginArgs(null, false)
         );
         var downloadArgs = new DownloadArgs(
-            Array.Empty<long>(),
+            [],
             false,
             false,
             new DirectoryInfo("test"),

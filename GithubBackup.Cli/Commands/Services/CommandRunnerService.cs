@@ -7,65 +7,48 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Services;
 
-internal sealed class CommandRunnerService : IHostedService
+internal sealed class CommandRunnerService(
+    GlobalArgs globalArgs,
+    ILogger<CommandRunnerService> logger,
+    IHostApplicationLifetime hostApplicationLifetime,
+    ICommandRunner commandRunner,
+    IAnsiConsole ansiConsole,
+    IStopwatch stopwatch
+) : IHostedService
 {
-    private readonly GlobalArgs _globalArgs;
-    private readonly ILogger<CommandRunnerService> _logger;
-    private readonly IHostApplicationLifetime _hostApplicationLifetime;
-    private readonly ICommandRunner _commandRunner;
-    private readonly IAnsiConsole _ansiConsole;
-    private readonly IStopwatch _stopwatch;
-
-    public CommandRunnerService(
-        GlobalArgs globalArgs,
-        ILogger<CommandRunnerService> logger,
-        IHostApplicationLifetime hostApplicationLifetime,
-        ICommandRunner commandRunner,
-        IAnsiConsole ansiConsole,
-        IStopwatch stopwatch
-    )
-    {
-        _globalArgs = globalArgs;
-        _logger = logger;
-        _hostApplicationLifetime = hostApplicationLifetime;
-        _commandRunner = commandRunner;
-        _ansiConsole = ansiConsole;
-        _stopwatch = stopwatch;
-    }
-
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Running command");
+        logger.LogInformation("Running command");
 
-        if (!_globalArgs.Quiet)
+        if (!globalArgs.Quiet)
         {
-            _ansiConsole.WriteLine("Running command");
+            ansiConsole.WriteLine("Running command");
         }
 
-        var stopWatch = _stopwatch.StartNew();
+        var stopWatch = stopwatch.StartNew();
 
         try
         {
-            _logger.LogInformation("Starting command: {Type}", _commandRunner.GetType().Name);
-            await _commandRunner.RunAsync(cancellationToken);
+            logger.LogInformation("Starting command: {Type}", commandRunner.GetType().Name);
+            await commandRunner.RunAsync(cancellationToken);
         }
         catch (FlurlHttpException e)
         {
             var error = await e.GetResponseStringAsync();
-            _logger.LogCritical(
+            logger.LogCritical(
                 e,
                 "Unhandled exception (Command: {Type}): {Message}",
-                _commandRunner.GetType().Name,
+                commandRunner.GetType().Name,
                 error
             );
             throw new Exception(error, e);
         }
         catch (Exception e)
         {
-            _logger.LogCritical(
+            logger.LogCritical(
                 e,
                 "Unhandled exception (Command: {Type}): {Message}",
-                _commandRunner.GetType().Name,
+                commandRunner.GetType().Name,
                 e.Message
             );
             throw;
@@ -73,14 +56,14 @@ internal sealed class CommandRunnerService : IHostedService
         finally
         {
             stopWatch.Stop();
-            _logger.LogInformation("Command finished. Duration: {Duration}", stopWatch.Elapsed);
+            logger.LogInformation("Command finished. Duration: {Duration}", stopWatch.Elapsed);
 
-            if (!_globalArgs.Quiet)
+            if (!globalArgs.Quiet)
             {
-                _ansiConsole.WriteLine($"Command finished. Duration: {stopWatch.Elapsed}");
+                ansiConsole.WriteLine($"Command finished. Duration: {stopWatch.Elapsed}");
             }
 
-            _hostApplicationLifetime.StopApplication();
+            hostApplicationLifetime.StopApplication();
         }
     }
 

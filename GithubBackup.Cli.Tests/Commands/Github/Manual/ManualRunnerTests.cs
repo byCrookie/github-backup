@@ -40,7 +40,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns([]);
         _loginService
             .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
@@ -70,7 +70,7 @@ public class ManualRunnerTests
 
         const string validToken = "token1";
 
-        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns([]);
         _loginService
             .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
@@ -104,7 +104,7 @@ public class ManualRunnerTests
 
         const string validToken = "token1";
 
-        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns([]);
 
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
@@ -130,7 +130,7 @@ public class ManualRunnerTests
 
         const string validToken = "token1";
 
-        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns([]);
 
         _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
@@ -312,7 +312,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns([]);
         _loginService
             .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
@@ -351,7 +351,7 @@ public class ManualRunnerTests
 
         var user = new User("test", "test");
 
-        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns([]);
         _loginService
             .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
@@ -404,7 +404,7 @@ public class ManualRunnerTests
                 Arg.Any<CancellationToken>()
             )
             .Returns(user);
-        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
+        _migrationService.GetMigrationsAsync(CancellationToken.None).Returns([]);
 
         _ansiConsole.Input.PushCharacter('y');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);

@@ -3,23 +3,18 @@ using Microsoft.Extensions.Primitives;
 
 namespace GithubBackup.TestUtils.Configuration;
 
-public class KeyValueConfigurationProvider : IConfigurationProvider, IConfigurationSource
+public class KeyValueConfigurationProvider(IDictionary<string, string?> data)
+    : IConfigurationProvider,
+        IConfigurationSource
 {
-    private readonly IDictionary<string, string?> _data;
-
-    public KeyValueConfigurationProvider(IDictionary<string, string?> data)
-    {
-        _data = data;
-    }
-
     public bool TryGet(string key, out string? value)
     {
-        return _data.TryGetValue(key, out value);
+        return data.TryGetValue(key, out value);
     }
 
     public void Set(string key, string? value)
     {
-        _data[key] = value;
+        data[key] = value;
     }
 
     public IChangeToken GetReloadToken()

@@ -9,4 +9,4 @@ public record LogEntry(LogLevel Level, [StringSyntax(StringSyntaxAttribute.Regex
     {
         return $"new LogEntry(LogLevel.{Level}, \"{Message}\")";
     }
-};
+}

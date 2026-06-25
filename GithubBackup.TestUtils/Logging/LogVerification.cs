@@ -17,4 +17,4 @@ public record LogVerification(
             ? $"Valid: {Message}"
             : $"Invalid: {ErrorMessage} - Expected: {ExpectedLevel} {ExpectedMessagePattern} - Actual: {Level} {Message}";
     }
-};
+}

@@ -2,17 +2,7 @@
 
 namespace GithubBackup.Core.Github.Users;
 
-internal sealed class UserResponse
-{
-    [JsonPropertyName("login")]
-    public string Login { get; set; }
-
-    [JsonPropertyName("name")]
-    public string Name { get; set; }
-
-    public UserResponse(string login, string name)
-    {
-        Login = login;
-        Name = name;
-    }
-}
+internal sealed record UserResponse(
+    [property: JsonPropertyName("login")] string Login,
+    [property: JsonPropertyName("name")] string Name
+);

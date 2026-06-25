@@ -7,97 +7,76 @@ using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Services;
 
-internal sealed class CommandIntervalRunnerService : IHostedService
+internal sealed class CommandIntervalRunnerService(
+    GlobalArgs globalArgs,
+    TimeSpan interval,
+    ILogger<CommandIntervalRunnerService> logger,
+    IHostApplicationLifetime hostApplicationLifetime,
+    ICommandRunner commandRunner,
+    IAnsiConsole ansiConsole,
+    IDateTimeProvider dateTimeProvider,
+    IStopwatch stopwatch
+) : IHostedService
 {
-    private readonly GlobalArgs _globalArgs;
-    private readonly TimeSpan _interval;
-    private readonly ILogger<CommandIntervalRunnerService> _logger;
-    private readonly IHostApplicationLifetime _hostApplicationLifetime;
-    private readonly ICommandRunner _commandRunner;
-    private readonly IAnsiConsole _ansiConsole;
-    private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IStopwatch _stopwatch;
-
-    public CommandIntervalRunnerService(
-        GlobalArgs globalArgs,
-        TimeSpan interval,
-        ILogger<CommandIntervalRunnerService> logger,
-        IHostApplicationLifetime hostApplicationLifetime,
-        ICommandRunner commandRunner,
-        IAnsiConsole ansiConsole,
-        IDateTimeProvider dateTimeProvider,
-        IStopwatch stopwatch
-    )
-    {
-        _globalArgs = globalArgs;
-        _interval = interval;
-        _logger = logger;
-        _hostApplicationLifetime = hostApplicationLifetime;
-        _commandRunner = commandRunner;
-        _ansiConsole = ansiConsole;
-        _dateTimeProvider = dateTimeProvider;
-        _stopwatch = stopwatch;
-    }
-
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Running command. Interval: {Interval}", _interval);
+        logger.LogInformation("Running command. Interval: {Interval}", interval);
 
-        if (!_globalArgs.Quiet)
+        if (!globalArgs.Quiet)
         {
-            _ansiConsole.WriteLine($"Running command. Interval: {_interval}");
+            ansiConsole.WriteLine($"Running command. Interval: {interval}");
         }
 
-        var periodicTimer = new PeriodicTimer(_interval);
+        var periodicTimer = new PeriodicTimer(interval);
 
         do
         {
-            var now = _dateTimeProvider.Now;
-            var stopWatch = _stopwatch.StartNew();
+            var now = dateTimeProvider.Now;
+            var stopWatch = stopwatch.StartNew();
 
             try
             {
-                _logger.LogInformation("Starting command: {Type}", _commandRunner.GetType().Name);
-                await _commandRunner.RunAsync(cancellationToken);
+                logger.LogInformation("Starting command: {Type}", commandRunner.GetType().Name);
+                await commandRunner.RunAsync(cancellationToken);
             }
             catch (FlurlHttpException e)
             {
                 var error = await e.GetResponseStringAsync();
-                _logger.LogError(
+                logger.LogError(
                     e,
                     "Unhandled exception (Command: {Type}): {Message}",
-                    _commandRunner.GetType().Name,
+                    commandRunner.GetType().Name,
                     error
                 );
-                _ansiConsole.MarkupLine($"[red]{error}[/]");
+                ansiConsole.MarkupLine($"[red]{error}[/]");
             }
             catch (Exception e)
             {
-                _logger.LogError(
+                logger.LogError(
                     e,
                     "Unhandled exception (Command: {Type}): {Message}",
-                    _commandRunner.GetType().Name,
+                    commandRunner.GetType().Name,
                     e.Message
                 );
-                _ansiConsole.MarkupLine($"[red]{e.Message}[/]");
+                ansiConsole.MarkupLine($"[red]{e.Message}[/]");
             }
             finally
             {
                 stopWatch.Stop();
-                _logger.LogInformation("Command finished. Duration: {Duration}", stopWatch.Elapsed);
+                logger.LogInformation("Command finished. Duration: {Duration}", stopWatch.Elapsed);
 
-                var waitUntil = now.Add(_interval);
-                _logger.LogInformation("Waiting until {WaitUntil} for next run", waitUntil);
+                var waitUntil = now.Add(interval);
+                logger.LogInformation("Waiting until {WaitUntil} for next run", waitUntil);
 
-                if (!_globalArgs.Quiet)
+                if (!globalArgs.Quiet)
                 {
-                    _ansiConsole.WriteLine($"Command finished. Duration: {stopWatch.Elapsed}");
-                    _ansiConsole.WriteLine($"Waiting until {waitUntil} for next run");
+                    ansiConsole.WriteLine($"Command finished. Duration: {stopWatch.Elapsed}");
+                    ansiConsole.WriteLine($"Waiting until {waitUntil} for next run");
                 }
             }
         } while (await WaitForNextTickAsync(periodicTimer, cancellationToken));
 
-        _hostApplicationLifetime.StopApplication();
+        hostApplicationLifetime.StopApplication();
     }
 
     private static Task<bool> WaitForNextTickAsync(

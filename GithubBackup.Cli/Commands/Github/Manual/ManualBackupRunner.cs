@@ -90,7 +90,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
 
             var repositories = await _repositoryService.GetRepositoriesAsync(repositoryOptions, ct);
 
-            if (!repositories.Any())
+            if (repositories.Count == 0)
             {
                 _ansiConsole.WriteLine("No repositories found.");
                 return;
@@ -152,7 +152,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
         {
             var migrations = await _migrationService.GetMigrationsAsync(ct);
 
-            if (!migrations.Any())
+            if (migrations.Count == 0)
             {
                 _ansiConsole.WriteLine("No migrations found.");
                 return;
@@ -229,7 +229,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
         IEnumerable<Repository> repositories
     )
     {
-        return selectedRepositories.Any()
+        return selectedRepositories.Count != 0
             ? selectedRepositories.Select(r => r.FullName).ToArray()
             : repositories.Select(r => r.FullName).ToArray();
     }

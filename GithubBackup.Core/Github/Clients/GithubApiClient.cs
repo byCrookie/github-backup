@@ -45,17 +45,16 @@ internal class GithubApiClient(
     private const string ApiVersionHeader = "X-GitHub-Api-Version";
     private const string ApiVersion = "2022-11-28";
 
-    private readonly Lazy<IFlurlClient> _client = new(
-        () =>
-            new FlurlClient(BaseUrl)
-                .WithSettings(s =>
-                    s.JsonSerializer = new DefaultJsonSerializer(
-                        new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }
-                    )
+    private readonly Lazy<IFlurlClient> _client = new(() =>
+        new FlurlClient(BaseUrl)
+            .WithSettings(s =>
+                s.JsonSerializer = new DefaultJsonSerializer(
+                    new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }
                 )
-                .WithHeader(HeaderNames.Accept, Accept)
-                .WithHeader(HeaderNames.UserAgent, UserAgent)
-                .WithHeader(ApiVersionHeader, ApiVersion)
+            )
+            .WithHeader(HeaderNames.Accept, Accept)
+            .WithHeader(HeaderNames.UserAgent, UserAgent)
+            .WithHeader(ApiVersionHeader, ApiVersion)
     );
 
     public async Task<List<TItem>> ReceiveJsonPagedAsync<TReponse, TItem>(

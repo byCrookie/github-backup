@@ -4,20 +4,19 @@ namespace GithubBackup.Core.Utils;
 
 internal static class CollectionExtensions
 {
-    public static T GetRequired<T>(this INameValueListBase<T> query, string key)
+    extension<T>(INameValueListBase<T> query)
         where T : class
     {
-        if (query.TryGetFirst(key, out var value))
+        public T GetRequired(string key)
         {
-            return value;
+            return query.TryGetFirst(key, out var value)
+                ? value
+                : throw new InvalidOperationException($"Query parameter '{key}' not found.");
         }
 
-        throw new InvalidOperationException($"Query parameter '{key}' not found.");
-    }
-
-    public static T? Get<T>(this INameValueListBase<T> query, string key)
-        where T : class
-    {
-        return query.TryGetFirst(key, out var value) ? value : null;
+        public T? Get(string key)
+        {
+            return query.TryGetFirst(key, out var value) ? value : null;
+        }
     }
 }
