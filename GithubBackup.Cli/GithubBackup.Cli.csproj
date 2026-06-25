@@ -34,6 +34,10 @@
         </PackageReference>
         <PackageReference Include="TestableIO.System.IO.Abstractions.Extensions"/>
         <PackageReference Include="TestableIO.System.IO.Abstractions.Wrappers"/>
+        <PackageReference Update="Nerdbank.GitVersioning">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

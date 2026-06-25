@@ -90,7 +90,12 @@ internal sealed class AuthenticationService : IAuthenticationService
             );
         }
 
-        return new AccessToken(response.AccessToken!, response.TokenType!, response.Scope!);
+        return new AccessToken(
+            response.AccessToken!,
+            response.TokenType!,
+            response.Scope!,
+            response.ExpiresIn
+        );
     }
 
     private ValueTask<TimeSpan?> OnRetryAsync(

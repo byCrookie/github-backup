@@ -17,6 +17,15 @@ Linux users can download the Linux binary and grant it execute permissions using
 
 ## Usage
 
+### Authentication
+Tokens are resolved in this order:
+
+1. `--token`
+2. `GITHUB_BACKUP_TOKEN`
+3. GitHub device flow
+
+Device-flow tokens are stored temporarily in plaintext while they are valid. They are not treated as permanent credentials.
+
 ### Backup Your GitHub Account
 To explore the available commands and options, you can run the following command:
 ```bash
@@ -42,4 +51,3 @@ If you find the github-backup cli tool beneficial and appreciate the effort that
 We welcome contributions from the community to enhance the github-backup cli tool. If you have suggestions for improvements or discover any issues, please feel free to contribute to our project on GitHub. Your input is valuable in making this tool even more versatile and efficient.
 
 Thank you for choosing the github-backup cli tool for your GitHub repository backup needs. Your data is now safe and accessible on your local machine. 🚀
-

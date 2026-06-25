@@ -17,7 +17,7 @@ internal sealed class BackupRunner(
 {
     public async Task RunAsync(CancellationToken ct)
     {
-        await loginService.WithPersistentAsync(globalArgs, backupArgs.LoginArgs, false, ct);
+        await loginService.LoginAsync(globalArgs, backupArgs.LoginArgs, ct);
 
         var options = new StartMigrationOptions(
             backupArgs.MigrateArgs.Repositories,

@@ -42,7 +42,7 @@ public class ManualRunnerTests
 
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
         _loginService
-            .PersistentOnlyAsync(
+            .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
                 Arg.Any<LoginArgs>(),
                 Arg.Any<CancellationToken>()
@@ -72,7 +72,7 @@ public class ManualRunnerTests
 
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
         _loginService
-            .PersistentOnlyAsync(
+            .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
                 Arg.Any<LoginArgs>(),
                 Arg.Any<CancellationToken>()
@@ -157,7 +157,7 @@ public class ManualRunnerTests
         var user = new User("test", "test");
 
         _loginService
-            .PersistentOnlyAsync(
+            .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
                 Arg.Any<LoginArgs>(),
                 Arg.Any<CancellationToken>()
@@ -191,7 +191,7 @@ public class ManualRunnerTests
         var user = new User("test", "test");
 
         _loginService
-            .PersistentOnlyAsync(
+            .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
                 Arg.Any<LoginArgs>(),
                 Arg.Any<CancellationToken>()
@@ -236,7 +236,7 @@ public class ManualRunnerTests
         var user = new User("test", "test");
 
         _loginService
-            .PersistentOnlyAsync(
+            .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
                 Arg.Any<LoginArgs>(),
                 Arg.Any<CancellationToken>()
@@ -314,7 +314,7 @@ public class ManualRunnerTests
 
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
         _loginService
-            .PersistentOnlyAsync(
+            .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
                 Arg.Any<LoginArgs>(),
                 Arg.Any<CancellationToken>()
@@ -353,7 +353,7 @@ public class ManualRunnerTests
 
         _migrationService.GetMigrationsAsync(CancellationToken.None).Returns(new List<Migration>());
         _loginService
-            .PersistentOnlyAsync(
+            .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
                 Arg.Any<LoginArgs>(),
                 Arg.Any<CancellationToken>()
@@ -398,7 +398,7 @@ public class ManualRunnerTests
         var user = new User("test", "test");
 
         _loginService
-            .PersistentOnlyAsync(
+            .TryLoginWithTemporaryTokenAsync(
                 Arg.Any<GlobalArgs>(),
                 Arg.Any<LoginArgs>(),
                 Arg.Any<CancellationToken>()

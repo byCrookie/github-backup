@@ -1,10 +1,12 @@
-﻿using AwesomeAssertions;
+using AwesomeAssertions;
 using GithubBackup.Cli.Commands.Github.Auth;
-using GithubBackup.Cli.Commands.Github.Auth.Pipeline;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Core.Github.Authentication;
+using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Users;
-using GithubBackup.TestUtils.Logging;
+using GithubBackup.Core.Utils;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Spectre.Console.Testing;
@@ -14,206 +16,172 @@ namespace GithubBackup.Cli.Tests.Commands.Github.Auth;
 public class LoginServiceTests
 {
     private readonly LoginService _sut;
-    private readonly ILogger<LoginService> _logger;
+    private readonly IGithubTokenStore _githubTokenStore;
+    private readonly IUserService _userService;
+    private readonly IAuthenticationService _authenticationService;
+    private readonly ITemporaryCredentialStore _temporaryCredentialStore;
+    private readonly IDateTimeOffsetProvider _dateTimeOffsetProvider;
     private readonly TestConsole _ansiConsole;
-    private readonly ILoginPipelineBuilder _loginPipelineBuilder;
+
+    private static readonly GlobalArgs GlobalArgs = new(
+        LogLevel.Debug,
+        false,
+        new FileInfo("Test")
+    );
 
     public LoginServiceTests()
     {
-        _logger = Substitute.For<ILogger<LoginService>>();
+        _githubTokenStore = Substitute.For<IGithubTokenStore>();
+        _userService = Substitute.For<IUserService>();
+        _authenticationService = Substitute.For<IAuthenticationService>();
+        _temporaryCredentialStore = Substitute.For<ITemporaryCredentialStore>();
+        _dateTimeOffsetProvider = Substitute.For<IDateTimeOffsetProvider>();
         _ansiConsole = new TestConsole();
-        _loginPipelineBuilder = Substitute.For<ILoginPipelineBuilder>();
 
-        _sut = new LoginService(_logger, _ansiConsole, _loginPipelineBuilder);
+        _dateTimeOffsetProvider.UtcNow.Returns(new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero));
+
+        _sut = new LoginService(
+            Substitute.For<ILogger<LoginService>>(),
+            _ansiConsole,
+            CreateConfiguration(null),
+            _githubTokenStore,
+            _userService,
+            _authenticationService,
+            _temporaryCredentialStore,
+            _dateTimeOffsetProvider
+        );
     }
 
     [Fact]
-    public async Task PersistentOnlyAsync_NotQuietAndNoUser_ReturnNullAndNotPrint()
+    public async Task LoginAsync_TokenArgument_UsesTokenArgumentFirst()
     {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, false, new FileInfo("Test"));
-        var args = new LoginArgs(null, false);
+        var user = new User("test", "test");
+        _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
 
-        var pipeline = Substitute.For<ILoginPipeline>();
-        _loginPipelineBuilder.PersistedOnly().Returns(pipeline);
-        pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns((User?)null);
+        var result = await _sut.LoginAsync(
+            GlobalArgs,
+            new LoginArgs("cli-token", false),
+            CancellationToken.None
+        );
 
-        var result = await _sut.PersistentOnlyAsync(globalArgs, args, CancellationToken.None);
+        result.Should().Be(user);
+        await _githubTokenStore.Received(1).SetAsync("cli-token");
+        await _temporaryCredentialStore.DidNotReceive().LoadTokenAsync(Arg.Any<CancellationToken>());
+        await _authenticationService
+            .DidNotReceive()
+            .RequestDeviceAndUserCodesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task LoginAsync_EnvironmentToken_UsesEnvironmentBeforeCache()
+    {
+        var sut = CreateSutWithToken("env-token");
+        var user = new User("test", "test");
+        _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
+
+        var result = await sut.LoginAsync(
+            GlobalArgs,
+            new LoginArgs(null, false),
+            CancellationToken.None
+        );
+
+        result.Should().Be(user);
+        await _githubTokenStore.Received(1).SetAsync("env-token");
+        await _temporaryCredentialStore.DidNotReceive().LoadTokenAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task LoginAsync_TemporaryTokenIsValid_UsesTemporaryTokenBeforeDeviceFlow()
+    {
+        var user = new User("test", "test");
+        _temporaryCredentialStore
+            .LoadTokenAsync(CancellationToken.None)
+            .Returns(new TemporaryCredential("cached-token", new DateTimeOffset(2026, 1, 1, 1, 0, 0, TimeSpan.Zero)));
+        _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
+
+        var result = await _sut.LoginAsync(
+            GlobalArgs,
+            new LoginArgs(null, false),
+            CancellationToken.None
+        );
+
+        result.Should().Be(user);
+        await _githubTokenStore.Received(1).SetAsync("cached-token");
+        await _authenticationService
+            .DidNotReceive()
+            .RequestDeviceAndUserCodesAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task LoginAsync_TemporaryTokenExpired_DeletesTokenAndUsesDeviceFlow()
+    {
+        var user = new User("test", "test");
+        _temporaryCredentialStore
+            .LoadTokenAsync(CancellationToken.None)
+            .Returns(new TemporaryCredential("cached-token", new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero)));
+        _authenticationService
+            .RequestDeviceAndUserCodesAsync(CancellationToken.None)
+            .Returns(new DeviceAndUserCodes("device", "user", "https://github.com/login/device", 900, 5));
+        _authenticationService
+            .PollForAccessTokenAsync("device", 5, CancellationToken.None)
+            .Returns(new AccessToken("device-token", "bearer", string.Empty, 60));
+        _userService.WhoAmIAsync(CancellationToken.None).Returns(user);
+
+        var result = await _sut.LoginAsync(
+            GlobalArgs,
+            new LoginArgs(null, false),
+            CancellationToken.None
+        );
+
+        result.Should().Be(user);
+        await _temporaryCredentialStore.Received(1).DeleteTokenAsync(CancellationToken.None);
+        await _githubTokenStore.Received(1).SetAsync("device-token");
+        await _temporaryCredentialStore
+            .Received(1)
+            .StoreTokenAsync(
+                "device-token",
+                new DateTimeOffset(2026, 1, 1, 0, 1, 0, TimeSpan.Zero),
+                CancellationToken.None
+            );
+    }
+
+    [Fact]
+    public async Task TryLoginWithTemporaryTokenAsync_NoTemporaryToken_ReturnsNull()
+    {
+        _temporaryCredentialStore.LoadTokenAsync(CancellationToken.None).Returns((TemporaryCredential?)null);
+
+        var result = await _sut.TryLoginWithTemporaryTokenAsync(
+            GlobalArgs,
+            new LoginArgs(null, false),
+            CancellationToken.None
+        );
 
         result.Should().BeNull();
-
-        _logger.VerifyLogs();
-        await Verify(_ansiConsole.Output);
+        await _authenticationService
+            .DidNotReceive()
+            .RequestDeviceAndUserCodesAsync(Arg.Any<CancellationToken>());
     }
 
-    [Fact]
-    public async Task PersistentOnlyAsync_NotQuietAndUser_ReturnUserAndPrint()
+    private LoginService CreateSutWithToken(string? token)
     {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, false, new FileInfo("Test"));
-        var args = new LoginArgs(null, false);
-        var user = new User("test", "test");
-
-        var pipeline = Substitute.For<ILoginPipeline>();
-        _loginPipelineBuilder.PersistedOnly().Returns(pipeline);
-        pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns(user);
-
-        var result = await _sut.PersistentOnlyAsync(globalArgs, args, CancellationToken.None);
-
-        result.Should().Be(user);
-
-        _logger.VerifyLogs(new LogEntry(LogLevel.Information, "Logged in as test"));
-        await Verify(_ansiConsole.Output);
-    }
-
-    [Fact]
-    public async Task PersistentOnlyAsync_QuietAndUser_ReturnUserAndDoNotPrint()
-    {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, true, new FileInfo("Test"));
-        var args = new LoginArgs(null, false);
-        var user = new User("test", "test");
-
-        var pipeline = Substitute.For<ILoginPipeline>();
-        _loginPipelineBuilder.PersistedOnly().Returns(pipeline);
-        pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns(user);
-
-        var result = await _sut.PersistentOnlyAsync(globalArgs, args, CancellationToken.None);
-
-        result.Should().Be(user);
-
-        _logger.VerifyLogs();
-        await Verify(_ansiConsole.Output);
-    }
-
-    [Fact]
-    public async Task WithoutPersistentAsync_NotQuietAndNoUser_ReturnNullAndNotPrint()
-    {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, false, new FileInfo("Test"));
-        var args = new LoginArgs(null, false);
-
-        var pipeline = Substitute.For<ILoginPipeline>();
-        _loginPipelineBuilder.WithoutPersistent().Returns(pipeline);
-        pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns((User?)null);
-
-        var action = () =>
-            _sut.WithoutPersistentAsync(globalArgs, args, false, CancellationToken.None);
-
-        await action.Should().ThrowAsync<Exception>();
-
-        _logger.VerifyLogs();
-        await Verify(_ansiConsole.Output);
-    }
-
-    [Fact]
-    public async Task WithoutPersistentAsync_NotQuietAndUser_ReturnUserAndPrint()
-    {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, false, new FileInfo("Test"));
-        var args = new LoginArgs(null, false);
-        var user = new User("test", "test");
-
-        var pipeline = Substitute.For<ILoginPipeline>();
-        _loginPipelineBuilder.WithoutPersistent().Returns(pipeline);
-        pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns(user);
-
-        var result = await _sut.WithoutPersistentAsync(
-            globalArgs,
-            args,
-            false,
-            CancellationToken.None
+        return new LoginService(
+            Substitute.For<ILogger<LoginService>>(),
+            _ansiConsole,
+            CreateConfiguration(token),
+            _githubTokenStore,
+            _userService,
+            _authenticationService,
+            _temporaryCredentialStore,
+            _dateTimeOffsetProvider
         );
-
-        result.Should().Be(user);
-
-        _logger.VerifyLogs(new LogEntry(LogLevel.Information, "Logged in as test"));
-        await Verify(_ansiConsole.Output);
     }
 
-    [Fact]
-    public async Task WithoutPersistentAsync_QuietAndUser_ReturnUserAndDoNotPrint()
+    private static IConfiguration CreateConfiguration(string? token)
     {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, true, new FileInfo("Test"));
-        var args = new LoginArgs(null, false);
-        var user = new User("test", "test");
+        var values = token is null
+            ? new Dictionary<string, string?>()
+            : new Dictionary<string, string?> { { "TOKEN", token } };
 
-        var pipeline = Substitute.For<ILoginPipeline>();
-        _loginPipelineBuilder.WithoutPersistent().Returns(pipeline);
-        pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns(user);
-
-        var result = await _sut.WithoutPersistentAsync(
-            globalArgs,
-            args,
-            false,
-            CancellationToken.None
-        );
-
-        result.Should().Be(user);
-
-        _logger.VerifyLogs();
-        await Verify(_ansiConsole.Output);
-    }
-
-    [Fact]
-    public async Task WithPersistentAsync_NotQuietAndNoUser_ReturnNullAndNotPrint()
-    {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, false, new FileInfo("Test"));
-        var args = new LoginArgs(null, false);
-
-        var pipeline = Substitute.For<ILoginPipeline>();
-        _loginPipelineBuilder.WithPersistent().Returns(pipeline);
-        pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns((User?)null);
-
-        var action = () =>
-            _sut.WithPersistentAsync(globalArgs, args, false, CancellationToken.None);
-
-        await action.Should().ThrowAsync<Exception>();
-
-        _logger.VerifyLogs();
-        await Verify(_ansiConsole.Output);
-    }
-
-    [Fact]
-    public async Task WithPersistentAsync_NotQuietAndUser_ReturnUserAndPrint()
-    {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, false, new FileInfo("Test"));
-        var args = new LoginArgs(null, false);
-        var user = new User("test", "test");
-
-        var pipeline = Substitute.For<ILoginPipeline>();
-        _loginPipelineBuilder.WithPersistent().Returns(pipeline);
-        pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns(user);
-
-        var result = await _sut.WithPersistentAsync(
-            globalArgs,
-            args,
-            false,
-            CancellationToken.None
-        );
-
-        result.Should().Be(user);
-
-        _logger.VerifyLogs(new LogEntry(LogLevel.Information, "Logged in as test"));
-        await Verify(_ansiConsole.Output);
-    }
-
-    [Fact]
-    public async Task WithPersistentAsync_QuietAndUser_ReturnUserAndDoNotPrint()
-    {
-        var globalArgs = new GlobalArgs(LogLevel.Debug, true, new FileInfo("Test"));
-        var args = new LoginArgs(null, false);
-        var user = new User("test", "test");
-
-        var pipeline = Substitute.For<ILoginPipeline>();
-        _loginPipelineBuilder.WithPersistent().Returns(pipeline);
-        pipeline.LoginAsync(globalArgs, args, false, CancellationToken.None).Returns(user);
-
-        var result = await _sut.WithPersistentAsync(
-            globalArgs,
-            args,
-            false,
-            CancellationToken.None
-        );
-
-        result.Should().Be(user);
-
-        _logger.VerifyLogs();
-        await Verify(_ansiConsole.Output);
+        return new ConfigurationBuilder().AddInMemoryCollection(values).Build();
     }
 }

@@ -18,6 +18,6 @@ internal sealed class LoginRunner : ICommandRunner
 
     public Task RunAsync(CancellationToken ct)
     {
-        return _loginService.WithoutPersistentAsync(_globalArgs, _loginArgs, true, ct);
+        return _loginService.LoginAsync(_globalArgs, _loginArgs, ct);
     }
 }

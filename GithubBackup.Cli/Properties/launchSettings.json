@@ -26,6 +26,11 @@
       "commandLineArgs": "migrations --help",
       "environmentVariables": {}
     },
+    "GithubBackup.Cli Migrations": {
+      "commandName": "Project",
+      "commandLineArgs": "migrations",
+      "environmentVariables": {}
+    },
     "GithubBackup.Cli Repositories Help": {
       "commandName": "Project",
       "commandLineArgs": "repositories --help",
@@ -53,7 +58,7 @@
     },
     "GithubBackup.Cli Download": {
       "commandName": "Project",
-      "commandLineArgs": "download --destination M:\\Development\\Temp\\github-backup --migrations 4019118 4019095",
+      "commandLineArgs": "download --destination C:/Users/byCrookie/private/tmp --migrations 4019118 4019095",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Manual Backup": {
@@ -63,7 +68,7 @@
     },
     "GithubBackup.Cli Migrate": {
       "commandName": "Project",
-      "commandLineArgs": "migrate --repositories \"byCrookie/TypeCode\"",
+      "commandLineArgs": "migrate",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Login": {

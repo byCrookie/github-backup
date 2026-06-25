@@ -11,8 +11,8 @@ internal static class LoginCommand
     private const string CommandName = "login";
 
     private const string CommandDescription = """
-        Login to Github. Persists your login token to disk for future use.
-        Only one login token can be persisted at a time. {0}
+        Login to Github. Tokens are resolved from --token, GITHUB_BACKUP_TOKEN, or GitHub device flow.
+        Device flow tokens are cached temporarily while valid. {0}
         """;
 
     public static Command Create(string[] args, CommandOptions options)

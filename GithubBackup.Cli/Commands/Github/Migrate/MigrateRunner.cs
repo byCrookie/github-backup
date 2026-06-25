@@ -30,7 +30,7 @@ internal sealed class MigrateRunner : ICommandRunner
 
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.WithPersistentAsync(_globalArgs, _migrateArgs.LoginArgs, false, ct);
+        await _loginService.LoginAsync(_globalArgs, _migrateArgs.LoginArgs, ct);
 
         var options = new StartMigrationOptions(
             _migrateArgs.Repositories,

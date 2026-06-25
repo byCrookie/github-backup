@@ -222,6 +222,7 @@ public class MigrationServiceTests
 
         onPollOutput
             .ToString()
+            .ReplaceLineEndings("\n")
             .Trim()
             .Should()
             .Be(

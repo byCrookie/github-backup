@@ -34,7 +34,7 @@ internal sealed class MigrationsRunner : ICommandRunner
 
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.WithPersistentAsync(_globalArgs, _migrationsArgs.LoginArgs, false, ct);
+        await _loginService.LoginAsync(_globalArgs, _migrationsArgs.LoginArgs, ct);
 
         var migrations = await _migrationService.GetMigrationsAsync(ct);
 

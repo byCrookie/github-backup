@@ -19,6 +19,10 @@
         <PackageReference Include="System.Threading.RateLimiting" />
         <PackageReference Include="TestableIO.System.IO.Abstractions" />
         <PackageReference Include="TestableIO.System.IO.Abstractions.Extensions" />
+        <PackageReference Update="Nerdbank.GitVersioning">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
     
     <ItemGroup>

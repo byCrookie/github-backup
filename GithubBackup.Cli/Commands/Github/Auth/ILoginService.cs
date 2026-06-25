@@ -6,21 +6,11 @@ namespace GithubBackup.Cli.Commands.Github.Auth;
 
 internal interface ILoginService
 {
-    public Task<User?> PersistentOnlyAsync(
+    public Task<User?> TryLoginWithTemporaryTokenAsync(
         GlobalArgs globalArgs,
         LoginArgs args,
         CancellationToken ct
     );
-    public Task<User> WithPersistentAsync(
-        GlobalArgs globalArgs,
-        LoginArgs args,
-        bool persist,
-        CancellationToken ct
-    );
-    public Task<User> WithoutPersistentAsync(
-        GlobalArgs globalArgs,
-        LoginArgs args,
-        bool persist,
-        CancellationToken ct
-    );
+
+    public Task<User> LoginAsync(GlobalArgs globalArgs, LoginArgs args, CancellationToken ct);
 }

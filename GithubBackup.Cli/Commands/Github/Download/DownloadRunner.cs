@@ -38,7 +38,7 @@ internal sealed class DownloadRunner : ICommandRunner
 
     public async Task RunAsync(CancellationToken ct)
     {
-        await _loginService.WithPersistentAsync(_globalArgs, _downloadArgs.LoginArgs, false, ct);
+        await _loginService.LoginAsync(_globalArgs, _downloadArgs.LoginArgs, ct);
 
         if (_downloadArgs.Migrations.Any())
         {

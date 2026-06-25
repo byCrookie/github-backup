@@ -238,7 +238,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
     {
         try
         {
-            var user = await _loginService.PersistentOnlyAsync(
+            var user = await _loginService.TryLoginWithTemporaryTokenAsync(
                 _globalArgs,
                 new LoginArgs(null, false),
                 ct
@@ -268,19 +268,17 @@ internal sealed class ManualBackupRunner : ICommandRunner
 
         if (useDeviceFlowAuth)
         {
-            return _loginService.WithoutPersistentAsync(
+            return _loginService.LoginAsync(
                 new GlobalArgs(_globalArgs.Verbosity, false, _globalArgs.LogFile),
                 new LoginArgs(null, true),
-                true,
                 ct
             );
         }
 
         var token = _ansiConsole.Ask<string>("Please enter your Github token:");
-        return _loginService.WithoutPersistentAsync(
+        return _loginService.LoginAsync(
             new GlobalArgs(_globalArgs.Verbosity, false, _globalArgs.LogFile),
             new LoginArgs(token, false),
-            true,
             ct
         );
     }

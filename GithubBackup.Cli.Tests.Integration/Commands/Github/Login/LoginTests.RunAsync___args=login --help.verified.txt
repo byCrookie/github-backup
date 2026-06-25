@@ -1,15 +1,15 @@
 ﻿Description:
-  Login to Github. Persists your login token to disk for future use.
-  Only one login token can be persisted at a time. 
+  Login to Github. Tokens are resolved from --token, GITHUB_BACKUP_TOKEN, or GitHub device flow.
+  Device flow tokens are cached temporarily while valid. 
 
 Usage:
   ghb login [options]
 
 Options:
-  -t, --token <token>                                                    If not provided, the token will be aquired from the environment variable GITHUB_BACKUP_TOKEN.
-                                                                         If provided, device flow authentication will be ignored. Recommended for use on servers.");
+  -t, --token <token>                                                    If not provided, the token will be acquired from the environment variable GITHUB_BACKUP_TOKEN.
+                                                                         If provided, temporary cache and device flow authentication will be ignored. Recommended for use on servers.
   -d, --device-flow-auth                                                 Interactive authentication using the device flow.
-                                                                         Requires a browser. Recommended for use on clients.
+                                                                         Bypasses the temporary token cache. Requires a browser. Recommended for use on clients.
   -?, -h, --help                                                         Show help and usage information
   -q, --quiet                                                            Do not print logs to console.
   -l, --log-file <log-file>                                              Path to the log file.

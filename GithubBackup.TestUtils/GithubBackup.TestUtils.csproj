@@ -11,6 +11,10 @@
         <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
         <PackageReference Include="Spectre.Console.Testing" />
         <PackageReference Include="System.CommandLine" />
+        <PackageReference Update="Nerdbank.GitVersioning">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

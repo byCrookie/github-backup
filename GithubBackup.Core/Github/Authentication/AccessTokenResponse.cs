@@ -13,6 +13,9 @@ internal sealed class AccessTokenResponse
     [JsonPropertyName("scope")]
     public string? Scope { get; set; }
 
+    [JsonPropertyName("expires_in")]
+    public int? ExpiresIn { get; set; }
+
     [JsonPropertyName("error")]
     public string? Error { get; set; }
 

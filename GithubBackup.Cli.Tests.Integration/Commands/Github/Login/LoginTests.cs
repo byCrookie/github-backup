@@ -7,7 +7,6 @@ public class LoginTests
 {
     [Theory]
     [InlineData("login --help")]
-    [InlineData("login", 1)]
     public async Task RunAsync__(string args, int exitCode = 0)
     {
         var action = () => TestCli.RunAsync(args, exitCode, _ => { });
@@ -19,6 +18,45 @@ public class LoginTests
         {
             await action.Should().ThrowAsync<Exception>().WithMessage("Login failed");
         }
+    }
+
+    [Fact]
+    public async Task RunAsync_LoginUsingDeviceFlow_Succeeds()
+    {
+        await TestCli.RunAsync(
+            "login",
+            0,
+            http =>
+            {
+                http.ForCallsTo("https://github.com/login/device/code")
+                    .WithVerb(HttpMethod.Post)
+                    .RespondWithJson(
+                        new
+                        {
+                            device_code = "device",
+                            user_code = "USER-CODE",
+                            verification_uri = "https://github.com/login/device",
+                            expires_in = 900,
+                            interval = 5,
+                        }
+                    );
+                http.ForCallsTo("https://github.com/login/oauth/access_token")
+                    .WithVerb(HttpMethod.Post)
+                    .RespondWithJson(
+                        new
+                        {
+                            access_token = "device-token",
+                            token_type = "bearer",
+                            scope = string.Empty,
+                            expires_in = 60,
+                        }
+                    );
+                http.ForCallsTo("https://api.github.com/user")
+                    .WithVerb(HttpMethod.Get)
+                    .RespondWithJson(new UserResponse("user", "user"), headers: GetHeaders());
+            },
+            fs => fs.Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData))
+        );
     }
 
     [Fact(Skip = "Not yet implemented")]

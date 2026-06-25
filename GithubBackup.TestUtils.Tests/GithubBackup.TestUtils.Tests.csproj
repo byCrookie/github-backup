@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <IsPackable>false</IsPackable>
-        <IsTestProject>true</IsTestProject>
+        <OutputType>Exe</OutputType>
+        <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
     </PropertyGroup>
 
     <ItemGroup>
@@ -10,19 +10,27 @@
         <PackageReference Include="AwesomeAssertions" />
         <PackageReference Include="Bogus"/>
         <PackageReference Include="Flurl.Http"/>
-        <PackageReference Include="Meziantou.Xunit.ParallelTestFramework" />
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
         <PackageReference Include="NSubstitute"/>
         <PackageReference Include="NSubstitute.Analyzers.CSharp"/>
-        <PackageReference Include="Verify.Xunit" />
-        <PackageReference Include="xunit"/>
-        <PackageReference Include="xunit.extensibility.core"/>
-        <PackageReference Include="xunit.runner.visualstudio"/>
-        <PackageReference Include="coverlet.collector"/>
+        <PackageReference Include="Verify.XunitV3" />
+        <PackageReference Update="Nerdbank.GitVersioning">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="xunit.v3.mtp-v2" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\GithubBackup.TestUtils\GithubBackup.TestUtils.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
     </ItemGroup>
 
 </Project>
