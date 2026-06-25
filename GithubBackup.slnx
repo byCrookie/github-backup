@@ -10,7 +10,7 @@
     <File Path="CHANGELOG.md" />
   </Folder>
   <Folder Name="/_/.github/">
-    <File Path=".github/FUNDING.md" />
+    <File Path=".github/FUNDING.yml" />
     <File Path=".github\dependabot.yml" />
   </Folder>
   <Folder Name="/_/.github/workflows/">
@@ -19,14 +19,11 @@
     <File Path=".github\workflows\test_osx_x64.yml" />
     <File Path=".github\workflows\test_win_x64.yml" />
   </Folder>
-  <Project
-    Path="GithubBackup.Cli.Tests.Integration\GithubBackup.Cli.Tests.Integration.csproj"
-    Type="C#"
-  />
-  <Project Path="GithubBackup.Cli.Tests\GithubBackup.Cli.Tests.csproj" Type="C#" />
-  <Project Path="GithubBackup.Cli\GithubBackup.Cli.csproj" Type="C#" />
-  <Project Path="GithubBackup.Core.Tests\GithubBackup.Core.Tests.csproj" Type="C#" />
-  <Project Path="GithubBackup.Core\GithubBackup.Core.csproj" Type="C#" />
-  <Project Path="GithubBackup.TestUtils.Tests\GithubBackup.TestUtils.Tests.csproj" Type="C#" />
-  <Project Path="GithubBackup.TestUtils\GithubBackup.TestUtils.csproj" Type="C#" />
+  <Project Path="GithubBackup.Cli.Tests.Integration\GithubBackup.Cli.Tests.Integration.csproj" />
+  <Project Path="GithubBackup.Cli.Tests\GithubBackup.Cli.Tests.csproj" />
+  <Project Path="GithubBackup.Cli\GithubBackup.Cli.csproj" />
+  <Project Path="GithubBackup.Core.Tests\GithubBackup.Core.Tests.csproj" />
+  <Project Path="GithubBackup.Core\GithubBackup.Core.csproj" />
+  <Project Path="GithubBackup.TestUtils.Tests\GithubBackup.TestUtils.Tests.csproj" />
+  <Project Path="GithubBackup.TestUtils\GithubBackup.TestUtils.csproj" />
 </Solution>
