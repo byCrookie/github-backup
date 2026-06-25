@@ -21,7 +21,7 @@ internal sealed partial class MigrationService(
         CancellationToken ct
     )
     {
-        logger.LogDebug("Starting migration");
+        logger.LogDebug("Creating migration");
 
         var request = new MigrationRequest(
             options.Repositories,
@@ -43,7 +43,7 @@ internal sealed partial class MigrationService(
 
     public async Task<List<Migration>> GetMigrationsAsync(CancellationToken ct)
     {
-        logger.LogDebug("Getting migrations");
+        logger.LogDebug("Fetching migrations");
 
         var response = await githubApiClient.ReceiveJsonPagedAsync<
             List<MigrationReponse>,
@@ -55,7 +55,7 @@ internal sealed partial class MigrationService(
 
     public async Task<Migration> GetMigrationAsync(long id, CancellationToken ct)
     {
-        logger.LogDebug("Getting migration {Id}", id);
+        logger.LogDebug("Fetching migration {Id}", id);
 
         var response = await githubApiClient
             .GetAsync($"/user/migrations/{id}", ct: ct)
@@ -122,7 +122,7 @@ internal sealed partial class MigrationService(
         if (migration.CreatedAt < dateTimeProvider.Now.AddDays(-7))
         {
             throw new Exception(
-                "The migration is older than 7 days and cannot be downloaded anymore."
+                "The migration is older than 7 days and can no longer be downloaded."
             );
         }
 
@@ -134,7 +134,7 @@ internal sealed partial class MigrationService(
         var tempDirectoryName = fileSystem.Path.GetDirectoryName(tempFile)!;
         var tempFileName = fileSystem.Path.GetFileName(tempFile);
 
-        logger.LogInformation("Downloading migration {Id} to {TempFile}", options.Id, tempFile);
+        logger.LogInformation("Downloading migration {Id} to temporary file {TempFile}", options.Id, tempFile);
 
         await githubApiClient.DownloadFileAsync(
             $"/user/migrations/{options.Id}/archive",
@@ -158,7 +158,7 @@ internal sealed partial class MigrationService(
         var migrationPath = fileSystem.Path.Combine(options.Destination.FullName, fileName);
         if (fileSystem.File.Exists(migrationPath))
         {
-            throw new Exception($"A backup with the id {options.Id} already exists.");
+            throw new Exception($"A backup with ID {options.Id} already exists.");
         }
 
         fileSystem.File.Move(tempFile, migrationPath);
@@ -188,7 +188,7 @@ internal sealed partial class MigrationService(
             foreach (var backup in backupsToDelete)
             {
                 logger.LogInformation(
-                    "Deleting backup {Backup} because to many backups are present",
+                    "Deleting backup {Backup} because the retention limit was exceeded",
                     backup.Value
                 );
                 fileSystem.File.Delete(
@@ -198,7 +198,7 @@ internal sealed partial class MigrationService(
         }
         else
         {
-            logger.LogInformation("Not to many backups");
+            logger.LogInformation("Backup retention limit not exceeded");
         }
     }
 

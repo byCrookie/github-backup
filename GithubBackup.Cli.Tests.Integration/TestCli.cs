@@ -68,7 +68,7 @@ public static class TestCli
                 s.Replace(
                     Assembly.GetExecutingAssembly().GetName().Name
                         ?? throw new InvalidOperationException(
-                            "Can not get executing assembly name"
+                            "Cannot get executing assembly name"
                         ),
                     "ghb"
                 )

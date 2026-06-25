@@ -1,15 +1,15 @@
 ﻿Description:
-  Login to Github. Tokens are resolved from --token, GITHUB_BACKUP_TOKEN, or GitHub device flow.
+  Authenticate with GitHub. Tokens are resolved from --token, GITHUB_BACKUP_TOKEN, or GitHub device flow.
   Device flow tokens are cached temporarily while valid. 
 
 Usage:
   ghb login [options]
 
 Options:
-  -t, --token <token>                                                    If not provided, the token will be acquired from the environment variable GITHUB_BACKUP_TOKEN.
-                                                                         If provided, temporary cache and device flow authentication will be ignored. Recommended for use on servers.
-  -d, --device-flow-auth                                                 Interactive authentication using the device flow.
-                                                                         Bypasses the temporary token cache. Requires a browser. Recommended for use on clients.
+  -t, --token <token>                                                    GitHub token to use for this command.
+                                                                         Takes precedence over GITHUB_BACKUP_TOKEN, temporary cache, and device flow.
+  -d, --device-flow-auth                                                 Start interactive GitHub device flow authentication.
+                                                                         Bypasses the temporary token cache. Requires a browser.
   -?, -h, --help                                                         Show help and usage information
   -q, --quiet                                                            Suppress non-essential status output.
   -l, --log-file <log-file>                                              Path to the log file.

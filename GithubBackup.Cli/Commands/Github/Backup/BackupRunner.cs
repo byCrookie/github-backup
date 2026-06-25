@@ -33,7 +33,7 @@ internal sealed class BackupRunner(
         var migration = await migrationService.StartMigrationAsync(options, ct);
 
         output.Status(
-            $"Downloading migration {migration.Id} to {backupArgs.DownloadArgs.Destination} when ready..."
+            $"Waiting for migration {migration.Id}, then downloading to {backupArgs.DownloadArgs.Destination}..."
         );
 
         var downloadOptions = new DownloadMigrationOptions(
@@ -54,7 +54,7 @@ internal sealed class BackupRunner(
             ct
         );
 
-        output.Status($"Downloaded migration {migration.Id} ({file})");
+        output.Status($"Downloaded migration {migration.Id} to {file}");
         output.Data(file);
     }
 }

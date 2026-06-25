@@ -3,5 +3,5 @@ Do you want to start a migration? [y/n] (n): n
 Found 3 migrations:
 - 3 Pending 10.01.2020 00:00:00 (1d)
 - 2 Exporting 06.01.2020 00:00:00 (5d)
-No exported migrations found in the last 7 days. If migration is pending or exporting, please fetch again in a few minutes.
+No downloadable migrations found in the last 7 days. If a migration is pending or exporting, fetch again in a few minutes.
 Fetch migration status again? [y/n] (y): n

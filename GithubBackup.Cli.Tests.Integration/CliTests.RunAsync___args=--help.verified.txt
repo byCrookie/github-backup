@@ -1,5 +1,5 @@
 ﻿Description:
-  Github Backup
+  Back up GitHub repositories and migrations.
 
 Usage:
   ghb [command] [options]
@@ -12,12 +12,11 @@ Options:
   --version                                                              Show version information
 
 Commands:
-  manual        Manually backup a Github user. This command is interactive.
-  migrate       Migrate a Github user. This command will create a new migration for the given repositories.
-  login         Login to Github. Tokens are resolved from --token, GITHUB_BACKUP_TOKEN, or GitHub device flow.
+  manual        Interactively create and download GitHub backups.
+  migrate       Create a GitHub migration for the selected repositories.
+  login         Authenticate with GitHub. Tokens are resolved from --token, GITHUB_BACKUP_TOKEN, or GitHub device flow.
                 Device flow tokens are cached temporarily while valid.
-  migrations    List migrations for a Github user.
-  repositories  List repositories for a Github user.
-  download      Download migrations for a Github user.
-  backup        Backup a Github user. This command will create a new migration
-                for the given repositories and download it when ready.
+  migrations    List GitHub migrations for the authenticated user.
+  repositories  List GitHub repositories available to the authenticated user.
+  download      Download GitHub migration archives.
+  backup        Create a GitHub migration for the selected repositories and download it when ready.

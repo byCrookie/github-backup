@@ -5,18 +5,18 @@ internal static class MigrationsArgDescriptions
     public static readonly Description Export = new(
         "Long",
         "Long",
-        "Only include valid migrations that can be exported."
+        "Show only migrations that can still be downloaded."
     );
 
     public static readonly Description Since = new(
         "Since",
         "Since",
-        "Only include migrations that were created after the given date."
+        "Show only migrations created on or after this date."
     );
 
     public static readonly Description DaysOld = new(
         "DaysOld",
         "DaysOld",
-        "Only include migrations that were create in the last given number of days."
+        "Show only migrations created within the last N days."
     );
 }

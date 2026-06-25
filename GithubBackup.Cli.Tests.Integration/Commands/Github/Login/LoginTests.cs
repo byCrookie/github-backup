@@ -17,7 +17,7 @@ public class LoginTests
         }
         else
         {
-            await action.Should().ThrowAsync<Exception>().WithMessage("Login failed");
+            await action.Should().ThrowAsync<Exception>().WithMessage("Authentication failed.");
         }
     }
 
@@ -105,7 +105,7 @@ public class LoginTests
                 }
             );
 
-        await action.Should().ThrowAsync<Exception>().WithMessage("Token is invalid");
+        await action.Should().ThrowAsync<Exception>().WithMessage("GitHub token is invalid.");
     }
 
     private static Dictionary<string, string> GetHeaders(

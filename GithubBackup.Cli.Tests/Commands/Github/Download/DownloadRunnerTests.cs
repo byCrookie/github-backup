@@ -117,7 +117,7 @@ public class DownloadRunnerTests
         _logger.VerifyLogs(
             new LogEntry(
                 LogLevel.Information,
-                "No migration ids specified, downloading latest migration"
+                "No migration IDs specified; downloading the latest migration"
             ),
             new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
             new LogEntry(LogLevel.Information, "Downloading migration 1"),
@@ -154,7 +154,7 @@ public class DownloadRunnerTests
         _logger.VerifyLogs(
             new LogEntry(
                 LogLevel.Information,
-                "No migration ids specified, downloading latest migration"
+                "No migration IDs specified; downloading the latest migration"
             ),
             new LogEntry(LogLevel.Information, "Downloading migration 1 to test"),
             new LogEntry(LogLevel.Information, "Downloading migration 1"),
@@ -181,7 +181,7 @@ public class DownloadRunnerTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Downloading latest migration"),
-            new LogEntry(LogLevel.Information, "No exported migrations found")
+            new LogEntry(LogLevel.Information, "No downloadable migrations found")
         );
 
         await Verify(_ansiConsole.Output);
@@ -211,7 +211,7 @@ public class DownloadRunnerTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Information, "Downloading latest migration"),
-            new LogEntry(LogLevel.Information, "No exported migrations found")
+            new LogEntry(LogLevel.Information, "No downloadable migrations found")
         );
 
         await _migrationService
@@ -254,7 +254,7 @@ public class DownloadRunnerTests
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs(
-            new LogEntry(LogLevel.Information, "Downloading migrations using ids"),
+            new LogEntry(LogLevel.Information, "Downloading migrations by ID"),
             new LogEntry(LogLevel.Information, "Downloading migration 2 to test"),
             new LogEntry(LogLevel.Information, "Downloading migration 2"),
             new LogEntry(LogLevel.Information, "Downloaded migration 2 to test2"),
@@ -296,7 +296,7 @@ public class DownloadRunnerTests
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs(
-            new LogEntry(LogLevel.Information, "Downloading migrations using ids"),
+            new LogEntry(LogLevel.Information, "Downloading migrations by ID"),
             new LogEntry(LogLevel.Information, "Downloading migration 2 to test"),
             new LogEntry(LogLevel.Information, "Downloading migration 2"),
             new LogEntry(LogLevel.Information, "Downloaded migration 2 to test2"),
@@ -340,7 +340,7 @@ public class DownloadRunnerTests
         await runner.RunAsync(CancellationToken.None);
 
         _logger.VerifyLogs(
-            new LogEntry(LogLevel.Information, "Downloading migrations using ids"),
+            new LogEntry(LogLevel.Information, "Downloading migrations by ID"),
             new LogEntry(LogLevel.Information, "Downloading migration 2 to test"),
             new LogEntry(LogLevel.Information, "Polling migration 2"),
             new LogEntry(LogLevel.Information, "Downloaded migration 2 to "),

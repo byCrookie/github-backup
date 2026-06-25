@@ -18,9 +18,9 @@ internal sealed class CommandIntervalRunnerService(
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("Running command. Interval: {Interval}", interval);
+        logger.LogInformation("Starting interval command runner with interval {Interval}", interval);
 
-        output.Status($"Running command. Interval: {interval}");
+        output.Status($"Running command every {interval}.");
 
         var periodicTimer = new PeriodicTimer(interval);
 
@@ -58,13 +58,12 @@ internal sealed class CommandIntervalRunnerService(
             finally
             {
                 stopWatch.Stop();
-                logger.LogInformation("Command finished. Duration: {Duration}", stopWatch.Elapsed);
+                logger.LogInformation("Command finished in {Duration}", stopWatch.Elapsed);
 
                 var waitUntil = now.Add(interval);
-                logger.LogInformation("Waiting until {WaitUntil} for next run", waitUntil);
+                logger.LogInformation("Next run scheduled for {WaitUntil}", waitUntil);
 
-                output.Status($"Command finished. Duration: {stopWatch.Elapsed}");
-                output.Status($"Waiting until {waitUntil} for next run");
+                output.Status($"Next run at {waitUntil}.");
             }
         } while (await WaitForNextTickAsync(periodicTimer, cancellationToken));
 

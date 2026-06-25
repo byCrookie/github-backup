@@ -22,6 +22,6 @@ public class Environment(IFileSystem fileSystem) : IEnvironment
                 fileSystem.Path.Combine(new[] { "/" }.Concat(paths).ToArray())
             );
 
-        throw new NotSupportedException("Operating system not supported");
+        throw new NotSupportedException("The current operating system is not supported.");
     }
 }

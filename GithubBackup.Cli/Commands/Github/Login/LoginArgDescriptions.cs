@@ -6,8 +6,8 @@ internal static class LoginArgDescriptions
         "Token",
         "Token",
         """
-        If not provided, the token will be acquired from the environment variable GITHUB_BACKUP_TOKEN.
-        If provided, temporary cache and device flow authentication will be ignored. Recommended for use on servers.
+        GitHub token to use for this command.
+        Takes precedence over GITHUB_BACKUP_TOKEN, temporary cache, and device flow.
         """
     );
 
@@ -15,8 +15,8 @@ internal static class LoginArgDescriptions
         "DeviceFlowAuth",
         "Device Flow Auth",
         """
-        Interactive authentication using the device flow.
-        Bypasses the temporary token cache. Requires a browser. Recommended for use on clients.
+        Start interactive GitHub device flow authentication.
+        Bypasses the temporary token cache. Requires a browser.
         """
     );
 }

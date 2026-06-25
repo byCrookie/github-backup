@@ -1,2 +1,2 @@
 ﻿Downloading latest migration
-No exported migrations found
+No downloadable migrations found.

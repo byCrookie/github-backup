@@ -1,3 +1,1 @@
-﻿Running command
-Logged in as user
-Command finished. Duration: <duration>
+﻿Logged in as user

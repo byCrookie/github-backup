@@ -48,7 +48,7 @@ internal sealed class LoginService(
 
         if (user is null)
         {
-            throw new Exception("Login failed");
+            throw new Exception("Authentication failed.");
         }
 
         output.Status($"Logged in as {user.Name}");
@@ -64,7 +64,7 @@ internal sealed class LoginService(
             return null;
         }
 
-        logger.LogInformation("Using token from command line");
+        logger.LogInformation("Using token from --token");
         return await ValidateTokenAsync(args.Token, ct);
     }
 
@@ -77,7 +77,7 @@ internal sealed class LoginService(
             return null;
         }
 
-        logger.LogInformation("Using token from environment variable");
+        logger.LogInformation("Using token from GITHUB_BACKUP_TOKEN");
         return await ValidateTokenAsync(token, ct);
     }
 
@@ -88,12 +88,12 @@ internal sealed class LoginService(
             return null;
         }
 
-        logger.LogInformation("Using temporary token cache");
+        logger.LogDebug("Checking temporary token cache");
         var credential = await temporaryCredentialStore.LoadTokenAsync(ct);
 
         if (credential is null || string.IsNullOrWhiteSpace(credential.Token))
         {
-            logger.LogInformation("Temporary token not found");
+            logger.LogDebug("No temporary token found");
             return null;
         }
 
@@ -102,7 +102,7 @@ internal sealed class LoginService(
             && credential.ExpiresAt <= dateTimeOffsetProvider.UtcNow
         )
         {
-            logger.LogInformation("Temporary token has expired");
+            logger.LogInformation("Temporary token expired; deleting cache entry");
             await temporaryCredentialStore.DeleteTokenAsync(ct);
             return null;
         }
@@ -113,7 +113,7 @@ internal sealed class LoginService(
         }
         catch (Exception e)
         {
-            logger.LogInformation("Temporary token is invalid: {Exception}", e.Message);
+            logger.LogInformation("Temporary token is invalid; deleting cache entry: {Exception}", e.Message);
             await temporaryCredentialStore.DeleteTokenAsync(ct);
             return null;
         }
@@ -121,7 +121,7 @@ internal sealed class LoginService(
 
     private async Task<User?> LoginWithDeviceFlowAsync(GlobalArgs globalArgs, CancellationToken ct)
     {
-        logger.LogInformation("Using device flow authentication");
+        logger.LogInformation("Starting GitHub device flow authentication");
         var accessToken = await GetOAuthTokenAsync(globalArgs, ct);
         var user = await ValidateTokenAsync(accessToken.Token, ct);
         var expiresAt = accessToken.ExpiresIn is null
@@ -141,8 +141,8 @@ internal sealed class LoginService(
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Token is invalid");
-            throw new Exception("Token is invalid");
+            logger.LogError(e, "GitHub token validation failed");
+            throw new Exception("GitHub token is invalid.");
         }
     }
 

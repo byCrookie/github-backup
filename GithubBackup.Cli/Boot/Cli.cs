@@ -11,7 +11,7 @@ internal static class Cli
     {
         var cliOptions = options ?? new CliOptions();
 
-        var rootCommand = new RootCommand("Github Backup");
+        var rootCommand = new RootCommand("Back up GitHub repositories and migrations.");
 
         var globalArguments = new GlobalArguments();
         rootCommand.AddOptions(globalArguments.Options());

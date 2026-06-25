@@ -37,16 +37,10 @@ public class CommandRunnerServiceTests
         stopwatch.StartNew().Returns(fakeStopWatch);
 
         var globalArgs = new GlobalArgs(LogLevel.Debug, false, new FileInfo("test"));
-        var output = new CliOutput(
-            globalArgs,
-            new CliOutputOptions(_ansiConsole.Profile.Out.Writer, _ansiConsole.Profile.Out.Writer)
-        );
-
         _sut = new CommandRunnerService(
             _logger,
             _hostApplicationLifeTime,
             _commandRunner,
-            output,
             stopwatch
         );
     }

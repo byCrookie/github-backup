@@ -8,32 +8,32 @@ internal static class MigrateArgDescriptions
         "Repositories",
         "Repositories",
         $"""
-        The repositories to backup e.g. 'owner/repo'.
-        Instead piping can be used to provide the repositories. Supported separators: {Piping.Separators}.
+        Repositories to back up, for example 'owner/repo'.
+        You can also pipe repository names using these separators: {Piping.Separators}.
         """
     );
 
     public static readonly Description LockRepositories = new(
         "LockRepositories",
         "Lock Repositories",
-        "Lock the repositories being migrated at the start of the migration."
+        "Lock repositories while GitHub exports the migration."
     );
 
     public static readonly Description ExcludeMetadata = new(
         "ExcludeMetadata",
         "Exclude Metadata",
-        "Indicates whether metadata should be excluded and only git source should be included for the migration."
+        "Exclude repository metadata and include only Git source data."
     );
 
     public static readonly Description ExcludeGitData = new(
         "ExcludeGitData",
         "Exclude Git Data",
-        "Indicates whether the repository git data should be excluded from the migration."
+        "Exclude repository Git data from the migration."
     );
 
     public static readonly Description ExcludeAttachements = new(
-        "ExcludeAttachements",
-        "Exclude Attachements",
+        "ExcludeAttachments",
+        "Exclude Attachments",
         "Do not include attachments in the migration."
     );
 
@@ -46,12 +46,12 @@ internal static class MigrateArgDescriptions
     public static readonly Description ExcludeOwnerProjects = new(
         "ExcludeOwnerProjects",
         "Exclude Owner Projects",
-        "Indicates whether projects owned by the organization or users should be excluded."
+        "Exclude projects owned by the organization or user."
     );
 
     public static readonly Description OrgMetadataOnly = new(
         "OrgMetadataOnly",
         "Org Metadata Only",
-        "Indicates whether this should only include organization metadata (repositories array should be empty and will ignore other flags)."
+        "Export organization metadata only. Do not specify repositories with this option."
     );
 }

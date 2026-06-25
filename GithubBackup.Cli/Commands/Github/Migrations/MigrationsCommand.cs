@@ -10,7 +10,7 @@ namespace GithubBackup.Cli.Commands.Github.Migrations;
 internal static class MigrationsCommand
 {
     private const string CommandName = "migrations";
-    private const string CommandDescription = "List migrations for a Github user.";
+    private const string CommandDescription = "List GitHub migrations for the authenticated user.";
 
     public static Command Create(string[] args, CommandOptions options)
     {

@@ -30,7 +30,7 @@ internal sealed class MigrateRunner(
 
         var migration = await migrationService.StartMigrationAsync(options, ct);
 
-        output.Status($"Migration started with id {migration.Id}");
+        output.Status($"Started migration {migration.Id}.");
         output.Data($"{migration.Id}");
     }
 }

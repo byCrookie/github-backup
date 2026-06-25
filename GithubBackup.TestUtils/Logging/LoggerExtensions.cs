@@ -16,7 +16,7 @@ public static class LoggerExtensions
             .Where(call => call.GetMethodInfo().Name == nameof(logger.Log))
             .Select(call => new LogEntry(
                 (LogLevel?)call.GetArguments()[0]
-                    ?? throw new Exception("loglevel can not be null"),
+                    ?? throw new Exception("Log level cannot be null."),
                 call.GetArguments()[2]?.ToString()
             ))
             .ToList();

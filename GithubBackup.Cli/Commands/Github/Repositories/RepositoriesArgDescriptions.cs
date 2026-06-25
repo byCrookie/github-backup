@@ -6,8 +6,8 @@ internal static class RepositoriesArgDescriptions
         "Type",
         "Type",
         """
-        Only return repositories of the specified type.
-        Can not be used with visibility or affiliation.
+        Return only repositories of this type.
+        Cannot be used with visibility or affiliation filters.
         """
     );
 
@@ -15,8 +15,8 @@ internal static class RepositoriesArgDescriptions
         "Affiliation",
         "Affiliation",
         """
-        Only return repositories of the specified affiliation.
-        Will be ignored if type is specified.
+        Return only repositories with this affiliation.
+        Ignored when type is specified.
         """
     );
 
@@ -24,8 +24,8 @@ internal static class RepositoriesArgDescriptions
         "Visibility",
         "Visibility",
         """
-        Only return repositories of the specified visibility.
-        Will be ignored if type is specified.
+        Return only repositories with this visibility.
+        Ignored when type is specified.
         """
     );
 }

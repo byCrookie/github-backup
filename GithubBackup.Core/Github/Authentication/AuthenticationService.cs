@@ -100,7 +100,7 @@ internal sealed class AuthenticationService(
             {
                 var delay = intervalWrapper.Interval;
                 logger.LogInformation(
-                    "Authorization pending. Retrying in {Seconds} seconds",
+                    "Waiting for device authorization. Retrying in {Seconds} seconds",
                     delay.TotalSeconds
                 );
                 return ValueTask.FromResult<TimeSpan?>(delay);
@@ -112,7 +112,7 @@ internal sealed class AuthenticationService(
                 );
                 intervalWrapper.Update(newDelay);
                 logger.LogInformation(
-                    "Slow down. Retrying in {Seconds} seconds",
+                    "GitHub requested slower polling. Retrying in {Seconds} seconds",
                     newDelay.TotalSeconds
                 );
                 return ValueTask.FromResult<TimeSpan?>(newDelay);
@@ -128,7 +128,7 @@ internal sealed class AuthenticationService(
             default:
             {
                 throw new Exception(
-                    $"Unknown error: {response.Error} - {response.ErrorDescription} - {response.ErrorUri}"
+                    $"GitHub device authorization failed with an unknown error: {response.Error} - {response.ErrorDescription} - {response.ErrorUri}"
                 );
             }
         }

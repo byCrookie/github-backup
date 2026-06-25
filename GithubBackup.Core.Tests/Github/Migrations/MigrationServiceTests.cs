@@ -200,14 +200,14 @@ public class MigrationServiceTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Polling migration 1"),
-            new LogEntry(LogLevel.Debug, "Getting migration 1"),
+            new LogEntry(LogLevel.Debug, "Fetching migration 1"),
             new LogEntry(LogLevel.Information, $"Migration {id} is Pending"),
-            new LogEntry(LogLevel.Debug, "Getting migration 1"),
+            new LogEntry(LogLevel.Debug, "Fetching migration 1"),
             new LogEntry(LogLevel.Information, $"Migration {id} is Exporting"),
-            new LogEntry(LogLevel.Debug, "Getting migration 1"),
+            new LogEntry(LogLevel.Debug, "Fetching migration 1"),
             new LogEntry(LogLevel.Information, $"Migration {id} is Exported"),
-            new LogEntry(LogLevel.Debug, "Getting migration 1"),
-            new LogEntry(LogLevel.Information, "Downloading migration 1 to (.*)")
+            new LogEntry(LogLevel.Debug, "Fetching migration 1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to temporary file (.*)")
         );
 
         result
@@ -273,8 +273,8 @@ public class MigrationServiceTests
         var result = await _sut.DownloadMigrationAsync(options, CancellationToken.None);
 
         _logger.VerifyLogs(
-            new LogEntry(LogLevel.Debug, "Getting migration 1"),
-            new LogEntry(LogLevel.Information, "Downloading migration 1 to (.*)")
+            new LogEntry(LogLevel.Debug, "Fetching migration 1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to temporary file (.*)")
         );
 
         result
@@ -334,8 +334,8 @@ public class MigrationServiceTests
         await action.Should().ThrowAsync<Exception>();
 
         _logger.VerifyLogs(
-            new LogEntry(LogLevel.Debug, "Getting migration 1"),
-            new LogEntry(LogLevel.Information, "Downloading migration 1 to (.*)")
+            new LogEntry(LogLevel.Debug, "Fetching migration 1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to temporary file (.*)")
         );
     }
 
@@ -397,8 +397,8 @@ public class MigrationServiceTests
         _mockFileSystem.File.Exists(backup3Path).Should().BeTrue();
 
         _logger.VerifyLogs(
-            new LogEntry(LogLevel.Debug, "Getting migration 1"),
-            new LogEntry(LogLevel.Information, "Downloading migration 1 to (.*)"),
+            new LogEntry(LogLevel.Debug, "Fetching migration 1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to temporary file (.*)"),
             new LogEntry(LogLevel.Information, "Overwriting backups"),
             new LogEntry(
                 LogLevel.Information,
@@ -478,20 +478,20 @@ public class MigrationServiceTests
         var result = await _sut.DownloadMigrationAsync(options, CancellationToken.None);
 
         _logger.VerifyLogs(
-            new LogEntry(LogLevel.Debug, "Getting migration 1"),
-            new LogEntry(LogLevel.Information, "Downloading migration 1 to (.*)"),
+            new LogEntry(LogLevel.Debug, "Fetching migration 1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to temporary file (.*)"),
             new LogEntry(LogLevel.Information, "Applying retention rules"),
             new LogEntry(
                 LogLevel.Information,
-                "Deleting backup 20001207000000_migration_1.tar.gz because to many backups are present"
+                "Deleting backup 20001207000000_migration_1.tar.gz because the retention limit was exceeded"
             ),
             new LogEntry(
                 LogLevel.Information,
-                "Deleting backup 20001202000000_migration_1.tar.gz because to many backups are present"
+                "Deleting backup 20001202000000_migration_1.tar.gz because the retention limit was exceeded"
             ),
             new LogEntry(
                 LogLevel.Information,
-                "Deleting backup 20001201000000_migration_3.tar.gz because to many backups are present"
+                "Deleting backup 20001201000000_migration_3.tar.gz because the retention limit was exceeded"
             )
         );
 

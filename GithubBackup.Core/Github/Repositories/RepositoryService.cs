@@ -17,7 +17,7 @@ internal sealed class RepositoryService(
     {
         if (options.Type is not null)
         {
-            logger.LogInformation("Getting repositories of type {Type}", options.Type.Value);
+            logger.LogInformation("Fetching repositories of type {Type}", options.Type.Value);
             return GetRepositoryResponseAsync(
                 rq => rq.SetQueryParam("type", options.Type.Value.GetEnumMemberValue()),
                 ct
@@ -25,7 +25,7 @@ internal sealed class RepositoryService(
         }
 
         logger.LogInformation(
-            "Getting repositories of affiliation {Affiliation} and visibility {Visibility}",
+            "Fetching repositories with affiliation {Affiliation} and visibility {Visibility}",
             options.Affiliation!.Value,
             options.Visibility!.Value
         );

@@ -1,5 +1,5 @@
 ﻿Do you want to continue as test? [y/n] (y): n
 Do you want to login using device flow authentication? [y/n] (y): n
-Please enter your Github token: token1
+Enter your GitHub token: token1
 Do you want to start a migration? [y/n] (n): n
 No migrations found.

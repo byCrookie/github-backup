@@ -25,9 +25,9 @@ internal sealed class DownloadRunner(
 
         if (downloadArgs.Migrations.Length != 0)
         {
-            output.Status("Downloading migrations...");
+            output.Status("Downloading selected migrations...");
 
-            logger.LogInformation("Downloading migrations using ids");
+            logger.LogInformation("Downloading migrations by ID");
             await DownloadUsingIdsAsync(ct);
             return;
         }
@@ -41,9 +41,9 @@ internal sealed class DownloadRunner(
             return;
         }
 
-        output.Status("No migration ids specified, downloading latest migration");
+        output.Status("No migration IDs specified; downloading the latest migration.");
 
-        logger.LogInformation("No migration ids specified, downloading latest migration");
+        logger.LogInformation("No migration IDs specified; downloading the latest migration");
         await DownloadLatestAsync(ct);
     }
 
@@ -53,9 +53,9 @@ internal sealed class DownloadRunner(
 
         if (migrations.All(e => e.State != MigrationState.Exported))
         {
-            logger.LogInformation("No exported migrations found");
+            logger.LogInformation("No downloadable migrations found");
 
-            output.Status("No exported migrations found");
+            output.Status("No downloadable migrations found.");
 
             return;
         }

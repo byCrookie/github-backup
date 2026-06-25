@@ -15,8 +15,7 @@ internal static class BackupCommand
     private const string CommandName = "backup";
 
     private const string CommandDescription = """
-        Backup a Github user. This command will create a new migration
-        for the given repositories and download it when ready.
+        Create a GitHub migration for the selected repositories and download it when ready.
         """;
 
     public static Command Create(string[] args, CommandOptions options)

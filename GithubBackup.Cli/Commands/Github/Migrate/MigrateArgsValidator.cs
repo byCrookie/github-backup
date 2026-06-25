@@ -14,5 +14,5 @@ internal class MigrateArgsValidator : AbstractValidator<MigrateArgs>
     }
 
     public static string OrgMetadataOnlyMustBeUsedAlone =>
-        "Cannot specify repositories when only migrating org metadata only.";
+        "Cannot specify repositories when --org-metadata-only is set.";
 }

@@ -9,7 +9,7 @@ internal static class ManualBackupCommand
 {
     private const string CommandName = "manual";
     private const string CommandDescription =
-        "Manually backup a Github user. This command is interactive.";
+        "Interactively create and download GitHub backups.";
 
     public static Command Create(string[] args, CommandOptions options)
     {

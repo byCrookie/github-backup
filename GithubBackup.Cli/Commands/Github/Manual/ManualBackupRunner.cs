@@ -69,7 +69,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
                 case true:
                     type = _ansiConsole.Prompt(
                         new SelectionPrompt<RepositoryType>()
-                            .Title("What type of repositories do you want to backup?")
+                            .Title("What type of repositories do you want to back up?")
                             .PageSize(20)
                             .AddChoices(Enum.GetValues<RepositoryType>())
                     );
@@ -77,14 +77,14 @@ internal sealed class ManualBackupRunner : ICommandRunner
                 case false:
                     affiliation = _ansiConsole.Prompt(
                         new SelectionPrompt<RepositoryAffiliation>()
-                            .Title("Which affiliation type do you want to backup?")
+                            .Title("Which affiliation type do you want to back up?")
                             .PageSize(20)
                             .AddChoices(Enum.GetValues<RepositoryAffiliation>())
                     );
 
                     visibility = _ansiConsole.Prompt(
                         new SelectionPrompt<RepositoryVisibility>()
-                            .Title("Which visibility type do you want to backup?")
+                            .Title("Which visibility type do you want to back up?")
                             .PageSize(20)
                             .AddChoices(Enum.GetValues<RepositoryVisibility>())
                     );
@@ -104,7 +104,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
             var selectedRepositories = _ansiConsole.Prompt(
                 new MultiSelectionPrompt<Repository>()
                     .Title(
-                        "Select [green]repositories[/] to backup? If none is selected, all repositories will be backed up."
+                        "Select [green]repositories[/] to back up. If none are selected, all repositories will be backed up."
                     )
                     .Required(false)
                     .PageSize(20)
@@ -183,7 +183,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
             )
             {
                 _output.Status(
-                    "No exported migrations found in the last 7 days. If migration is pending or exporting, please fetch again in a few minutes."
+                    "No downloadable migrations found in the last 7 days. If a migration is pending or exporting, fetch again in a few minutes."
                 );
                 continue;
             }
@@ -230,7 +230,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
                     ),
                     ct
                 );
-                _output.Status($"Downloaded migration {migration.Id} ({file})");
+                _output.Status($"Downloaded migration {migration.Id} to {file}");
             }
         } while (
             await _ansiConsole.ConfirmAsync("Fetch migration status again?", cancellationToken: ct)
@@ -291,7 +291,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
             );
         }
 
-        var token = _ansiConsole.Ask<string>("Please enter your Github token:");
+        var token = _ansiConsole.Ask<string>("Enter your GitHub token:");
         return _loginService.LoginAsync(
             new GlobalArgs(_globalArgs.Verbosity, false, _globalArgs.LogFile),
             new LoginArgs(token, false),

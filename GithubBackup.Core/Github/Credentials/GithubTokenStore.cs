@@ -17,7 +17,7 @@ public class GithubTokenStore(ILogger<GithubTokenStore> logger) : IGithubTokenSt
     {
         if (_token is null)
         {
-            throw new InvalidOperationException("Token not set");
+            throw new InvalidOperationException("GitHub token has not been set.");
         }
 
         logger.LogDebug("Getting token");

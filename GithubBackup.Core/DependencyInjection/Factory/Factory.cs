@@ -10,7 +10,7 @@ internal sealed class Factory(IServiceProvider serviceProvider) : IFactory
         if (serviceProvider.GetService(typeof(T)) is not T service)
         {
             throw new ArgumentException(
-                $"Type {typeof(T).FullName} can not be resolved. Try register explicatly."
+                $"Type {typeof(T).FullName} cannot be resolved. Register it explicitly."
             );
         }
 
@@ -24,7 +24,7 @@ internal sealed class Factory(IServiceProvider serviceProvider) : IFactory
         if (service is null)
         {
             throw new ArgumentException(
-                $"Type {type.FullName} can not be resolved. Try register explicatly."
+                $"Type {type.FullName} cannot be resolved. Register it explicitly."
             );
         }
 
@@ -37,7 +37,7 @@ internal sealed class Factory(IServiceProvider serviceProvider) : IFactory
         if (serviceProvider.GetService(type) is not T service)
         {
             throw new ArgumentException(
-                $"Type {typeof(T).FullName} can not be resolved. Try register explicatly."
+                $"Type {typeof(T).FullName} cannot be resolved. Register it explicitly."
             );
         }
 

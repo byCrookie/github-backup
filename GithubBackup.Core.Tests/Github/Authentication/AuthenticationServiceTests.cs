@@ -116,8 +116,8 @@ public class AuthenticationServiceTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Polling for access token"),
-            new LogEntry(LogLevel.Information, "Authorization pending. Retrying in 1 seconds"),
-            new LogEntry(LogLevel.Information, "Slow down. Retrying in 2 seconds")
+            new LogEntry(LogLevel.Information, "Waiting for device authorization. Retrying in 1 seconds"),
+            new LogEntry(LogLevel.Information, "GitHub requested slower polling. Retrying in 2 seconds")
         );
 
         result.Should().BeEquivalentTo(new AccessToken(accessToken, tokenType, scope));

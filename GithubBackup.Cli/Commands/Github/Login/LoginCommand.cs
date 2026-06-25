@@ -11,7 +11,7 @@ internal static class LoginCommand
     private const string CommandName = "login";
 
     private const string CommandDescription = """
-        Login to Github. Tokens are resolved from --token, GITHUB_BACKUP_TOKEN, or GitHub device flow.
+        Authenticate with GitHub. Tokens are resolved from --token, GITHUB_BACKUP_TOKEN, or GitHub device flow.
         Device flow tokens are cached temporarily while valid. {0}
         """;
 
@@ -53,7 +53,7 @@ internal static class LoginCommand
     {
         var homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         return string.IsNullOrWhiteSpace(homeDirectory)
-            ? $"{Environment.NewLine}ERROR: Could not determine home directory. Login command will not work."
+            ? $"{Environment.NewLine}ERROR: Could not determine the application data directory. Temporary token caching is unavailable."
             : string.Empty;
     }
 }

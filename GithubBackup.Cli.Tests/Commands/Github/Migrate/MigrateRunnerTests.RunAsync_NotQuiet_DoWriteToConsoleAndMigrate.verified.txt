@@ -1,2 +1,2 @@
-﻿Migration started with id 1
+﻿Started migration 1.
 1

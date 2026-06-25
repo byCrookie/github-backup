@@ -8,8 +8,8 @@ internal static class DownloadArgDescriptions
         "Migrations",
         "Migrations",
         $"""
-        Id's of the migrations to download.
-        Instead piping can be used to provide the id's. Supported separators: {Piping.Separators}.
+        IDs of migrations to download.
+        You can also pipe migration IDs using these separators: {Piping.Separators}.
         If not specified, the latest migration will be downloaded.
         """
     );
@@ -18,30 +18,30 @@ internal static class DownloadArgDescriptions
         "Latest",
         "Latest",
         """
-        Only download the latest migration.
-        If the migration is not yet completed, it will be skipped.
-        If id's are specified, this flag will be ignored.
+        Download only the latest migration.
+        If the migration is not complete, it will be skipped unless --poll is specified.
+        Ignored when migration IDs are provided.
         """
     );
 
     public static readonly Description Poll = new(
         "Poll",
         "Poll",
-        "Poll the latest migration until it is ready to be downloaded."
+        "Wait until the selected migration is ready, then download it."
     );
 
     public static readonly Description Destination = new(
         "Destination",
         "Destination",
-        "The destination directory to download the migrations to."
+        "Directory where migration archives will be saved."
     );
 
     public static readonly Description NumberOfBackups = new(
         "NumberOfBackups",
         "NumberOfBackups",
         """
-        The number of backups to keep.
-        If not specified, all backups will be kept.
+        Number of backup archives to keep.
+        If not specified, all backups are kept.
         """
     );
 
