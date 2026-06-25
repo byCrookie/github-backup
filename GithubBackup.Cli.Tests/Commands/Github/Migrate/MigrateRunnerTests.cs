@@ -3,6 +3,7 @@ using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Interval;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
@@ -71,7 +72,13 @@ public class MigrateRunnerTests
             migrateArgs,
             _migrationService,
             _loginService,
-            _ansiConsole
+            new CliOutput(
+                globalArgs,
+                new CliOutputOptions(
+                    _ansiConsole.Profile.Out.Writer,
+                    _ansiConsole.Profile.Out.Writer
+                )
+            )
         );
     }
 }

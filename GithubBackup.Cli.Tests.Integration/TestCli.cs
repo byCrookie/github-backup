@@ -2,6 +2,7 @@
 using System.IO.Abstractions.TestingHelpers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using AwesomeAssertions;
 using Flurl.Http.Testing;
 using GithubBackup.Cli.Boot;
@@ -50,8 +51,18 @@ public static class TestCli
         var settings = new VerifySettings();
         settings.AddScrubber(sb => sb.Replace("ReSharperTestRunner", "ghb"));
         settings.AddScrubber(sb => sb.Replace("testhost", "ghb"));
+        settings.AddScrubber(sb =>
+        {
+            var scrubbed = Regex.Replace(
+                sb.ToString(),
+                @"Command finished\. Duration: .*",
+                "Command finished. Duration: <duration>"
+            );
+            sb.Clear();
+            sb.Append(scrubbed);
+        });
 
-        await Verify(testConsole.Output, settings, sourceFile)
+        await Verify(testConsole.Output.TrimEnd(), settings, sourceFile)
             .UseParameters(args)
             .ScrubLinesWithReplace(s =>
                 s.Replace(

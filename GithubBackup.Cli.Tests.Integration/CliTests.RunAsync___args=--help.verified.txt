@@ -5,7 +5,7 @@ Usage:
   ghb [command] [options]
 
 Options:
-  -q, --quiet                                                            Do not print logs to console.
+  -q, --quiet                                                            Suppress non-essential status output.
   -l, --log-file <log-file>                                              Path to the log file.
   -v, --verbosity <Critical|Debug|Error|Information|None|Trace|Warning>  Set the verbosity level of the log file. [default: Information]
   -?, -h, --help                                                         Show help and usage information
@@ -21,4 +21,3 @@ Commands:
   download      Download migrations for a Github user.
   backup        Backup a Github user. This command will create a new migration
                 for the given repositories and download it when ready.
-

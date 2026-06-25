@@ -206,7 +206,8 @@ public class MigrationServiceTests
             new LogEntry(LogLevel.Information, $"Migration {id} is Exporting"),
             new LogEntry(LogLevel.Debug, "Getting migration 1"),
             new LogEntry(LogLevel.Information, $"Migration {id} is Exported"),
-            new LogEntry(LogLevel.Debug, "Getting migration 1")
+            new LogEntry(LogLevel.Debug, "Getting migration 1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to (.*)")
         );
 
         result
@@ -271,7 +272,10 @@ public class MigrationServiceTests
 
         var result = await _sut.DownloadMigrationAsync(options, CancellationToken.None);
 
-        _logger.VerifyLogs(new LogEntry(LogLevel.Debug, "Getting migration 1"));
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Debug, "Getting migration 1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to (.*)")
+        );
 
         result
             .Should()
@@ -329,7 +333,10 @@ public class MigrationServiceTests
 
         await action.Should().ThrowAsync<Exception>();
 
-        _logger.VerifyLogs(new LogEntry(LogLevel.Debug, "Getting migration 1"));
+        _logger.VerifyLogs(
+            new LogEntry(LogLevel.Debug, "Getting migration 1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to (.*)")
+        );
     }
 
     [Fact]
@@ -391,6 +398,7 @@ public class MigrationServiceTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Getting migration 1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to (.*)"),
             new LogEntry(LogLevel.Information, "Overwriting backups"),
             new LogEntry(
                 LogLevel.Information,
@@ -471,6 +479,7 @@ public class MigrationServiceTests
 
         _logger.VerifyLogs(
             new LogEntry(LogLevel.Debug, "Getting migration 1"),
+            new LogEntry(LogLevel.Information, "Downloading migration 1 to (.*)"),
             new LogEntry(LogLevel.Information, "Applying retention rules"),
             new LogEntry(
                 LogLevel.Information,

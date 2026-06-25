@@ -17,7 +17,6 @@ internal static class ServicesModule
             services.AddHostedService(sp =>
                 ActivatorUtilities.CreateInstance<CommandIntervalRunnerService>(
                     sp,
-                    globalArgs,
                     intervalArgs.IntervalArgs.Interval.Value
                 )
             );
@@ -25,7 +24,7 @@ internal static class ServicesModule
         else
         {
             services.AddHostedService(sp =>
-                ActivatorUtilities.CreateInstance<CommandRunnerService>(sp, globalArgs)
+                ActivatorUtilities.CreateInstance<CommandRunnerService>(sp)
             );
         }
     }

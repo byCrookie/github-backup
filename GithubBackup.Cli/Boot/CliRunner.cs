@@ -1,7 +1,9 @@
 ﻿using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Logging;
+using GithubBackup.Cli.Output;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
@@ -23,6 +25,8 @@ internal class CliRunner<TCliCommand, TCommandArgs>(
         var builder = Host.CreateApplicationBuilder(args);
 
         builder.Configuration.AddEnvironmentVariables("GITHUB_BACKUP_");
+
+        builder.Services.AddSingleton(new CliOutputOptions(options.Output, options.Error));
 
         builder.Services.AddCli<TCliCommand, TCommandArgs>(globalArgs, commandArgs);
         options.AfterServices.Invoke(builder);

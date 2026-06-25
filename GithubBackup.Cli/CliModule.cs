@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -30,7 +31,16 @@ internal static class CliModule
         services.AddCore();
         services.AddSerilog();
         services.AddTransient<IFileSystem, FileSystem>();
-        services.AddSingleton<IAnsiConsole>(_ => AnsiConsole.Console);
+        services.AddSingleton(globalArgs);
+        services.AddSingleton<IAnsiConsole>(sp =>
+            AnsiConsole.Create(
+                new AnsiConsoleSettings
+                {
+                    Out = new AnsiConsoleOutput(sp.GetRequiredService<CliOutputOptions>().Error),
+                }
+            )
+        );
+        services.AddSingleton<ICliOutput, CliOutput>();
 
         services.AddCommands<TCliCommand, TCommandArgs>(globalArgs, commandArgs);
     }

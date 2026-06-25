@@ -1,19 +1,17 @@
 using Flurl.Http;
-using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Services;
 
 internal sealed class CommandIntervalRunnerService(
-    GlobalArgs globalArgs,
     TimeSpan interval,
     ILogger<CommandIntervalRunnerService> logger,
     IHostApplicationLifetime hostApplicationLifetime,
     ICommandRunner commandRunner,
-    IAnsiConsole ansiConsole,
+    ICliOutput output,
     IDateTimeProvider dateTimeProvider,
     IStopwatch stopwatch
 ) : IHostedService
@@ -22,10 +20,7 @@ internal sealed class CommandIntervalRunnerService(
     {
         logger.LogInformation("Running command. Interval: {Interval}", interval);
 
-        if (!globalArgs.Quiet)
-        {
-            ansiConsole.WriteLine($"Running command. Interval: {interval}");
-        }
+        output.Status($"Running command. Interval: {interval}");
 
         var periodicTimer = new PeriodicTimer(interval);
 
@@ -48,7 +43,7 @@ internal sealed class CommandIntervalRunnerService(
                     commandRunner.GetType().Name,
                     error
                 );
-                ansiConsole.MarkupLine($"[red]{error}[/]");
+                output.Error(error);
             }
             catch (Exception e)
             {
@@ -58,7 +53,7 @@ internal sealed class CommandIntervalRunnerService(
                     commandRunner.GetType().Name,
                     e.Message
                 );
-                ansiConsole.MarkupLine($"[red]{e.Message}[/]");
+                output.Error(e.Message);
             }
             finally
             {
@@ -68,11 +63,8 @@ internal sealed class CommandIntervalRunnerService(
                 var waitUntil = now.Add(interval);
                 logger.LogInformation("Waiting until {WaitUntil} for next run", waitUntil);
 
-                if (!globalArgs.Quiet)
-                {
-                    ansiConsole.WriteLine($"Command finished. Duration: {stopWatch.Elapsed}");
-                    ansiConsole.WriteLine($"Waiting until {waitUntil} for next run");
-                }
+                output.Status($"Command finished. Duration: {stopWatch.Elapsed}");
+                output.Status($"Waiting until {waitUntil} for next run");
             }
         } while (await WaitForNextTickAsync(periodicTimer, cancellationToken));
 

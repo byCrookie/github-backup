@@ -1,7 +1,7 @@
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Migrations;
-using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Migrate;
 
@@ -10,7 +10,7 @@ internal sealed class MigrateRunner(
     MigrateArgs migrateArgs,
     IMigrationService migrationService,
     ILoginService loginService,
-    IAnsiConsole ansiConsole
+    ICliOutput output
 ) : ICommandRunner
 {
     public async Task RunAsync(CancellationToken ct)
@@ -30,8 +30,7 @@ internal sealed class MigrateRunner(
 
         var migration = await migrationService.StartMigrationAsync(options, ct);
 
-        ansiConsole.WriteLine(
-            !globalArgs.Quiet ? $"Migration started with id {migration.Id}" : $"{migration.Id}"
-        );
+        output.Status($"Migration started with id {migration.Id}");
+        output.Data($"{migration.Id}");
     }
 }

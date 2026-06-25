@@ -1,8 +1,8 @@
 using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Migrations;
-using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Backup;
 
@@ -12,7 +12,7 @@ internal sealed class BackupRunner(
     IMigrationService migrationService,
     ILoginService loginService,
     IFileSystem fileSystem,
-    IAnsiConsole ansiConsole
+    ICliOutput output
 ) : ICommandRunner
 {
     public async Task RunAsync(CancellationToken ct)
@@ -32,12 +32,9 @@ internal sealed class BackupRunner(
 
         var migration = await migrationService.StartMigrationAsync(options, ct);
 
-        if (!globalArgs.Quiet)
-        {
-            ansiConsole.WriteLine(
-                $"Downloading migration {migration.Id} to {backupArgs.DownloadArgs.Destination} when ready..."
-            );
-        }
+        output.Status(
+            $"Downloading migration {migration.Id} to {backupArgs.DownloadArgs.Destination} when ready..."
+        );
 
         var downloadOptions = new DownloadMigrationOptions(
             migration.Id,
@@ -50,18 +47,14 @@ internal sealed class BackupRunner(
             downloadOptions,
             update =>
             {
-                if (!globalArgs.Quiet)
-                {
-                    ansiConsole.WriteLine($"Migration {update.Id} is {update.State}...");
-                }
+                output.Status($"Migration {update.Id} is {update.State}...");
 
                 return Task.CompletedTask;
             },
             ct
         );
 
-        ansiConsole.WriteLine(
-            !globalArgs.Quiet ? $"Downloaded migration {migration.Id} ({file})" : file
-        );
+        output.Status($"Downloaded migration {migration.Id} ({file})");
+        output.Data(file);
     }
 }

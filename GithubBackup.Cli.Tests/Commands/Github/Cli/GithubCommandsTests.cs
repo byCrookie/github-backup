@@ -16,7 +16,13 @@ public class GithubCommandsTests
         GithubCommands.AddCommands(
             args,
             rootCommand,
-            new CommandOptions { AfterServices = _ => { }, GlobalArguments = globalArguments }
+            new CommandOptions
+            {
+                Output = TextWriter.Null,
+                Error = TextWriter.Null,
+                AfterServices = _ => { },
+                GlobalArguments = globalArguments,
+            }
         );
         rootCommand.Subcommands.Should().HaveCount(7);
     }

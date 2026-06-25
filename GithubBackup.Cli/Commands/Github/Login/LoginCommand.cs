@@ -34,7 +34,12 @@ internal static class LoginCommand
                     args,
                     globalArgs,
                     loginArgs,
-                    new RunOptions { AfterServices = options.AfterServices }
+                    new RunOptions
+                    {
+                        Output = options.Output,
+                        Error = options.Error,
+                        AfterServices = options.AfterServices,
+                    }
                 );
 
                 return runner.RunAsync(ct);

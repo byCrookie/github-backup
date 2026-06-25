@@ -3,6 +3,7 @@ using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrate;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
@@ -18,6 +19,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
     private readonly IRepositoryService _repositoryService;
     private readonly IFileSystem _fileSystem;
     private readonly IAnsiConsole _ansiConsole;
+    private readonly ICliOutput _output;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILoginService _loginService;
 
@@ -32,6 +34,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
         IRepositoryService repositoryService,
         IFileSystem fileSystem,
         IAnsiConsole ansiConsole,
+        ICliOutput output,
         IDateTimeProvider dateTimeProvider,
         ILoginService loginService
     )
@@ -41,6 +44,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
         _repositoryService = repositoryService;
         _fileSystem = fileSystem;
         _ansiConsole = ansiConsole;
+        _output = output;
         _dateTimeProvider = dateTimeProvider;
         _loginService = loginService;
     }
@@ -93,7 +97,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
 
             if (repositories.Count == 0)
             {
-                _ansiConsole.WriteLine("No repositories found.");
+                _output.Status("No repositories found.");
                 return;
             }
 
@@ -155,14 +159,18 @@ internal sealed class ManualBackupRunner : ICommandRunner
 
             if (migrations.Count == 0)
             {
-                _ansiConsole.WriteLine("No migrations found.");
+                _output.Status("No migrations found.");
                 return;
             }
 
-            _ansiConsole.WriteLine($"Found {migrations.Count} migrations:");
-            foreach (var migration in migrations.OrderByDescending(m => m.CreatedAt).Where(m => m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
+            _output.Status($"Found {migrations.Count} migrations:");
+            foreach (
+                var migration in migrations
+                    .OrderByDescending(m => m.CreatedAt)
+                    .Where(m => m.CreatedAt > _dateTimeProvider.Now.AddDays(-7))
+            )
             {
-                _ansiConsole.WriteLine(
+                _output.Status(
                     $"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)"
                 );
             }
@@ -174,7 +182,9 @@ internal sealed class ManualBackupRunner : ICommandRunner
                 )
             )
             {
-                _ansiConsole.WriteLine("No exported migrations found in the last 7 days. If migration is pending or exporting, please fetch again in a few minutes.");
+                _output.Status(
+                    "No exported migrations found in the last 7 days. If migration is pending or exporting, please fetch again in a few minutes."
+                );
                 continue;
             }
 
@@ -212,7 +222,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
 
             foreach (var migration in selectedMigrations)
             {
-                _ansiConsole.WriteLine($"Downloading migration {migration.Id} to {destination}...");
+                _output.Status($"Downloading migration {migration.Id} to {destination}...");
                 var file = await _migrationService.DownloadMigrationAsync(
                     new DownloadMigrationOptions(
                         migration.Id,
@@ -220,7 +230,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
                     ),
                     ct
                 );
-                _ansiConsole.WriteLine($"Downloaded migration {migration.Id} ({file})");
+                _output.Status($"Downloaded migration {migration.Id} ({file})");
             }
         } while (
             await _ansiConsole.ConfirmAsync("Fetch migration status again?", cancellationToken: ct)

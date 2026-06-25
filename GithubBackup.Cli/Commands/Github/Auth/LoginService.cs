@@ -1,18 +1,18 @@
 ﻿using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Users;
 using GithubBackup.Core.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Auth;
 
 internal sealed class LoginService(
     ILogger<LoginService> logger,
-    IAnsiConsole ansiConsole,
+    ICliOutput output,
     IConfiguration configuration,
     IGithubTokenStore githubTokenStore,
     IUserService userService,
@@ -29,9 +29,9 @@ internal sealed class LoginService(
     {
         var user = await LoginWithTemporaryTokenAsync(args, ct);
 
-        if (!globalArgs.Quiet && user is not null)
+        if (user is not null)
         {
-            ansiConsole.WriteLine($"Logged in as {user.Name}");
+            output.Status($"Logged in as {user.Name}");
             logger.LogInformation("Logged in as {Username}", user.Name);
         }
 
@@ -51,11 +51,8 @@ internal sealed class LoginService(
             throw new Exception("Login failed");
         }
 
-        if (!globalArgs.Quiet)
-        {
-            ansiConsole.WriteLine($"Logged in as {user.Name}");
-            logger.LogInformation("Logged in as {Username}", user.Name);
-        }
+        output.Status($"Logged in as {user.Name}");
+        logger.LogInformation("Logged in as {Username}", user.Name);
 
         return user;
     }
@@ -155,18 +152,16 @@ internal sealed class LoginService(
 
         if (!globalArgs.Quiet)
         {
-            ansiConsole.WriteLine(
+            output.Status(
                 $"Go to {deviceAndUserCodes.VerificationUri}{Environment.NewLine}and enter {deviceAndUserCodes.UserCode}"
             );
-            ansiConsole.WriteLine(
+            output.Status(
                 $"You have {deviceAndUserCodes.ExpiresIn} seconds to authenticate before the code expires."
             );
         }
         else
         {
-            ansiConsole.WriteLine(
-                $"{deviceAndUserCodes.VerificationUri} - {deviceAndUserCodes.UserCode}"
-            );
+            output.Error($"{deviceAndUserCodes.VerificationUri} - {deviceAndUserCodes.UserCode}");
         }
 
         return await authenticationService.PollForAccessTokenAsync(

@@ -5,7 +5,7 @@ internal static class GlobalArgDescriptions
     public static readonly Description Quiet = new(
         "Quiet",
         "Quiet",
-        "Do not print logs to console."
+        "Suppress non-essential status output."
     );
     public static readonly Description LogFile = new(
         "LogFile",

@@ -1,9 +1,8 @@
 ﻿Do you want to continue as test? [y/n] (y): y
 Do you want to start a migration? [y/n] (n): n
 Found 3 migrations:
-- 1 Exported 01.01.2020 00:00:00 (10d)
-- 2 Exported 06.01.2020 00:00:00 (5d)
 - 3 Exported 10.01.2020 00:00:00 (1d)
+- 2 Exported 06.01.2020 00:00:00 (5d)
 Select migrations to download?                          
                                                         
 > [ ] 2 Exported 06.01.2020 00:00:00 (5d)               

@@ -1,18 +1,16 @@
 using Flurl.Http;
-using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Utils;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Services;
 
 internal sealed class CommandRunnerService(
-    GlobalArgs globalArgs,
     ILogger<CommandRunnerService> logger,
     IHostApplicationLifetime hostApplicationLifetime,
     ICommandRunner commandRunner,
-    IAnsiConsole ansiConsole,
+    ICliOutput output,
     IStopwatch stopwatch
 ) : IHostedService
 {
@@ -20,10 +18,7 @@ internal sealed class CommandRunnerService(
     {
         logger.LogInformation("Running command");
 
-        if (!globalArgs.Quiet)
-        {
-            ansiConsole.WriteLine("Running command");
-        }
+        output.Status("Running command");
 
         var stopWatch = stopwatch.StartNew();
 
@@ -58,10 +53,7 @@ internal sealed class CommandRunnerService(
             stopWatch.Stop();
             logger.LogInformation("Command finished. Duration: {Duration}", stopWatch.Elapsed);
 
-            if (!globalArgs.Quiet)
-            {
-                ansiConsole.WriteLine($"Command finished. Duration: {stopWatch.Elapsed}");
-            }
+            output.Status($"Command finished. Duration: {stopWatch.Elapsed}");
 
             hostApplicationLifetime.StopApplication();
         }

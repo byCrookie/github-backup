@@ -33,7 +33,12 @@ internal static class MigrationsCommand
                     args,
                     globalArgs,
                     migrationsArgs,
-                    new RunOptions { AfterServices = options.AfterServices }
+                    new RunOptions
+                    {
+                        Output = options.Output,
+                        Error = options.Error,
+                        AfterServices = options.AfterServices,
+                    }
                 );
 
                 return runner.RunAsync(ct);

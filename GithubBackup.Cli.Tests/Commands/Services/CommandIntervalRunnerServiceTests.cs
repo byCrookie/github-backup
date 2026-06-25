@@ -7,6 +7,7 @@ using Flurl.Http;
 using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Services;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Environment;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
@@ -44,13 +45,18 @@ public class CommandIntervalRunnerServiceTests
 
         dateTimeProvider.Now.Returns(new DateTime(1, 1, 1, 12, 0, 0));
 
+        var globalArgs = new GlobalArgs(LogLevel.Debug, false, new FileInfo("test"));
+        var output = new CliOutput(
+            globalArgs,
+            new CliOutputOptions(_ansiConsole.Profile.Out.Writer, _ansiConsole.Profile.Out.Writer)
+        );
+
         _sut = new CommandIntervalRunnerService(
-            new GlobalArgs(LogLevel.Debug, false, new FileInfo("test")),
             TimeSpan.FromSeconds(2),
             _logger,
             _hostApplicationLifeTime,
             _commandRunner,
-            _ansiConsole,
+            output,
             dateTimeProvider,
             stopwatch
         );

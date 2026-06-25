@@ -5,6 +5,7 @@ using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Manual;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.Core.Github.Users;
@@ -199,6 +200,9 @@ public class ManualRunnerTests
             .Returns(user);
 
         _ansiConsole.Input.PushCharacter('y');
+        _ansiConsole.Input.PushKey(ConsoleKey.Enter);
+
+        _ansiConsole.Input.PushCharacter('n');
         _ansiConsole.Input.PushKey(ConsoleKey.Enter);
 
         _ansiConsole.Input.PushCharacter('n');
@@ -452,14 +456,22 @@ public class ManualRunnerTests
     private ManualBackupRunner CreateRunner()
     {
         var manualBackupArgs = new ManualBackupArgs();
+        var globalArgs = new GlobalArgs(LogLevel.Debug, false, new FileInfo("test"));
 
         return new ManualBackupRunner(
-            new GlobalArgs(LogLevel.Debug, false, new FileInfo("test")),
+            globalArgs,
             manualBackupArgs,
             _migrationService,
             _repositoryService,
             _fileSystem,
             _ansiConsole,
+            new CliOutput(
+                globalArgs,
+                new CliOutputOptions(
+                    _ansiConsole.Profile.Out.Writer,
+                    _ansiConsole.Profile.Out.Writer
+                )
+            ),
             _dateTimeProvider,
             _loginService
         );

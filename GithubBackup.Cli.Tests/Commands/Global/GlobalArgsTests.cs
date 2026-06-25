@@ -58,7 +58,7 @@ public class GlobalArgsTests
             var globalArgs = new GlobalArgsBinder(_globalArguments).Get(p);
             globalArgs.Should().NotBeNull();
             globalArgs.LogFile.Should().BeNull();
-            globalArgs.Quiet.Should().BeTrue();
+            globalArgs.Quiet.Should().BeFalse();
             globalArgs.Verbosity.Should().Be(LogLevel.Information);
         });
 

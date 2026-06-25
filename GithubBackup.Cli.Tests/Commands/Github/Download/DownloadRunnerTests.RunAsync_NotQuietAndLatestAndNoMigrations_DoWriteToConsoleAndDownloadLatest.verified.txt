@@ -1,3 +1,4 @@
 ﻿No migration ids specified, downloading latest migration
 Downloading migration 1 to test...
 Downloaded migration 1 to test
+test

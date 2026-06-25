@@ -1,8 +1,8 @@
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Utils;
-using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Migrations;
 
@@ -11,7 +11,7 @@ internal sealed class MigrationsRunner(
     MigrationsArgs migrationsArgs,
     IMigrationService migrationService,
     ILoginService loginService,
-    IAnsiConsole ansiConsole,
+    ICliOutput output,
     IDateTimeProvider dateTimeProvider
 ) : ICommandRunner
 {
@@ -23,10 +23,7 @@ internal sealed class MigrationsRunner(
 
         if (migrations.Count == 0)
         {
-            if (!globalArgs.Quiet)
-            {
-                ansiConsole.WriteLine("No migrations found.");
-            }
+            output.Status("No migrations found.");
 
             return;
         }
@@ -48,25 +45,19 @@ internal sealed class MigrationsRunner(
 
         if (filteredMigrations.Count == 0)
         {
-            if (!globalArgs.Quiet)
-            {
-                ansiConsole.WriteLine("No migrations found after filters were applied.");
-            }
+            output.Status("No migrations found after filters were applied.");
 
             return;
         }
 
-        if (!globalArgs.Quiet)
+        output.Status($"Found {filteredMigrations.Count} migrations:");
+        foreach (var migration in filteredMigrations)
         {
-            ansiConsole.WriteLine($"Found {filteredMigrations.Count} migrations:");
-            foreach (var migration in filteredMigrations)
-            {
-                ansiConsole.WriteLine(
-                    $"- {migration.Id} {migration.State} {migration.CreatedAt} ({(dateTimeProvider.Now - migration.CreatedAt).Days}d)"
-                );
-            }
+            output.Status(
+                $"- {migration.Id} {migration.State} {migration.CreatedAt} ({(dateTimeProvider.Now - migration.CreatedAt).Days}d)"
+            );
         }
 
-        ansiConsole.WriteLine(string.Join(" ", filteredMigrations.Select(m => m.Id)));
+        output.Data(string.Join(" ", filteredMigrations.Select(m => m.Id)));
     }
 }

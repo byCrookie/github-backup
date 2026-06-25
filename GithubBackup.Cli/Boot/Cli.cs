@@ -22,6 +22,8 @@ internal static class Cli
             new CommandOptions
             {
                 GlobalArguments = globalArguments,
+                Output = cliOptions.Output,
+                Error = cliOptions.Error,
                 AfterServices = cliOptions.AfterServices,
             }
         );

@@ -3,6 +3,7 @@ using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Migrations;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
@@ -264,7 +265,13 @@ public class MigrationsRunnerTests
             migrateArgs,
             _migrationService,
             _loginService,
-            _ansiConsole,
+            new CliOutput(
+                globalArgs,
+                new CliOutputOptions(
+                    _ansiConsole.Profile.Out.Writer,
+                    _ansiConsole.Profile.Out.Writer
+                )
+            ),
             _dateTimeProvider
         );
     }

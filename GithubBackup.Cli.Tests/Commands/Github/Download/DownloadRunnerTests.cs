@@ -5,6 +5,7 @@ using GithubBackup.Cli.Commands.Github.Download;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Interval;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Migrations;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
@@ -372,6 +373,13 @@ public class DownloadRunnerTests
             _loginService,
             _fileSystem,
             _logger,
+            new CliOutput(
+                globalArgs,
+                new CliOutputOptions(
+                    _ansiConsole.Profile.Out.Writer,
+                    _ansiConsole.Profile.Out.Writer
+                )
+            ),
             _ansiConsole
         );
     }

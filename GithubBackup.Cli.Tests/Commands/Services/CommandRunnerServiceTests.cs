@@ -6,6 +6,7 @@ using Flurl.Http;
 using GithubBackup.Cli.Commands;
 using GithubBackup.Cli.Commands.Global;
 using GithubBackup.Cli.Commands.Services;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Utils;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Hosting;
@@ -35,12 +36,17 @@ public class CommandRunnerServiceTests
         var fakeStopWatch = new Stopwatch();
         stopwatch.StartNew().Returns(fakeStopWatch);
 
+        var globalArgs = new GlobalArgs(LogLevel.Debug, false, new FileInfo("test"));
+        var output = new CliOutput(
+            globalArgs,
+            new CliOutputOptions(_ansiConsole.Profile.Out.Writer, _ansiConsole.Profile.Out.Writer)
+        );
+
         _sut = new CommandRunnerService(
-            new GlobalArgs(LogLevel.Debug, false, new FileInfo("test")),
             _logger,
             _hostApplicationLifeTime,
             _commandRunner,
-            _ansiConsole,
+            output,
             stopwatch
         );
     }

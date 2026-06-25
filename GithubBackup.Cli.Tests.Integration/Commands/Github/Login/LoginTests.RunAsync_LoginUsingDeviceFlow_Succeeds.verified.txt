@@ -1,1 +1,6 @@
-﻿emptyString
+﻿Running command
+Go to https://github.com/login/device
+and enter USER-CODE
+You have 900 seconds to authenticate before the code expires.
+Logged in as user
+Command finished. Duration: <duration>

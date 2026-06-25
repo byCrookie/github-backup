@@ -9,7 +9,7 @@ public class GlobalArguments
         new(name: "--quiet", aliases: ["-q"])
         {
             Description = GlobalArgDescriptions.Quiet.Long,
-            DefaultValueFactory = _ => true,
+            DefaultValueFactory = _ => false,
             Recursive = true,
         };
 

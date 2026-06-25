@@ -2,6 +2,7 @@ using AwesomeAssertions;
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Authentication;
 using GithubBackup.Core.Github.Credentials;
 using GithubBackup.Core.Github.Users;
@@ -9,7 +10,6 @@ using GithubBackup.Core.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using Spectre.Console.Testing;
 
 namespace GithubBackup.Cli.Tests.Commands.Github.Auth;
 
@@ -21,7 +21,7 @@ public class LoginServiceTests
     private readonly IAuthenticationService _authenticationService;
     private readonly ITemporaryCredentialStore _temporaryCredentialStore;
     private readonly IDateTimeOffsetProvider _dateTimeOffsetProvider;
-    private readonly TestConsole _ansiConsole;
+    private readonly ICliOutput _output;
 
     private static readonly GlobalArgs GlobalArgs = new(
         LogLevel.Debug,
@@ -36,7 +36,7 @@ public class LoginServiceTests
         _authenticationService = Substitute.For<IAuthenticationService>();
         _temporaryCredentialStore = Substitute.For<ITemporaryCredentialStore>();
         _dateTimeOffsetProvider = Substitute.For<IDateTimeOffsetProvider>();
-        _ansiConsole = new TestConsole();
+        _output = Substitute.For<ICliOutput>();
 
         _dateTimeOffsetProvider.UtcNow.Returns(
             new DateTimeOffset(2026, 1, 1, 0, 0, 0, TimeSpan.Zero)
@@ -44,7 +44,7 @@ public class LoginServiceTests
 
         _sut = new LoginService(
             Substitute.For<ILogger<LoginService>>(),
-            _ansiConsole,
+            _output,
             CreateConfiguration(null),
             _githubTokenStore,
             _userService,
@@ -186,7 +186,7 @@ public class LoginServiceTests
     {
         return new LoginService(
             Substitute.For<ILogger<LoginService>>(),
-            _ansiConsole,
+            _output,
             CreateConfiguration(token),
             _githubTokenStore,
             _userService,

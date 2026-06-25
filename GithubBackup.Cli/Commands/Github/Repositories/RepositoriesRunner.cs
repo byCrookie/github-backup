@@ -1,7 +1,7 @@
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Repositories;
-using Spectre.Console;
 
 namespace GithubBackup.Cli.Commands.Github.Repositories;
 
@@ -10,7 +10,7 @@ internal sealed class RepositoriesRunner(
     RepositoriesArgs repositoriesArgs,
     IRepositoryService repositoryService,
     ILoginService loginService,
-    IAnsiConsole ansiConsole
+    ICliOutput output
 ) : ICommandRunner
 {
     public async Task RunAsync(CancellationToken ct)
@@ -27,23 +27,17 @@ internal sealed class RepositoriesRunner(
 
         if (repositories.Count == 0)
         {
-            if (!globalArgs.Quiet)
-            {
-                ansiConsole.WriteLine("No migrations found.");
-            }
+            output.Status("No repositories found.");
 
             return;
         }
 
-        if (!globalArgs.Quiet)
+        output.Status($"Found {repositories.Count} repositories:");
+        foreach (var repository in repositories)
         {
-            ansiConsole.WriteLine($"Found {repositories.Count} repositories:");
-            foreach (var repository in repositories)
-            {
-                ansiConsole.WriteLine($"- {repository.FullName}");
-            }
+            output.Status($"- {repository.FullName}");
         }
 
-        ansiConsole.WriteLine(string.Join(" ", repositories.Select(r => r.FullName)));
+        output.Data(string.Join(" ", repositories.Select(r => r.FullName)));
     }
 }

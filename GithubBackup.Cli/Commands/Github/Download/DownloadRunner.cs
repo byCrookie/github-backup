@@ -1,6 +1,7 @@
 using System.IO.Abstractions;
 using GithubBackup.Cli.Commands.Github.Auth;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Migrations;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
@@ -14,6 +15,7 @@ internal sealed class DownloadRunner(
     ILoginService loginService,
     IFileSystem fileSystem,
     ILogger<DownloadRunner> logger,
+    ICliOutput output,
     IAnsiConsole ansiConsole
 ) : ICommandRunner
 {
@@ -23,10 +25,7 @@ internal sealed class DownloadRunner(
 
         if (downloadArgs.Migrations.Length != 0)
         {
-            if (!globalArgs.Quiet)
-            {
-                ansiConsole.WriteLine("Downloading migrations...");
-            }
+            output.Status("Downloading migrations...");
 
             logger.LogInformation("Downloading migrations using ids");
             await DownloadUsingIdsAsync(ct);
@@ -35,20 +34,14 @@ internal sealed class DownloadRunner(
 
         if (downloadArgs.Latest)
         {
-            if (!globalArgs.Quiet)
-            {
-                ansiConsole.WriteLine("Downloading latest migration");
-            }
+            output.Status("Downloading latest migration");
 
             logger.LogInformation("Downloading latest migration");
             await DownloadLatestAsync(ct);
             return;
         }
 
-        if (!globalArgs.Quiet)
-        {
-            ansiConsole.WriteLine("No migration ids specified, downloading latest migration");
-        }
+        output.Status("No migration ids specified, downloading latest migration");
 
         logger.LogInformation("No migration ids specified, downloading latest migration");
         await DownloadLatestAsync(ct);
@@ -62,10 +55,7 @@ internal sealed class DownloadRunner(
         {
             logger.LogInformation("No exported migrations found");
 
-            if (!globalArgs.Quiet)
-            {
-                ansiConsole.WriteLine("No exported migrations found");
-            }
+            output.Status("No exported migrations found");
 
             return;
         }
@@ -101,7 +91,7 @@ internal sealed class DownloadRunner(
 
         if (!globalArgs.Quiet)
         {
-            ansiConsole.WriteLine($"Downloading migration {id} to {downloadArgs.Destination}...");
+            output.Status($"Downloading migration {id} to {downloadArgs.Destination}...");
             var progress = ansiConsole.Progress();
             progress.RefreshRate = TimeSpan.FromSeconds(5);
             await progress.StartAsync(_ => DownloadMigrationAsync(id, ct));
@@ -122,7 +112,8 @@ internal sealed class DownloadRunner(
 
         var path = await DownloadAsync(options, ct);
         logger.LogInformation("Downloaded migration {Id} to {Path}", id, path);
-        ansiConsole.WriteLine(!globalArgs.Quiet ? $"Downloaded migration {id} to {path}" : path);
+        output.Status($"Downloaded migration {id} to {path}");
+        output.Data(path);
     }
 
     private Task<string> DownloadAsync(DownloadMigrationOptions options, CancellationToken ct)
@@ -134,10 +125,7 @@ internal sealed class DownloadRunner(
                 options,
                 update =>
                 {
-                    if (!globalArgs.Quiet)
-                    {
-                        ansiConsole.WriteLine($"Migration {update.Id} is {update.State}...");
-                    }
+                    output.Status($"Migration {update.Id} is {update.State}...");
 
                     return Task.CompletedTask;
                 },

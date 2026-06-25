@@ -2,6 +2,7 @@
 using GithubBackup.Cli.Commands.Github.Login;
 using GithubBackup.Cli.Commands.Github.Repositories;
 using GithubBackup.Cli.Commands.Global;
+using GithubBackup.Cli.Output;
 using GithubBackup.Core.Github.Repositories;
 using GithubBackup.TestUtils.Logging;
 using Microsoft.Extensions.Logging;
@@ -100,7 +101,13 @@ public class RepositoriesRunnerTests
             migrateArgs,
             _repositoryService,
             _loginService,
-            _ansiConsole
+            new CliOutput(
+                globalArgs,
+                new CliOutputOptions(
+                    _ansiConsole.Profile.Out.Writer,
+                    _ansiConsole.Profile.Out.Writer
+                )
+            )
         );
     }
 }
