@@ -92,7 +92,7 @@ internal class GithubApiClient(
             .Value.Request(url)
             .WithOAuthBearerToken(await githubTokenStore.GetAsync());
         configure?.Invoke(request);
-        logger.LogDebug("Downloading {Url}", request.Url);
+        logger.LogDebug("Downloading {Url} to {Path}", request.Url, path);
         var file = await request.DownloadFileAsync(
             path,
             fileName,

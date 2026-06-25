@@ -49,11 +49,12 @@ internal sealed class ManualBackupRunner : ICommandRunner
     {
         await LoginAsync(ct);
 
-        if (_ansiConsole.Confirm("Do you want to start a migration?", false))
+        if (await _ansiConsole.ConfirmAsync("Do you want to start a migration?", false, ct))
         {
-            var byType = _ansiConsole.Confirm(
+            var byType = await _ansiConsole.ConfirmAsync(
                 "Do you want to select repositories by type? If selected, no affiliation or visibility can be selected.",
-                false
+                false,
+                ct
             );
             var type = (RepositoryType?)null;
             var affiliation = (RepositoryAffiliation?)RepositoryAffiliation.Owner;
@@ -159,7 +160,7 @@ internal sealed class ManualBackupRunner : ICommandRunner
             }
 
             _ansiConsole.WriteLine($"Found {migrations.Count} migrations:");
-            foreach (var migration in migrations)
+            foreach (var migration in migrations.OrderByDescending(m => m.CreatedAt).Where(m => m.CreatedAt > _dateTimeProvider.Now.AddDays(-7)))
             {
                 _ansiConsole.WriteLine(
                     $"- {migration.Id} {migration.State} {migration.CreatedAt} ({(_dateTimeProvider.Now - migration.CreatedAt).Days}d)"
@@ -173,8 +174,8 @@ internal sealed class ManualBackupRunner : ICommandRunner
                 )
             )
             {
-                _ansiConsole.WriteLine("No exported migrations found in the last 7 days.");
-                return;
+                _ansiConsole.WriteLine("No exported migrations found in the last 7 days. If migration is pending or exporting, please fetch again in a few minutes.");
+                continue;
             }
 
             var selectedMigrations = _ansiConsole.Prompt(
@@ -221,11 +222,13 @@ internal sealed class ManualBackupRunner : ICommandRunner
                 );
                 _ansiConsole.WriteLine($"Downloaded migration {migration.Id} ({file})");
             }
-        } while (_ansiConsole.Confirm("Fetch migration status again?"));
+        } while (
+            await _ansiConsole.ConfirmAsync("Fetch migration status again?", cancellationToken: ct)
+        );
     }
 
     private static string[] GetRepositoryNames(
-        IReadOnlyCollection<Repository> selectedRepositories,
+        List<Repository> selectedRepositories,
         IEnumerable<Repository> repositories
     )
     {
@@ -246,7 +249,10 @@ internal sealed class ManualBackupRunner : ICommandRunner
 
             if (
                 user is not null
-                && _ansiConsole.Confirm($"Do you want to continue as {user.Name}?")
+                && await _ansiConsole.ConfirmAsync(
+                    $"Do you want to continue as {user.Name}?",
+                    cancellationToken: ct
+                )
             )
             {
                 return;

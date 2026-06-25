@@ -21,7 +21,7 @@ internal sealed class DownloadRunner(
     {
         await loginService.LoginAsync(globalArgs, downloadArgs.LoginArgs, ct);
 
-        if (downloadArgs.Migrations.Any())
+        if (downloadArgs.Migrations.Length != 0)
         {
             if (!globalArgs.Quiet)
             {

@@ -133,6 +133,8 @@ internal sealed partial class MigrationService(
         );
         var tempDirectoryName = fileSystem.Path.GetDirectoryName(tempFile)!;
         var tempFileName = fileSystem.Path.GetFileName(tempFile);
+        
+        logger.LogInformation("Downloading migration {Id} to {TempFile}", options.Id, tempFile);
 
         await githubApiClient.DownloadFileAsync(
             $"/user/migrations/{options.Id}/archive",

@@ -28,7 +28,7 @@
     },
     "GithubBackup.Cli Migrations": {
       "commandName": "Project",
-      "commandLineArgs": "migrations",
+      "commandLineArgs": "migrations -d 7 --quiet false",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Repositories Help": {
@@ -58,7 +58,7 @@
     },
     "GithubBackup.Cli Download": {
       "commandName": "Project",
-      "commandLineArgs": "download --destination C:/Users/byCrookie/private/tmp --migrations 4019118 4019095",
+      "commandLineArgs": "download --destination C:/Users/byCrookie/private/tmp --quiet false",
       "environmentVariables": {}
     },
     "GithubBackup.Cli Manual Backup": {
